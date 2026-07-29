@@ -48,11 +48,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 ---
 
 <header
+  style="backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);"
   class:list={[
     { sticky: isSticky, relative: !isSticky, dark: isDark },
     'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out',
-    // ===== 磨砂玻璃效果（增强版） =====
-    'bg-white/30 dark:bg-gray-900/50 backdrop-blur-2xl backdrop-saturate-200 shadow-lg shadow-black/5 border-b border-white/20 dark:border-gray-700/30',
+    'bg-white/30 dark:bg-gray-900/50 shadow-lg shadow-black/5 border-b border-white/20 dark:border-gray-700/30',
   ]}
   {...isSticky ? { 'data-aw-sticky-header': true } : {}}
   {...id ? { id } : {}}
