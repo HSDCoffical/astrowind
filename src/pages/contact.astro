@@ -5,73 +5,73 @@ import ContactUs from '~/components/widgets/Contact.astro';
 import Features2 from '~/components/widgets/Features2.astro';
 
 const metadata = {
-  title: 'Contact',
+  title: '联系界面',
 };
 ---
 
 <Layout metadata={metadata}>
   <!-- HeroText Widget ******************* -->
 
-  <HeroText tagline="Contact" title="Let's Connect!" />
+  <HeroText tagline="Contact" title="欢迎！" />
 
   <ContactUs
     id="form"
-    title="Drop us a message today!"
-    subtitle="For quicker answers, explore our FAQs section. You may find the solution you're looking  for right there! If not, our support team is delighted to help you."
+    title="发送邮件"
+    subtitle="通过此界面向中心发送邮件，但是并不确定100%能收到，所以建议您尽量在自己的邮箱里发送"
     inputs={[
       {
         type: 'text',
-        name: 'name',
-        label: 'Name',
+        name: '主题',
+        label: '主题',
       },
       {
-        type: 'email',
-        name: 'email',
-        label: 'Email',
+        type: 'eamil',
+        name: '邮件地址',
+        label: '邮件地址',
       },
     ]}
     textarea={{
-      label: 'Message',
+      label: '正文',
     }}
     disclaimer={{
       label:
-        'By submitting this contact form, you acknowledge and agree to the collection of your personal information.',
+        '提交后我们将从你填写的邮件地址发送回执，如确认无误，请确定',
     }}
-    description="Our support team typically responds within 24 business hours."
+    description="我们将会在一周内回复您，感谢您的来信"
   />
 
   <!-- Features2 Widget ************** -->
 
   <Features2
-    title="We are here to help!"
+    title="提供"
     items={[
       {
-        title: 'General support',
-        description: `Chat with us for inquiries related to account management, website navigation, payment issues, accessing purchased templates or general questions about the website's functionality.`,
+        title: '我的信息会被泄露吗？',
+        description: `不会，全程只有一人操作，不必担心信息泄露`,
       },
       {
-        title: 'Contact sales',
+        title: '这个地址会被存储或订阅吗？',
         description:
-          'Chat with us for questions about purchases, customization options, licensing for commercial use, inquiries about specific template, etc.',
+          '不会，电子邮箱地址完全不会记录在我们的云端上，并且不会给您推送订阅消息',
       },
       {
-        title: 'Technical support',
+        title: '这个界面可靠吗',
         description:
-          'Chat with us when facing issues like template installation, problems editing difficulties, compatibility issues with software or download errors, or other technical challenges related to using the templates.',
+          '还是建议您从自己的邮箱APP发送一份',
       },
       {
-        title: 'Phone',
-        description: '+1 (234) 567-890',
+        title: '官方网址',
+        description: 'https://hsdc.dpdns.org',
         icon: 'tabler:headset',
       },
       {
-        title: 'Email',
-        description: 'contact@support.com',
+        title: '官方邮箱',
+        description: 'xuexiang@lianggong.dpdns.org',
         icon: 'tabler:mail',
       },
       {
-        title: 'Location',
-        description: '1234 Lorem Ipsum St, 12345, Miami, EEUU',
+        title: '地区',
+        description: 'CN-中国',
         icon: 'tabler:map-pin',
       },
     ]}
