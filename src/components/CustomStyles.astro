@@ -60,4 +60,14 @@ import '@fontsource-variable/inter';
       color: snow;
     }
   }
+
+  /* ===== 隐藏返回顶部的火箭按钮 ===== */
+  button:has(svg[class*="rocket"]),
+  a:has(svg[class*="rocket"]),
+  [id*="back-to-top"],
+  [class*="back-to-top"],
+  [id*="scroll-top"],
+  [class*="scroll-top"] {
+    display: none !important;
+  }
 </style>
