@@ -18,7 +18,7 @@ export const headerData = {
   actions: [
     {
       text: '联系我们',
-      href: 'mailto:your-email@example.com',
+      href: 'mailto:xuexiang@lianggong.dpdns.org',
     },
   ],
 };
