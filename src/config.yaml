@@ -1,5 +1,5 @@
 site:
-  name: 凉宫数据欢迎您！
+  name: 凉宫数据开放平台
   site: 'https://hsdc.dpdns.org/'
   base: '/'
   trailingSlash: false
