@@ -9,7 +9,7 @@ site:
 # Default SEO metadata
 metadata:
   title:
-    default: 凉宫数据
+    default: 凉宫数据-开放平台
     template: '%s — '
   description: "\U0001F680 创新型互联网企业."
   robots:
