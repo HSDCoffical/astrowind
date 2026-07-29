@@ -378,7 +378,8 @@ bgOpacity={30}
     {
       variant: 'primary',
       text: '联系我们',
-      href: 'xuexiang@lianggong.dpdns.org',
+      href: 'javascript:void(0)',
+      onclick: 'showEmailModal()',
       icon: 'tabler:mail',
     },
   ]}
@@ -387,6 +388,57 @@ bgOpacity={30}
     联系我们
   </Fragment>
   <Fragment slot="subtitle">
-    申请·反馈·举报
+    点击按钮获取凉宫数据的官方联系邮箱
   </Fragment>
 </CallToAction>
+
+<!-- ===== 邮箱弹窗（Modal） ===== -->
+<div
+  id="emailModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-500"
+>
+  <div
+    class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-sm w-full mx-4 p-6 transform scale-95 transition-all duration-500"
+  >
+    <div class="text-center">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">📧 联系邮箱</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">邮箱地址：</p>
+      <div
+        class="bg-gray-100 dark:bg-gray-700 rounded-xl px-4 py-3 mb-4 select-all cursor-pointer"
+        onclick="navigator.clipboard?.writeText('xuexiang@lianggong.dpdns.org') && alert('已复制！')"
+      >
+        <code class="text-blue-600 dark:text-blue-400 font-mono text-lg">
+          xiexiang@lianggong.dpdns.org
+        </code>
+      </div>
+      <p class="text-xs text-gray-400 dark:text-gray-500 mb-4">点击上方邮箱即可复制</p>
+      <button
+        onclick="closeEmailModal()"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-xl transition-colors"
+      >
+        了解
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showEmailModal() {
+    const modal = document.getElementById('emailModal');
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+    modal.querySelector('div').classList.remove('scale-95');
+    modal.querySelector('div').classList.add('scale-100');
+  }
+
+  function closeEmailModal() {
+    const modal = document.getElementById('emailModal');
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    modal.querySelector('div').classList.remove('scale-100');
+    modal.querySelector('div').classList.add('scale-95');
+  }
+
+  // 点击背景遮罩也可关闭
+  document.getElementById('emailModal')?.addEventListener('click', function (e) {
+    if (e.target === this) closeEmailModal();
+  });
+</script>
