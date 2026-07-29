@@ -11,7 +11,7 @@ metadata:
   title:
     default: 凉宫数据-开放平台
     template: '%s — '
-  description: "\U0001F680 创新型互联网企业."
+  description: "\U0001F680 创新型互联网企业/凉宫数据中央行政中心/凉宫数据开放平台."
   robots:
     index: true
     follow: true
