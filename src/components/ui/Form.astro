@@ -5,7 +5,7 @@ import Button from '~/components/ui/Button.astro';
 const { inputs, textarea, disclaimer, button = 'Contact us', description = '' } = Astro.props;
 ---
 
-<form action="https://formspree.io/f/mlgqvrnq" method="POST">
+<form action="https://formspree.io/f/mlgqvrnq" method="POST" id="contact-form">
   {
     inputs &&
       inputs.map(
@@ -70,7 +70,7 @@ const { inputs, textarea, disclaimer, button = 'Contact us', description = '' } 
   {
     button && (
       <div class="mt-10 grid">
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="submit" id="submit-btn">
           {button}
         </Button>
       </div>
@@ -84,4 +84,95 @@ const { inputs, textarea, disclaimer, button = 'Contact us', description = '' } 
       </div>
     )
   }
+
+  <!-- ===== 剩余条数显示（调用 Cloudflare KV） ===== -->
+  <div id="remaining-display" class="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+    本月剩余可用次数：<span id="remaining-count" class="font-bold text-blue-600 dark:text-blue-400">--</span> 次
+  </div>
 </form>
+
+<script>
+  (function() {
+    const API_URL = '/api/count';
+
+    // 获取剩余次数
+    async function fetchRemaining() {
+      try {
+        const resp = await fetch(API_URL);
+        const data = await resp.json();
+        const remaining = data.value || 0;
+        const countEl = document.getElementById('remaining-count');
+        if (countEl) countEl.textContent = remaining;
+        updateUI(remaining);
+        return remaining;
+      } catch (e) {
+        console.error('获取剩余次数失败', e);
+        const countEl = document.getElementById('remaining-count');
+        if (countEl) countEl.textContent = '?';
+      }
+    }
+
+    // 更新UI
+    function updateUI(remaining) {
+      const btn = document.getElementById('submit-btn');
+      const countEl = document.getElementById('remaining-count');
+      if (remaining <= 0) {
+        if (btn) { btn.disabled = true; btn.textContent = '额度已用完'; }
+        if (countEl) {
+          countEl.textContent = '0';
+          countEl.className = 'font-bold text-red-600 dark:text-red-400';
+        }
+      } else {
+        if (btn) btn.disabled = false;
+        if (countEl) {
+          countEl.className = 'font-bold text-blue-600 dark:text-blue-400';
+        }
+      }
+    }
+
+    // 提交表单时减少
+    const form = document.getElementById('contact-form');
+    if (form) {
+      form.addEventListener('submit', async function(e) {
+        // 获取当前剩余
+        let current = 0;
+        try {
+          const resp = await fetch(API_URL);
+          const data = await resp.json();
+          current = data.value || 0;
+        } catch (e) {
+          alert('无法验证剩余次数，请检查网络后重试');
+          e.preventDefault();
+          return;
+        }
+
+        if (current <= 0) {
+          e.preventDefault();
+          alert('本月额度已用完，请通过邮箱发送至：xuexiang@lianggong.dpdns.org');
+          return;
+        }
+
+        // 执行减1
+        try {
+          const updateResp = await fetch(API_URL, { method: 'POST' });
+          const updateData = await updateResp.json();
+          if (updateData.error) {
+            alert('更新失败：' + updateData.error);
+            e.preventDefault();
+            return;
+          }
+          const newValue = updateData.value;
+          const countEl = document.getElementById('remaining-count');
+          if (countEl) countEl.textContent = newValue;
+          updateUI(newValue);
+        } catch (e) {
+          alert('更新计数失败，请稍后重试');
+          e.preventDefault();
+        }
+      });
+    }
+
+    // 页面加载时获取
+    window.addEventListener('load', fetchRemaining);
+  })();
+</script>
