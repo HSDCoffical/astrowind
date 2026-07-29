@@ -48,11 +48,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 ---
 
 <header
-  style="backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);"
+  style="background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);"
   class:list={[
     { sticky: isSticky, relative: !isSticky, dark: isDark },
-    'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out',
-    'bg-white/30 dark:bg-gray-900/50 shadow-lg shadow-black/5 border-b border-white/20 dark:border-gray-700/30',
+    'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out border-b border-gray-200/30 dark:border-gray-700/30',
+    'dark:bg-gray-900/50',
   ]}
   {...isSticky ? { 'data-aw-sticky-header': true } : {}}
   {...id ? { id } : {}}
