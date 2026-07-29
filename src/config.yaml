@@ -16,7 +16,7 @@ metadata:
     index: true
     follow: true
   openGraph:
-    site_name: 凉宫数据
+    site_name: 凉宫数据开放平台
     images:
       - url: '~/assets/images/default.png'
         width: 1200
