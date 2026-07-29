@@ -12,42 +12,56 @@ const metadata = {
 <Layout metadata={metadata}>
   <!-- HeroText Widget ******************* -->
 
-  <HeroText tagline="Contact" title="欢迎！" />
+  <HeroText tagline="联系界面" title="欢迎！" />
 
   <ContactUs
     id="form"
+    action="https://formspree.io/f/mlgqvrnq"    <!-- ← 替换成你的 Formspree 端点 -->
+    method="POST"
     title="发送邮件"
-    subtitle="通过此界面向中心发送邮件，但是并不确定100%能收到，所以建议您尽量在自己的邮箱里发送"
+    subtitle="通过此界面向中心发送邮件"
     inputs={[
       {
         type: 'text',
-        name: '主题',
-        label: '主题',
+        name: 'name',
+        label: '姓名',
+        required: true,
       },
       {
-        type: 'eamil',
-        name: '邮件地址',
-        label: '邮件地址',
+        type: 'email',
+        name: 'email',
+        label: '邮箱地址',
+        required: true,
+      },
+      {
+        type: 'text',
+        name: 'subject',
+        label: '主题',
+        required: false,
       },
     ]}
     textarea={{
+      name: 'message',
       label: '正文',
+      required: true,
     }}
     disclaimer={{
       label:
         '提交后我们将从你填写的邮件地址发送回执，如确认无误，请确定',
     }}
     description="我们将会在一周内回复您，感谢您的来信"
+    submitText="发送邮件"
+    successMessage="感谢您的来信，我们会尽快回复！"
   />
 
   <!-- Features2 Widget ************** -->
 
   <Features2
-    title="提供"
+    title="常见问题"
     items={[
       {
         title: '我的信息会被泄露吗？',
-        description: `不会，全程只有一人操作，不必担心信息泄露`,
+        description: '不会，全程只有一人操作，不必担心信息泄露',
       },
       {
         title: '这个地址会被存储或订阅吗？',
@@ -56,23 +70,19 @@ const metadata = {
       },
       {
         title: '这个界面可靠吗',
-        description:
-          '还是建议您从自己的邮箱APP发送一份',
+        description: '建议您从自己的邮箱APP发送一份',
       },
       {
         title: '官方网址',
         description: 'https://hsdc.dpdns.org',
-        icon: 'tabler:headset',
       },
       {
         title: '官方邮箱',
         description: 'xuexiang@lianggong.dpdns.org',
-        icon: 'tabler:mail',
       },
       {
         title: '地区',
         description: 'CN-中国',
-        icon: 'tabler:map-pin',
       },
     ]}
   />
