@@ -57,6 +57,31 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   {...isSticky ? { 'data-aw-sticky-header': true } : {}}
   {...id ? { id } : {}}
 >
+  <!-- 强制所有子元素背景透明，防止白色块遮挡磨砂效果 -->
+  <style>
+    header > *,
+    header .flex,
+    header .items-center,
+    header .justify-between,
+    header a,
+    header button,
+    header div,
+    header span,
+    header nav,
+    header ul,
+    header li,
+    header .bg-white,
+    header .dark\:bg-gray-900 {
+      background: transparent !important;
+    }
+    /* 保留按钮悬停背景色，但不影响磨砂效果 */
+    header button:hover {
+      background: rgba(255,255,255,0.1) !important;
+    }
+    .dark header button:hover {
+      background: rgba(255,255,255,0.05) !important;
+    }
+  </style>
   <div class="absolute inset-0"></div>
   <div
     class:list={[
