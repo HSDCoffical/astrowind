@@ -48,41 +48,37 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 ---
 
 <header
+  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;"
   class:list={[
     { sticky: isSticky, relative: !isSticky, dark: isDark },
     'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out border-b border-gray-200/30 dark:border-gray-700/30',
-    'bg-white/20 dark:bg-gray-900/40',
   ]}
-  style="background-image: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.7) 0%, transparent 50%), radial-gradient(circle at 90% 80%, rgba(255,255,255,0.5) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.3) 0%, transparent 60%);"
   {...isSticky ? { 'data-aw-sticky-header': true } : {}}
   {...id ? { id } : {}}
 >
-  <!-- 强制所有子元素背景透明，防止白色块遮挡磨砂效果 -->
+  <!-- 强制所有子元素背景透明 -->
   <style>
-    header > *,
-    header .flex,
-    header .items-center,
-    header .justify-between,
-    header a,
-    header button,
-    header div,
-    header span,
-    header nav,
-    header ul,
-    header li,
-    header .bg-white,
-    header .dark\:bg-gray-900 {
+    header#header * {
       background: transparent !important;
     }
-    /* 保留按钮悬停背景色，但不影响磨砂效果 */
-    header button:hover {
+    header#header .bg-white,
+    header#header .dark\:bg-gray-900,
+    header#header .bg-gray-100,
+    header#header .bg-gray-50,
+    header#header [class*="bg-"] {
+      background: transparent !important;
+    }
+    /* 保留按钮悬停效果 */
+    header#header button:hover,
+    header#header a:hover {
       background: rgba(255,255,255,0.1) !important;
     }
-    .dark header button:hover {
+    .dark header#header button:hover,
+    .dark header#header a:hover {
       background: rgba(255,255,255,0.05) !important;
     }
   </style>
-  <div class="absolute inset-0"></div>
+  <div class="absolute inset-0" style="background: transparent !important;"></div>
   <div
     class:list={[
       'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
