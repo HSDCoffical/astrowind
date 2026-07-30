@@ -56,7 +56,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   {...isSticky ? { 'data-aw-sticky-header': true } : {}}
   {...id ? { id } : {}}
 >
-  <!-- 强制所有子元素背景透明 -->
   <style>
     header#header * {
       background: transparent !important;
@@ -102,7 +101,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </div>
     </div>
 
-    <!-- ===== 桌面端导航（大屏显示） ===== -->
+    <!-- ===== 桌面端导航 ===== -->
     <nav
       class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
       aria-label="Main navigation"
@@ -191,7 +190,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     </div>
   </div>
 
-  <!-- ===== 手机端滑动菜单（只在小屏显示） ===== -->
+  <!-- ===== 手机端滑动菜单 ===== -->
   <div
     id="mobile-menu"
     class="fixed top-0 right-0 h-screen w-64 bg-white/95 dark:bg-gray-900/95 shadow-lg z-50 md:hidden transform transition-transform duration-300 ease-in-out translate-x-full"
@@ -249,33 +248,38 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       const menu = document.getElementById('mobile-menu');
       const toggle = document.querySelector('[data-aw-toggle-menu]');
 
-      if (toggle && menu) {
-        function closeMenu() {
-          menu.classList.add('translate-x-full');
-          menu.classList.remove('translate-x-0');
-        }
-        function openMenu() {
-          menu.classList.remove('translate-x-full');
-          menu.classList.add('translate-x-0');
-        }
+      function closeMenu() {
+        menu.classList.add('translate-x-full');
+        menu.classList.remove('translate-x-0');
+        if (toggle) toggle.classList.remove('expanded');
+      }
 
+      function openMenu() {
+        menu.classList.remove('translate-x-full');
+        menu.classList.add('translate-x-0');
+        if (toggle) toggle.classList.add('expanded');
+      }
+
+      if (toggle && menu) {
         toggle.addEventListener('click', function(e) {
           e.stopPropagation();
           const isOpen = menu.classList.contains('translate-x-0');
           if (isOpen) closeMenu();
           else openMenu();
         });
+      }
 
-        menu.querySelectorAll('a, button').forEach(el => {
+      if (menu) {
+        menu.querySelectorAll('a, button').forEach(function(el) {
           el.addEventListener('click', closeMenu);
         });
-
-        document.addEventListener('click', function(e) {
-          if (!menu.contains(e.target) && !toggle.contains(e.target)) {
-            closeMenu();
-          }
-        });
       }
+
+      document.addEventListener('click', function(e) {
+        if (menu && toggle && !menu.contains(e.target) && !toggle.contains(e.target)) {
+          closeMenu();
+        }
+      });
     });
   </script>
 </header>
