@@ -75,6 +75,46 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     .dark header#header a:hover {
       background: rgba(255,255,255,0.05) !important;
     }
+    /* 手机菜单浮层样式 */
+    #mobile-menu {
+      position: fixed !important;
+      top: 0 !important;
+      right: 0 !important;
+      height: 100vh !important;
+      width: 280px !important;
+      background: rgba(255,255,255,0.95) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.1) !important;
+      z-index: 9999 !important;
+      transform: translateX(100%) !important;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      padding-top: 60px !important;
+      overflow-y: auto !important;
+    }
+    .dark #mobile-menu {
+      background: rgba(17, 24, 39, 0.95) !important;
+    }
+    #mobile-menu.open {
+      transform: translateX(0) !important;
+    }
+    /* 遮罩层 */
+    #menu-overlay {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgba(0,0,0,0.3) !important;
+      z-index: 9998 !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transition: opacity 0.35s ease !important;
+    }
+    #menu-overlay.open {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
   </style>
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
@@ -190,13 +230,12 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     </div>
   </div>
 
-  <!-- ===== 手机端滑动菜单 ===== -->
-  <div
-    id="mobile-menu"
-    class="fixed top-0 right-0 h-screen w-64 bg-white/95 dark:bg-gray-900/95 shadow-lg z-50 md:hidden transform transition-transform duration-300 ease-in-out translate-x-full"
-    aria-label="Mobile navigation"
-  >
-    <ul class="flex flex-col w-full text-xl font-medium mt-16 px-4">
+  <!-- ===== 遮罩层 ===== -->
+  <div id="menu-overlay"></div>
+
+  <!-- ===== 手机端滑动菜单（独立浮层） ===== -->
+  <div id="mobile-menu">
+    <ul class="flex flex-col w-full text-lg font-medium px-6">
       {
         links.map(({ text, href, links }) => (
           <li class={links?.length ? 'dropdown' : ''}>
@@ -204,18 +243,18 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
               <>
                 <button
                   type="button"
-                  class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap w-full"
+                  class="hover:text-blue-600 dark:hover:text-blue-400 py-3 flex items-center w-full border-b border-gray-100 dark:border-gray-700"
                 >
-                  {text}{' '}
-                  <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
+                  {text}
+                  <Icon name="tabler:chevron-down" class="w-4 h-4 ml-auto" />
                 </button>
                 <ul class="pl-4">
                   {links.map(({ text: text2, href: href2 }) => (
                     <li>
                       <a
                         class:list={[
-                          'block py-2 px-4 hover:text-link dark:hover:text-white',
-                          { 'aw-link-active': href2 === currentPath },
+                          'block py-2 hover:text-blue-600 dark:hover:text-blue-400',
+                          { 'text-blue-600 dark:text-blue-400': href2 === currentPath },
                         ]}
                         href={href2}
                       >
@@ -228,8 +267,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             ) : (
               <a
                 class:list={[
-                  'block px-4 py-3 hover:text-link dark:hover:text-white',
-                  { 'aw-link-active': href === currentPath },
+                  'block py-3 border-b border-gray-100 dark:border-gray-700 hover:text-blue-600 dark:hover:text-blue-400',
+                  { 'text-blue-600 dark:text-blue-400': href === currentPath },
                 ]}
                 href={href}
               >
@@ -242,31 +281,37 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     </ul>
   </div>
 
-  <!-- ===== 滑动菜单控制脚本 ===== -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const menu = document.getElementById('mobile-menu');
+      const overlay = document.getElementById('menu-overlay');
       const toggle = document.querySelector('[data-aw-toggle-menu]');
 
-      function closeMenu() {
-        menu.classList.add('translate-x-full');
-        menu.classList.remove('translate-x-0');
-        if (toggle) toggle.classList.remove('expanded');
-      }
-
       function openMenu() {
-        menu.classList.remove('translate-x-full');
-        menu.classList.add('translate-x-0');
+        menu.classList.add('open');
+        overlay.classList.add('open');
         if (toggle) toggle.classList.add('expanded');
+        document.body.style.overflow = 'hidden';
       }
 
-      if (toggle && menu) {
+      function closeMenu() {
+        menu.classList.remove('open');
+        overlay.classList.remove('open');
+        if (toggle) toggle.classList.remove('expanded');
+        document.body.style.overflow = '';
+      }
+
+      if (toggle) {
         toggle.addEventListener('click', function(e) {
           e.stopPropagation();
-          const isOpen = menu.classList.contains('translate-x-0');
+          const isOpen = menu.classList.contains('open');
           if (isOpen) closeMenu();
           else openMenu();
         });
+      }
+
+      if (overlay) {
+        overlay.addEventListener('click', closeMenu);
       }
 
       if (menu) {
@@ -274,12 +319,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           el.addEventListener('click', closeMenu);
         });
       }
-
-      document.addEventListener('click', function(e) {
-        if (menu && toggle && !menu.contains(e.target) && !toggle.contains(e.target)) {
-          closeMenu();
-        }
-      });
     });
   </script>
 </header>
