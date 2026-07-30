@@ -187,8 +187,98 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     </div>
   </div>
 
-  <!-- ===== 固定左下角主题切换 ===== -->
-  <div class="fixed bottom-4 left-4 z-50">
-    <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5" />
+  <!-- ===== 手机端滑动菜单 ===== -->
+  <div
+    id="mobile-menu"
+    class="fixed top-0 right-0 h-screen w-64 bg-white/95 dark:bg-gray-900/95 shadow-lg z-50 md:hidden transform transition-transform duration-300 ease-in-out translate-x-full"
+    aria-label="Mobile navigation"
+  >
+    <ul class="flex flex-col w-full text-xl font-medium mt-16 px-4">
+      {
+        links.map(({ text, href, links }) => (
+          <li class={links?.length ? 'dropdown' : ''}>
+            {links?.length ? (
+              <>
+                <button
+                  type="button"
+                  class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap w-full"
+                >
+                  {text}{' '}
+                  <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
+                </button>
+                <ul class="pl-4">
+                  {links.map(({ text: text2, href: href2 }) => (
+                    <li>
+                      <a
+                        class:list={[
+                          'block py-2 px-4 hover:text-link dark:hover:text-white',
+                          { 'aw-link-active': href2 === currentPath },
+                        ]}
+                        href={href2}
+                      >
+                        {text2}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <a
+                class:list={[
+                  'block px-4 py-3 hover:text-link dark:hover:text-white',
+                  { 'aw-link-active': href === currentPath },
+                ]}
+                href={href}
+              >
+                {text}
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+
+    <!-- ===== 主题切换按钮（菜单左下角） ===== -->
+    <div class="absolute bottom-6 left-4">
+      <ToggleTheme iconClass="w-6 h-6" />
+    </div>
   </div>
+
+  <!-- ===== 滑动菜单控制脚本 ===== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const menu = document.getElementById('mobile-menu');
+      const toggle = document.querySelector('[data-aw-toggle-menu]');
+
+      if (toggle && menu) {
+        function closeMenu() {
+          menu.classList.add('translate-x-full');
+          menu.classList.remove('translate-x-0');
+          if (toggle) toggle.classList.remove('expanded');
+        }
+        function openMenu() {
+          menu.classList.remove('translate-x-full');
+          menu.classList.add('translate-x-0');
+          if (toggle) toggle.classList.add('expanded');
+        }
+
+        toggle.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const isOpen = menu.classList.contains('translate-x-0');
+          if (isOpen) closeMenu();
+          else openMenu();
+        });
+
+        menu.querySelectorAll('a, button').forEach(function(el) {
+          el.addEventListener('click', closeMenu);
+        });
+
+        document.addEventListener('click', function(e) {
+          if (!menu.contains(e.target) && !toggle.contains(e.target)) {
+            closeMenu();
+          }
+        });
+      }
+    });
+  </script>
 </header>
