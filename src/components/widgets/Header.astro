@@ -75,6 +75,25 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     .dark header#header a:hover {
       background: rgba(255,255,255,0.05) !important;
     }
+    /* 手机端菜单底部主题切换项 */
+    .menu-theme-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      margin-top: 0.5rem;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      color: #666;
+    }
+    .dark .menu-theme-item {
+      border-top-color: rgba(255,255,255,0.06);
+      color: #aaa;
+    }
+    @media (min-width: 768px) {
+      .menu-theme-item {
+        display: none !important;
+      }
+    }
   </style>
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
@@ -151,6 +170,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             </li>
           ))
         }
+        <!-- 手机端菜单底部主题切换 -->
+        <li class="menu-theme-item">
+          <ToggleTheme iconClass="w-5 h-5" />
+          <span class="text-sm">切换主题</span>
+        </li>
       </ul>
     </nav>
 
