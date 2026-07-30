@@ -1,8 +1,8 @@
 ---
 import { Icon } from 'astro-icon/components';
 import Logo from '~/components/Logo.astro';
-import ToggleMenu from '~/components/common/ToggleMenu.astro';
 import ToggleTheme from '~/components/common/ToggleTheme.astro';
+import ToggleMenu from '~/components/common/ToggleMenu.astro';
 import Button from '~/components/ui/Button.astro';
 
 import { getHomePermalink } from '~/utils/permalinks';
@@ -76,80 +76,47 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.05) !important;
     }
 
-    /* 右侧滑出菜单 - 固定定位，不占文档流 */
-    #mobile-menu {
-      position: fixed;
-      top: 0;
-      right: 0;
-      height: 100vh;
-      width: 280px;
-      max-width: 80vw;
-      background: rgba(255,255,255,0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: -4px 0 20px rgba(0,0,0,0.08);
-      z-index: 9999;
-      transform: translateX(100%);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      padding: 80px 24px 24px 24px;
-      overflow-y: auto;
-      display: flex;
+    /* 手机端导航菜单展开（直接流式，非浮层） */
+    .mobile-nav-list {
+      display: none;
       flex-direction: column;
-      pointer-events: none;
+      width: 100%;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 0 0 12px 12px;
+      padding: 12px 0;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
     }
-    #mobile-menu.open {
-      transform: translateX(0);
-      pointer-events: auto;
+    .dark .mobile-nav-list {
+      background: rgba(17, 24, 39, 0.95);
     }
-    .dark #mobile-menu {
-      background: rgba(17, 24, 39, 0.85);
-    }
-
-    /* 遮罩层 - 完全透明，仅用于点击关闭 */
-    #menu-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: transparent;
-      z-index: 9998;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    #menu-overlay.open {
-      pointer-events: auto;
-    }
-
-    /* 关闭按钮 */
-    #menu-close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 24px;
-      color: #333;
-      background: none;
-      border: none;
-      cursor: pointer;
-      z-index: 10000;
-      padding: 4px 8px;
-    }
-    .dark #menu-close-btn {
-      color: #eee;
-    }
-
-    /* 菜单底部 */
-    #menu-footer {
-      margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid rgba(0,0,0,0.06);
+    .mobile-nav-list.open {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
     }
-    .dark #menu-footer {
-      border-top-color: rgba(255,255,255,0.06);
+    .mobile-nav-list a,
+    .mobile-nav-list button {
+      padding: 10px 20px;
+      color: #333;
+      font-weight: 500;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      transition: background 0.2s;
+    }
+    .dark .mobile-nav-list a,
+    .dark .mobile-nav-list button {
+      color: #eee;
+      border-bottom-color: rgba(255,255,255,0.04);
+    }
+    .mobile-nav-list a:hover,
+    .mobile-nav-list button:hover {
+      background: rgba(0,0,0,0.03);
+    }
+    .dark .mobile-nav-list a:hover,
+    .dark .mobile-nav-list button:hover {
+      background: rgba(255,255,255,0.03);
+    }
+    .mobile-nav-list .dropdown-sub {
+      padding-left: 20px;
     }
 
     /* 桌面导航 */
@@ -160,31 +127,33 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     @media (min-width: 768px) {
       .desktop-nav { display: flex !important; }
       .mobile-toggle { display: none !important; }
+      .mobile-nav-list { display: none !important; }
     }
   </style>
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
   <div
-    class:list={[
-      'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
-      {
-        'md:flex md:justify-between': position !== 'center',
-      },
-      {
-        'md:grid md:grid-cols-3 md:items-center': position === 'center',
-      },
-      {
-        'max-w-7xl': !isFullWidth,
-      },
-    ]}
+    class="relative text-default py-3 px-3 md:px-6 mx-auto w-full"
   >
-    <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
+    <!-- 顶部行：Logo + 右侧控件 -->
+    <div class="flex items-center justify-between">
       <a class="flex items-center" href={getHomePermalink()}>
         <Logo />
       </a>
-      <!-- 手机端汉堡按钮 -->
-      <div class="flex items-center md:hidden mobile-toggle">
-        <ToggleMenu />
+      <div class="flex items-center gap-2">
+        <div class="hidden md:flex items-center gap-2">
+          {showToggleTheme && <ToggleTheme iconClass="w-5 h-5" />}
+          {
+            actions?.length ? (
+              actions.map((btnProps) => (
+                <Button {...btnProps} class="py-1.5 px-4 text-sm font-semibold shadow-none" />
+              ))
+            ) : ''
+          }
+        </div>
+        <div class="mobile-toggle flex items-center md:hidden">
+          <ToggleMenu />
+        </div>
       </div>
     </div>
 
@@ -241,161 +210,69 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- 桌面端右侧控件 -->
-    <div
-      class:list={[
-        { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
-        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
-      ]}
-    >
-      <div class="items-center flex justify-between w-full md:w-auto">
-        <div class="flex">
-          {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
-          {
-            showRssFeed && (
-              <a
-                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
-                aria-label="RSS Feed"
-                href={getAsset('/rss.xml')}
-              >
-                <Icon name="tabler:rss" class="w-5 h-5" />
-              </a>
-            )
-          }
-        </div>
+    <!-- 手机端展开菜单（流式，非浮层） -->
+    <div id="mobile-nav" class="mobile-nav-list">
+      {
+        links.map(({ text, href, links }) => (
+          <div>
+            {links?.length ? (
+              <>
+                <button
+                  type="button"
+                  class="flex items-center justify-between w-full"
+                  onclick="this.nextElementSibling.classList.toggle('hidden')"
+                >
+                  {text}
+                  <Icon name="tabler:chevron-down" class="w-4 h-4" />
+                </button>
+                <div class="dropdown-sub hidden">
+                  {links.map(({ text: t, href: h }) => (
+                    <a href={h} class="block">{t}</a>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <a href={href}>{text}</a>
+            )}
+          </div>
+        ))
+      }
+      <!-- 底部额外操作（主题切换和联系按钮） -->
+      <div class="flex items-center gap-3 px-4 pt-3 border-t border-gray-200 dark:border-gray-700 mt-2">
+        <ToggleTheme iconClass="w-5 h-5" />
         {
           actions?.length ? (
-            <span class="ml-4 rtl:ml-0 rtl:mr-4">
-              {actions.map((btnProps) => (
-                <Button {...btnProps} class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto" />
-              ))}
-            </span>
-          ) : (
-            ''
-          )
+            actions.map((btnProps) => (
+              <Button {...btnProps} class="py-1.5 px-4 text-sm font-semibold shadow-none" />
+            ))
+          ) : ''
         }
       </div>
     </div>
   </div>
 
-  <!-- 遮罩层（透明） -->
-  <div id="menu-overlay"></div>
-
-  <!-- 右侧滑出菜单 -->
-  <div id="mobile-menu">
-    <button id="menu-close-btn" aria-label="关闭菜单">✕</button>
-
-    <ul class="flex flex-col w-full text-lg font-medium">
-      {
-        links.map(({ text, href, links }) => (
-          <li class={links?.length ? 'dropdown' : ''}>
-            {links?.length ? (
-              <>
-                <button
-                  type="button"
-                  class="hover:text-blue-600 dark:hover:text-blue-400 py-3 flex items-center w-full border-b border-gray-100 dark:border-gray-700"
-                >
-                  {text}
-                  <Icon name="tabler:chevron-down" class="w-4 h-4 ml-auto" />
-                </button>
-                <ul class="pl-4">
-                  {links.map(({ text: text2, href: href2 }) => (
-                    <li>
-                      <a
-                        class:list={[
-                          'block py-2 hover:text-blue-600 dark:hover:text-blue-400',
-                          { 'text-blue-600 dark:text-blue-400': href2 === currentPath },
-                        ]}
-                        href={href2}
-                      >
-                        {text2}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            ) : (
-              <a
-                class:list={[
-                  'block py-3 border-b border-gray-100 dark:border-gray-700 hover:text-blue-600 dark:hover:text-blue-400',
-                  { 'text-blue-600 dark:text-blue-400': href === currentPath },
-                ]}
-                href={href}
-              >
-                {text}
-              </a>
-            )}
-          </li>
-        ))
-      }
-    </ul>
-
-    <!-- 菜单底部：主题切换 + 联系按钮 -->
-    <div id="menu-footer">
-      <ToggleTheme iconClass="w-6 h-6" />
-      {
-        actions?.length ? (
-          actions.map((btnProps) => (
-            <Button {...btnProps} class="py-1.5 px-4 text-sm font-semibold shadow-none" />
-          ))
-        ) : ''
-      }
-    </div>
-  </div>
-
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const menu = document.getElementById('mobile-menu');
-      const overlay = document.getElementById('menu-overlay');
-      const toggle = document.querySelector('[data-aw-toggle-menu]');
-      const closeBtn = document.getElementById('menu-close-btn');
+      const toggleBtn = document.querySelector('[data-aw-toggle-menu]');
+      const mobileNav = document.getElementById('mobile-nav');
 
-      function openMenu() {
-        menu.classList.add('open');
-        overlay.classList.add('open');
-        if (toggle) toggle.classList.add('expanded');
-        document.body.style.overflow = 'hidden';
-      }
-
-      function closeMenu() {
-        menu.classList.remove('open');
-        overlay.classList.remove('open');
-        if (toggle) toggle.classList.remove('expanded');
-        document.body.style.overflow = '';
-      }
-
-      if (toggle) {
-        toggle.addEventListener('click', function(e) {
+      if (toggleBtn && mobileNav) {
+        toggleBtn.addEventListener('click', function(e) {
           e.stopPropagation();
-          const isOpen = menu.classList.contains('open');
-          if (isOpen) closeMenu();
-          else openMenu();
+          mobileNav.classList.toggle('open');
+          this.classList.toggle('expanded');
         });
       }
 
-      if (closeBtn) {
-        closeBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          closeMenu();
+      // 点击菜单链接后关闭菜单
+      if (mobileNav) {
+        mobileNav.querySelectorAll('a, button').forEach(function(el) {
+          el.addEventListener('click', function() {
+            mobileNav.classList.remove('open');
+            if (toggleBtn) toggleBtn.classList.remove('expanded');
+          });
         });
       }
-
-      if (overlay) {
-        overlay.addEventListener('click', closeMenu);
-      }
-
-      if (menu) {
-        menu.querySelectorAll('a, button:not(#menu-close-btn)').forEach(function(el) {
-          el.addEventListener('click', closeMenu);
-        });
-      }
-
-      // 窗口尺寸变化，桌面时关闭
-      window.addEventListener('resize', function() {
-        if (window.innerWidth >= 768 && menu.classList.contains('open')) {
-          closeMenu();
-        }
-      });
     });
   </script>
 </header>
