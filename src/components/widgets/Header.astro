@@ -1,7 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
 import Logo from '~/components/Logo.astro';
-import ToggleTheme from '~/components/common/ToggleTheme.astro';
 import ToggleMenu from '~/components/common/ToggleMenu.astro';
 import Button from '~/components/ui/Button.astro';
 
@@ -50,11 +49,144 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 <header
   class:list={[
     { sticky: isSticky, relative: !isSticky, dark: isDark },
-    'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out border-b border-gray-200/30 dark:border-gray-700/30 bg-white/40 dark:bg-gray-900/40 backdrop-blur-lg',
+    'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out border-b border-gray-200/30 dark:border-gray-700/30',
   ]}
+  style="background: rgba(255,255,255,0.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);"
   {...isSticky ? { 'data-aw-sticky-header': true } : {}}
   {...id ? { id } : {}}
 >
+  <!-- 仅保留必要的样式，移除所有 !important 强制透明 -->
+  <style>
+    /* 毛玻璃效果已在 header 上通过 style 实现，无需额外覆盖 */
+    /* 手机菜单样式 */
+    .mobile-nav-list {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 0 0 16px 16px;
+      padding: 12px 0;
+      margin-top: 4px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    }
+    .dark .mobile-nav-list {
+      background: rgba(17, 24, 39, 0.92);
+    }
+    .mobile-nav-list.open {
+      display: flex;
+    }
+
+    .mobile-nav-list > div {
+      padding: 0 16px;
+      margin-bottom: 2px;
+    }
+    .mobile-nav-list a,
+    .mobile-nav-list button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      color: #333;
+      font-weight: 500;
+      font-size: 1rem;
+      border-radius: 12px;
+      background: transparent;
+      transition: background 0.2s;
+      width: 100%;
+      border: none;
+      cursor: pointer;
+    }
+    .dark .mobile-nav-list a,
+    .dark .mobile-nav-list button {
+      color: #eee;
+    }
+    .mobile-nav-list a:hover,
+    .mobile-nav-list button:hover {
+      background: rgba(0,0,0,0.06);
+    }
+    .dark .mobile-nav-list a:hover,
+    .dark .mobile-nav-list button:hover {
+      background: rgba(255,255,255,0.06);
+    }
+
+    .mobile-nav-list .dropdown-sub {
+      padding-left: 20px;
+      margin-top: 2px;
+      display: none;
+    }
+    .mobile-nav-list .dropdown-sub.open {
+      display: block;
+    }
+    .mobile-nav-list .dropdown-sub a {
+      padding: 10px 16px;
+      font-size: 0.95rem;
+      font-weight: 400;
+      border-radius: 10px;
+      background: transparent;
+    }
+
+    /* 底部主题切换项 */
+    .menu-theme-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      margin: 0 16px;
+      margin-top: 8px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      color: #666;
+      border-radius: 12px;
+    }
+    .dark .menu-theme-item {
+      border-top-color: rgba(255,255,255,0.06);
+      color: #aaa;
+    }
+    .menu-theme-item span {
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .theme-toggle-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      color: #333;
+    }
+    .dark .theme-toggle-btn {
+      color: #eee;
+    }
+    .theme-toggle-btn:hover {
+      background: rgba(0,0,0,0.06);
+    }
+    .dark .theme-toggle-btn:hover {
+      background: rgba(255,255,255,0.06);
+    }
+
+    @media (min-width: 768px) {
+      .mobile-nav-list {
+        display: none !important;
+      }
+      .menu-theme-item {
+        display: none !important;
+      }
+    }
+    @media (max-width: 767px) {
+      .desktop-nav {
+        display: none !important;
+      }
+    }
+  </style>
+
+  <div class="absolute inset-0" style="pointer-events: none;"></div>
   <div
     class:list={[
       'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
@@ -80,7 +212,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
     <!-- 桌面导航 -->
     <nav
-      class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
+      class="desktop-nav items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
       aria-label="Main navigation"
     >
       <ul
@@ -138,8 +270,17 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       ]}
     >
       <div class="items-center flex justify-between w-full md:w-auto">
-        <div class="flex">
-          {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
+        <div class="flex items-center gap-2">
+          <!-- 自定义主题切换（桌面） -->
+          <button
+            id="theme-toggle-desktop"
+            class="theme-toggle-btn"
+            aria-label="切换主题"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </button>
           {
             showRssFeed && (
               <a
@@ -165,5 +306,166 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         }
       </div>
     </div>
+
+    <!-- 手机端菜单 -->
+    <div id="mobile-nav" class="mobile-nav-list">
+      {
+        links.map(({ text, href, links }) => (
+          <div>
+            {links?.length ? (
+              <>
+                <button
+                  type="button"
+                  class="flex items-center justify-between w-full"
+                  onclick="this.nextElementSibling.classList.toggle('open')"
+                >
+                  {text}
+                  <Icon name="tabler:chevron-down" class="w-4 h-4 transition-transform" />
+                </button>
+                <div class="dropdown-sub">
+                  {links.map(({ text: t, href: h }) => (
+                    <a href={h} class="block">{t}</a>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <a href={href}>{text}</a>
+            )}
+          </div>
+        ))
+      }
+      <div class="menu-theme-item">
+        <button
+          id="theme-toggle-mobile"
+          class="theme-toggle-btn"
+          aria-label="切换主题"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </button>
+        <span>切换主题</span>
+      </div>
+    </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // ===== 主题切换逻辑 =====
+      function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+        if (isDark) {
+          html.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+        updateIcons();
+      }
+
+      function updateIcons() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const icons = document.querySelectorAll('#theme-toggle-desktop svg, #theme-toggle-mobile svg');
+        icons.forEach(svg => {
+          if (isDark) {
+            svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
+          } else {
+            svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
+          }
+        });
+      }
+
+      // 初始化主题
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else if (saved === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+      updateIcons();
+
+      // 绑定主题切换按钮
+      document.querySelectorAll('#theme-toggle-desktop, #theme-toggle-mobile').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleTheme();
+        });
+      });
+
+      // ===== 菜单控制 =====
+      const toggleBtn = document.querySelector('[data-aw-toggle-menu]');
+      const mobileNav = document.getElementById('mobile-nav');
+
+      if (toggleBtn && mobileNav) {
+        toggleBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          mobileNav.classList.toggle('open');
+          this.classList.toggle('expanded');
+        });
+      }
+
+      if (mobileNav) {
+        mobileNav.querySelectorAll('a, button:not(#theme-toggle-mobile)').forEach(function(el) {
+          el.addEventListener('click', function() {
+            if (this.closest('.dropdown-sub')) return;
+            mobileNav.classList.remove('open');
+            if (toggleBtn) toggleBtn.classList.remove('expanded');
+          });
+        });
+      }
+
+      document.addEventListener('click', function(e) {
+        if (mobileNav && toggleBtn) {
+          if (!mobileNav.contains(e.target) && !toggleBtn.contains(e.target)) {
+            mobileNav.classList.remove('open');
+            toggleBtn.classList.remove('expanded');
+          }
+        }
+      });
+    });
+
+    // 支持 Astro View Transitions
+    document.addEventListener('astro:after-swap', function() {
+      // 重新绑定主题切换
+      document.querySelectorAll('#theme-toggle-desktop, #theme-toggle-mobile').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const html = document.documentElement;
+          const isDark = html.classList.contains('dark');
+          if (isDark) {
+            html.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+          } else {
+            html.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+          }
+          const icons = document.querySelectorAll('#theme-toggle-desktop svg, #theme-toggle-mobile svg');
+          icons.forEach(svg => {
+            if (html.classList.contains('dark')) {
+              svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
+            } else {
+              svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
+            }
+          });
+        });
+      });
+
+      // 重新绑定菜单
+      const toggleBtn = document.querySelector('[data-aw-toggle-menu]');
+      const mobileNav = document.getElementById('mobile-nav');
+      if (toggleBtn && mobileNav) {
+        toggleBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          mobileNav.classList.toggle('open');
+          this.classList.toggle('expanded');
+        });
+      }
+    });
+  </script>
 </header>
