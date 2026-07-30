@@ -57,7 +57,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   {...id ? { id } : {}}
 >
   <style>
-    /* 基础透明 */
     header#header * {
       background: transparent !important;
     }
@@ -119,79 +118,66 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       pointer-events: auto !important;
     }
 
-    /* 手机端隐藏桌面导航 */
+    .menu-close-btn {
+      position: absolute !important;
+      top: 20px !important;
+      right: 20px !important;
+      font-size: 24px !important;
+      color: #666 !important;
+      cursor: pointer !important;
+      background: none !important;
+      border: none !important;
+      z-index: 10000 !important;
+    }
+    .dark .menu-close-btn {
+      color: #ccc !important;
+    }
+    .menu-close-btn:hover {
+      color: #000 !important;
+    }
+    .dark .menu-close-btn:hover {
+      color: #fff !important;
+    }
+
+    /* 桌面导航显示，手机隐藏 */
     @media (max-width: 767px) {
       .desktop-nav {
         display: none !important;
       }
-      .mobile-controls {
-        display: flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-      }
     }
     @media (min-width: 768px) {
-      .mobile-controls {
-        display: none !important;
+      .desktop-nav {
+        display: flex !important;
       }
     }
   </style>
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
-  <div
-    class="relative text-default py-3 px-3 md:px-6 mx-auto w-full flex items-center justify-between"
-  >
-    <!-- 左侧 Logo -->
+  <div class="relative text-default py-3 px-3 md:px-6 mx-auto w-full flex items-center justify-between">
+    <!-- Logo -->
     <a class="flex items-center" href={getHomePermalink()}>
       <Logo />
     </a>
 
-    <!-- ===== 桌面端导航 ===== -->
-    <nav
-      class="desktop-nav items-center w-full md:w-auto flex md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
-      aria-label="Main navigation"
-    >
-      <ul
-        class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
-      >
+    <!-- 桌面导航 -->
+    <nav class="desktop-nav items-center md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center" aria-label="Main navigation">
+      <ul class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center">
         {
           links.map(({ text, href, links }) => (
             <li class={links?.length ? 'dropdown' : ''}>
               {links?.length ? (
                 <>
-                  <button
-                    type="button"
-                    class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
-                  >
-                    {text}{' '}
-                    <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
+                  <button type="button" class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap">
+                    {text} <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
                   </button>
                   <ul class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl">
                     {links.map(({ text: text2, href: href2 }) => (
-                      <li>
-                        <a
-                          class:list={[
-                            'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
-                            { 'aw-link-active': href2 === currentPath },
-                          ]}
-                          href={href2}
-                        >
-                          {text2}
-                        </a>
-                      </li>
+                      <li><a class:list={['first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap', { 'aw-link-active': href2 === currentPath }]} href={href2}>{text2}</a></li>
                     ))}
                   </ul>
                 </>
               ) : (
-                <a
-                  class:list={[
-                    'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
-                    { 'aw-link-active': href === currentPath },
-                  ]}
-                  href={href}
-                >
-                  {text}
-                </a>
+                <a class:list={['hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap', { 'aw-link-active': href === currentPath }]} href={href}>{text}</a>
               )}
             </li>
           ))
@@ -199,77 +185,43 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- ===== 右侧控件（手机端+桌面端） ===== -->
-    <div class="flex items-center gap-2">
-      <!-- 主题切换 -->
-      {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
-      <!-- 联系按钮（actions） -->
-      {
-        actions?.length ? (
-          <span class="ml-2 rtl:ml-0 rtl:mr-2 hidden sm:inline">
-            {actions.map((btnProps) => (
-              <Button {...btnProps} class="py-2 px-4 md:px-5 font-semibold shadow-none text-sm" />
-            ))}
-          </span>
-        ) : (
-          ''
-        )
-      }
-      <!-- 手机端汉堡菜单 -->
-      <div class="mobile-controls">
-        <ToggleMenu />
-      </div>
+    <!-- 右侧控件 -->
+    <div class="flex items-center gap-2 md:gap-3 flex-nowrap">
+      {showToggleTheme && <ToggleTheme iconClass="w-5 h-5 md:w-5 md:h-5 lg:w-6 lg:h-6" />}
+      {actions?.length ? (
+        <span class="hidden sm:inline-block">
+          {actions.map((btnProps) => <Button {...btnProps} class="py-1.5 px-3 md:py-2 md:px-4 lg:py-2.5 lg:px-5 font-semibold shadow-none text-xs md:text-sm whitespace-nowrap" />)}
+        </span>
+      ) : ''}
+      <div class="md:hidden flex items-center"><ToggleMenu /></div>
     </div>
   </div>
 
-  <!-- ===== 遮罩层 ===== -->
+  <!-- 遮罩层 -->
   <div id="menu-overlay"></div>
 
-  <!-- ===== 手机端滑动菜单 ===== -->
+  <!-- 手机菜单 -->
   <div id="mobile-menu">
+    <button class="menu-close-btn" id="close-menu-btn" aria-label="关闭菜单">✕</button>
     <ul class="flex flex-col w-full text-lg font-medium">
-      {
-        links.map(({ text, href, links }) => (
-          <li class={links?.length ? 'dropdown' : ''}>
-            {links?.length ? (
-              <>
-                <button
-                  type="button"
-                  class="hover:text-blue-600 dark:hover:text-blue-400 py-3 flex items-center w-full border-b border-gray-100 dark:border-gray-700"
-                >
-                  {text}
-                  <Icon name="tabler:chevron-down" class="w-4 h-4 ml-auto" />
-                </button>
-                <ul class="pl-4">
-                  {links.map(({ text: text2, href: href2 }) => (
-                    <li>
-                      <a
-                        class:list={[
-                          'block py-2 hover:text-blue-600 dark:hover:text-blue-400',
-                          { 'text-blue-600 dark:text-blue-400': href2 === currentPath },
-                        ]}
-                        href={href2}
-                      >
-                        {text2}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            ) : (
-              <a
-                class:list={[
-                  'block py-3 border-b border-gray-100 dark:border-gray-700 hover:text-blue-600 dark:hover:text-blue-400',
-                  { 'text-blue-600 dark:text-blue-400': href === currentPath },
-                ]}
-                href={href}
-              >
-                {text}
-              </a>
-            )}
-          </li>
-        ))
-      }
+      {links.map(({ text, href, links }) => (
+        <li class={links?.length ? 'dropdown' : ''}>
+          {links?.length ? (
+            <>
+              <button type="button" class="hover:text-blue-600 dark:hover:text-blue-400 py-3 flex items-center w-full border-b border-gray-100 dark:border-gray-700">
+                {text} <Icon name="tabler:chevron-down" class="w-4 h-4 ml-auto" />
+              </button>
+              <ul class="pl-4">
+                {links.map(({ text: text2, href: href2 }) => (
+                  <li><a class:list={['block py-2 hover:text-blue-600 dark:hover:text-blue-400', { 'text-blue-600 dark:text-blue-400': href2 === currentPath }]} href={href2}>{text2}</a></li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <a class:list={['block py-3 border-b border-gray-100 dark:border-gray-700 hover:text-blue-600 dark:hover:text-blue-400', { 'text-blue-600 dark:text-blue-400': href === currentPath }]} href={href}>{text}</a>
+          )}
+        </li>
+      ))}
     </ul>
   </div>
 
@@ -278,6 +230,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       const menu = document.getElementById('mobile-menu');
       const overlay = document.getElementById('menu-overlay');
       const toggle = document.querySelector('[data-aw-toggle-menu]');
+      const closeBtn = document.getElementById('close-menu-btn');
 
       function openMenu() {
         menu.classList.add('open');
@@ -293,24 +246,10 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         document.body.style.overflow = '';
       }
 
-      if (toggle) {
-        toggle.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const isOpen = menu.classList.contains('open');
-          if (isOpen) closeMenu();
-          else openMenu();
-        });
-      }
-
-      if (overlay) {
-        overlay.addEventListener('click', closeMenu);
-      }
-
-      if (menu) {
-        menu.querySelectorAll('a, button').forEach(function(el) {
-          el.addEventListener('click', closeMenu);
-        });
-      }
+      if (toggle) toggle.addEventListener('click', function(e) { e.stopPropagation(); menu.classList.contains('open') ? closeMenu() : openMenu(); });
+      if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+      if (overlay) overlay.addEventListener('click', closeMenu);
+      if (menu) menu.querySelectorAll('a, button:not(#close-menu-btn)').forEach(el => el.addEventListener('click', closeMenu));
     });
   </script>
 </header>
