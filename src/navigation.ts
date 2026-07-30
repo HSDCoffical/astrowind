@@ -14,6 +14,10 @@ export const headerData = {
       text: '关于我们',
       href: getPermalink('/about'),
     },
+    {
+      text: '社区',
+      href: 'https://hono-bbs-9qj.pages.dev',
+    },
   ],
   actions: [
     {
