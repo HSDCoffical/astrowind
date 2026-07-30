@@ -48,39 +48,18 @@ const { language, textDirection } = I18N;
   <body class="antialiased text-default bg-page tracking-tight">
     <slot />
 
-    <!-- ===== 底部渐变模糊（轻量版，只占底部一小块） ===== -->
+    <!-- ===== 底部毛玻璃（单层清晰版） ===== -->
     <!-- 亮色模式 -->
-    <div class="fixed bottom-0 left-0 w-full h-4 pointer-events-none z-30 block dark:hidden"
-         style="background: linear-gradient(to top, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%); 
-                backdrop-filter: blur(0.5px); 
-                -webkit-backdrop-filter: blur(0.5px);">
+    <div class="fixed bottom-0 left-0 w-full h-20 pointer-events-none z-30 block dark:hidden"
+         style="background: linear-gradient(to top, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%); 
+                backdrop-filter: blur(12px); 
+                -webkit-backdrop-filter: blur(12px);">
     </div>
-    <div class="fixed bottom-0 left-0 w-full h-8 pointer-events-none z-30 block dark:hidden"
-         style="background: linear-gradient(to top, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%); 
-                backdrop-filter: blur(3px); 
-                -webkit-backdrop-filter: blur(3px);">
-    </div>
-    <div class="fixed bottom-0 left-0 w-full h-16 pointer-events-none z-30 block dark:hidden"
-         style="background: linear-gradient(to top, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%); 
-                backdrop-filter: blur(8px); 
-                -webkit-backdrop-filter: blur(8px);">
-    </div>
-
     <!-- 暗色模式 -->
-    <div class="fixed bottom-0 left-0 w-full h-4 pointer-events-none z-30 hidden dark:block"
-         style="background: linear-gradient(to top, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 100%); 
-                backdrop-filter: blur(0.5px); 
-                -webkit-backdrop-filter: blur(0.5px);">
-    </div>
-    <div class="fixed bottom-0 left-0 w-full h-8 pointer-events-none z-30 hidden dark:block"
-         style="background: linear-gradient(to top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 100%); 
-                backdrop-filter: blur(3px); 
-                -webkit-backdrop-filter: blur(3px);">
-    </div>
-    <div class="fixed bottom-0 left-0 w-full h-16 pointer-events-none z-30 hidden dark:block"
-         style="background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 100%); 
-                backdrop-filter: blur(8px); 
-                -webkit-backdrop-filter: blur(8px);">
+    <div class="fixed bottom-0 left-0 w-full h-20 pointer-events-none z-30 hidden dark:block"
+         style="background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%); 
+                backdrop-filter: blur(12px); 
+                -webkit-backdrop-filter: blur(12px);">
     </div>
 
     <BasicScripts />
