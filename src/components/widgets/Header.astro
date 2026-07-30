@@ -57,6 +57,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   {...id ? { id } : {}}
 >
   <style>
+    /* 基础透明 */
     header#header * {
       background: transparent !important;
     }
@@ -75,7 +76,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     .dark header#header a:hover {
       background: rgba(255,255,255,0.05) !important;
     }
-    /* 手机菜单浮层样式 */
+
+    /* 手机菜单浮层 */
     #mobile-menu {
       position: fixed !important;
       top: 0 !important;
@@ -89,7 +91,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       z-index: 9999 !important;
       transform: translateX(100%) !important;
       transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      padding-top: 60px !important;
+      padding: 80px 24px 24px 24px !important;
       overflow-y: auto !important;
     }
     .dark #mobile-menu {
@@ -98,6 +100,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     #mobile-menu.open {
       transform: translateX(0) !important;
     }
+
     /* 遮罩层 */
     #menu-overlay {
       position: fixed !important;
@@ -115,35 +118,37 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       opacity: 1 !important;
       pointer-events: auto !important;
     }
+
+    /* 手机端隐藏桌面导航 */
+    @media (max-width: 767px) {
+      .desktop-nav {
+        display: none !important;
+      }
+      .mobile-controls {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+      }
+    }
+    @media (min-width: 768px) {
+      .mobile-controls {
+        display: none !important;
+      }
+    }
   </style>
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
   <div
-    class:list={[
-      'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
-      {
-        'md:flex md:justify-between': position !== 'center',
-      },
-      {
-        'md:grid md:grid-cols-3 md:items-center': position === 'center',
-      },
-      {
-        'max-w-7xl': !isFullWidth,
-      },
-    ]}
+    class="relative text-default py-3 px-3 md:px-6 mx-auto w-full flex items-center justify-between"
   >
-    <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
-      <a class="flex items-center" href={getHomePermalink()}>
-        <Logo />
-      </a>
-      <div class="flex items-center md:hidden">
-        <ToggleMenu />
-      </div>
-    </div>
+    <!-- 左侧 Logo -->
+    <a class="flex items-center" href={getHomePermalink()}>
+      <Logo />
+    </a>
 
     <!-- ===== 桌面端导航 ===== -->
     <nav
-      class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
+      class="desktop-nav items-center w-full md:w-auto flex md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
       aria-label="Main navigation"
     >
       <ul
@@ -194,38 +199,25 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <div
-      class:list={[
-        { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
-        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
-      ]}
-    >
-      <div class="items-center flex justify-between w-full md:w-auto">
-        <div class="flex">
-          {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
-          {
-            showRssFeed && (
-              <a
-                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
-                aria-label="RSS Feed"
-                href={getAsset('/rss.xml')}
-              >
-                <Icon name="tabler:rss" class="w-5 h-5" />
-              </a>
-            )
-          }
-        </div>
-        {
-          actions?.length ? (
-            <span class="ml-4 rtl:ml-0 rtl:mr-4">
-              {actions.map((btnProps) => (
-                <Button {...btnProps} class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto" />
-              ))}
-            </span>
-          ) : (
-            ''
-          )
-        }
+    <!-- ===== 右侧控件（手机端+桌面端） ===== -->
+    <div class="flex items-center gap-2">
+      <!-- 主题切换 -->
+      {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
+      <!-- 联系按钮（actions） -->
+      {
+        actions?.length ? (
+          <span class="ml-2 rtl:ml-0 rtl:mr-2 hidden sm:inline">
+            {actions.map((btnProps) => (
+              <Button {...btnProps} class="py-2 px-4 md:px-5 font-semibold shadow-none text-sm" />
+            ))}
+          </span>
+        ) : (
+          ''
+        )
+      }
+      <!-- 手机端汉堡菜单 -->
+      <div class="mobile-controls">
+        <ToggleMenu />
       </div>
     </div>
   </div>
@@ -233,9 +225,9 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   <!-- ===== 遮罩层 ===== -->
   <div id="menu-overlay"></div>
 
-  <!-- ===== 手机端滑动菜单（独立浮层） ===== -->
+  <!-- ===== 手机端滑动菜单 ===== -->
   <div id="mobile-menu">
-    <ul class="flex flex-col w-full text-lg font-medium px-6">
+    <ul class="flex flex-col w-full text-lg font-medium">
       {
         links.map(({ text, href, links }) => (
           <li class={links?.length ? 'dropdown' : ''}>
