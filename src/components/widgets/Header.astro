@@ -2,6 +2,7 @@
 import { Icon } from 'astro-icon/components';
 import Logo from '~/components/Logo.astro';
 import ToggleMenu from '~/components/common/ToggleMenu.astro';
+import ToggleTheme from '~/components/common/ToggleTheme.astro';
 import Button from '~/components/ui/Button.astro';
 
 import { getHomePermalink } from '~/utils/permalinks';
@@ -26,6 +27,7 @@ export interface Props {
   isSticky?: boolean;
   isDark?: boolean;
   isFullWidth?: boolean;
+  showToggleTheme?: boolean;
   showRssFeed?: boolean;
   position?: string;
 }
@@ -37,6 +39,7 @@ const {
   isSticky = false,
   isDark = false,
   isFullWidth = false,
+  showToggleTheme = false,
   showRssFeed = false,
   position = 'center',
 } = Astro.props;
@@ -54,7 +57,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   {...id ? { id } : {}}
 >
   <style>
-    /* 基础透明样式 */
     header#header * {
       background: transparent !important;
     }
@@ -74,6 +76,35 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.05) !important;
     }
 
+    /* 右侧滑出菜单 - 固定定位，不占文档流 */
+    #mobile-menu {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      width: 280px;
+      max-width: 80vw;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: -4px 0 20px rgba(0,0,0,0.08);
+      z-index: 9999;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 80px 24px 24px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      pointer-events: none;
+    }
+    #mobile-menu.open {
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+    .dark #mobile-menu {
+      background: rgba(17, 24, 39, 0.85);
+    }
+
     /* 遮罩层 - 完全透明，仅用于点击关闭 */
     #menu-overlay {
       position: fixed;
@@ -81,42 +112,13 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: transparent !important;
+      background: transparent;
       z-index: 9998;
       pointer-events: none;
       transition: opacity 0.3s ease;
     }
     #menu-overlay.open {
       pointer-events: auto;
-    }
-
-    /* 手机菜单 - 固定定位，覆盖在内容之上，不占文档流 */
-    #mobile-menu {
-      position: fixed !important;
-      top: 0 !important;
-      right: 0 !important;
-      height: 100vh !important;
-      width: 280px !important;
-      max-width: 80vw !important;
-      background: rgba(255,255,255,0.85) !important;
-      backdrop-filter: blur(16px) !important;
-      -webkit-backdrop-filter: blur(16px) !important;
-      box-shadow: -4px 0 20px rgba(0,0,0,0.08) !important;
-      z-index: 9999 !important;
-      transform: translateX(100%) !important;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      padding: 80px 24px 24px 24px !important;
-      overflow-y: auto !important;
-      display: flex !important;
-      flex-direction: column !important;
-      pointer-events: none !important;
-    }
-    #mobile-menu.open {
-      transform: translateX(0) !important;
-      pointer-events: auto !important;
-    }
-    .dark #mobile-menu {
-      background: rgba(17, 24, 39, 0.85) !important;
     }
 
     /* 关闭按钮 */
@@ -136,7 +138,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       color: #eee;
     }
 
-    /* 菜单底部：主题切换 + 按钮 */
+    /* 菜单底部 */
     #menu-footer {
       margin-top: auto;
       padding-top: 16px;
@@ -150,13 +152,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       border-top-color: rgba(255,255,255,0.06);
     }
 
-    /* 汉堡按钮始终在顶层 */
-    .mobile-toggle {
-      z-index: 10001 !important;
-      position: relative;
-    }
-
-    /* 响应式：桌面显示导航，手机隐藏 */
+    /* 桌面导航 */
     @media (max-width: 767px) {
       .desktop-nav { display: none !important; }
       .mobile-toggle { display: flex !important; }
@@ -168,32 +164,76 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </style>
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
-  <div class="relative text-default py-3 px-3 md:px-6 mx-auto w-full flex items-center justify-between">
-    <!-- Logo -->
-    <a class="flex items-center" href={getHomePermalink()}>
-      <Logo />
-    </a>
+  <div
+    class:list={[
+      'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
+      {
+        'md:flex md:justify-between': position !== 'center',
+      },
+      {
+        'md:grid md:grid-cols-3 md:items-center': position === 'center',
+      },
+      {
+        'max-w-7xl': !isFullWidth,
+      },
+    ]}
+  >
+    <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
+      <a class="flex items-center" href={getHomePermalink()}>
+        <Logo />
+      </a>
+      <!-- 手机端汉堡按钮 -->
+      <div class="flex items-center md:hidden mobile-toggle">
+        <ToggleMenu />
+      </div>
+    </div>
 
     <!-- 桌面导航 -->
-    <nav class="desktop-nav items-center md:flex md:mx-5 text-default" aria-label="Main navigation">
-      <ul class="flex flex-row items-center text-[0.9375rem] font-medium gap-1">
+    <nav
+      class="desktop-nav items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
+      aria-label="Main navigation"
+    >
+      <ul
+        class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
+      >
         {
           links.map(({ text, href, links }) => (
-            <li class={links?.length ? 'dropdown relative' : ''}>
+            <li class={links?.length ? 'dropdown' : ''}>
               {links?.length ? (
                 <>
-                  <button class="hover:text-link dark:hover:text-white px-3 py-2 flex items-center whitespace-nowrap">
-                    {text}
-                    <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5" />
+                  <button
+                    type="button"
+                    class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
+                  >
+                    {text}{' '}
+                    <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
                   </button>
-                  <ul class="dropdown-menu absolute top-full left-0 hidden md:bg-white/90 dark:md:bg-dark rounded shadow-lg min-w-[180px] py-2">
-                    {links.map(({ text: t, href: h }) => (
-                      <li><a class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" href={h}>{t}</a></li>
+                  <ul class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl">
+                    {links.map(({ text: text2, href: href2 }) => (
+                      <li>
+                        <a
+                          class:list={[
+                            'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
+                            { 'aw-link-active': href2 === currentPath },
+                          ]}
+                          href={href2}
+                        >
+                          {text2}
+                        </a>
+                      </li>
                     ))}
                   </ul>
                 </>
               ) : (
-                <a class="hover:text-link dark:hover:text-white px-3 py-2 block" href={href}>{text}</a>
+                <a
+                  class:list={[
+                    'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
+                    { 'aw-link-active': href === currentPath },
+                  ]}
+                  href={href}
+                >
+                  {text}
+                </a>
               )}
             </li>
           ))
@@ -201,27 +241,47 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- 右侧：桌面端联系按钮 + 手机端汉堡 -->
-    <div class="flex items-center gap-2 flex-nowrap">
-      <div class="hidden md:flex items-center gap-2">
+    <!-- 桌面端右侧控件 -->
+    <div
+      class:list={[
+        { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
+        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
+      ]}
+    >
+      <div class="items-center flex justify-between w-full md:w-auto">
+        <div class="flex">
+          {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
+          {
+            showRssFeed && (
+              <a
+                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
+                aria-label="RSS Feed"
+                href={getAsset('/rss.xml')}
+              >
+                <Icon name="tabler:rss" class="w-5 h-5" />
+              </a>
+            )
+          }
+        </div>
         {
           actions?.length ? (
-            actions.map((btnProps) => (
-              <Button {...btnProps} class="py-1.5 px-4 text-sm font-semibold shadow-none" />
-            ))
-          ) : ''
+            <span class="ml-4 rtl:ml-0 rtl:mr-4">
+              {actions.map((btnProps) => (
+                <Button {...btnProps} class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto" />
+              ))}
+            </span>
+          ) : (
+            ''
+          )
         }
-      </div>
-      <div class="mobile-toggle flex items-center md:hidden">
-        <ToggleMenu />
       </div>
     </div>
   </div>
 
-  <!-- 遮罩层 -->
+  <!-- 遮罩层（透明） -->
   <div id="menu-overlay"></div>
 
-  <!-- 手机菜单 - 浮层 -->
+  <!-- 右侧滑出菜单 -->
   <div id="mobile-menu">
     <button id="menu-close-btn" aria-label="关闭菜单">✕</button>
 
@@ -231,37 +291,48 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           <li class={links?.length ? 'dropdown' : ''}>
             {links?.length ? (
               <>
-                <button class="hover:text-blue-600 dark:hover:text-blue-400 py-3 flex items-center w-full border-b border-gray-100 dark:border-gray-700">
+                <button
+                  type="button"
+                  class="hover:text-blue-600 dark:hover:text-blue-400 py-3 flex items-center w-full border-b border-gray-100 dark:border-gray-700"
+                >
                   {text}
                   <Icon name="tabler:chevron-down" class="w-4 h-4 ml-auto" />
                 </button>
                 <ul class="pl-4">
-                  {links.map(({ text: t, href: h }) => (
-                    <li><a class="block py-2 hover:text-blue-600 dark:hover:text-blue-400" href={h}>{t}</a></li>
+                  {links.map(({ text: text2, href: href2 }) => (
+                    <li>
+                      <a
+                        class:list={[
+                          'block py-2 hover:text-blue-600 dark:hover:text-blue-400',
+                          { 'text-blue-600 dark:text-blue-400': href2 === currentPath },
+                        ]}
+                        href={href2}
+                      >
+                        {text2}
+                      </a>
+                    </li>
                   ))}
                 </ul>
               </>
             ) : (
-              <a class="block py-3 border-b border-gray-100 dark:border-gray-700 hover:text-blue-600 dark:hover:text-blue-400" href={href}>{text}</a>
+              <a
+                class:list={[
+                  'block py-3 border-b border-gray-100 dark:border-gray-700 hover:text-blue-600 dark:hover:text-blue-400',
+                  { 'text-blue-600 dark:text-blue-400': href === currentPath },
+                ]}
+                href={href}
+              >
+                {text}
+              </a>
             )}
           </li>
         ))
       }
     </ul>
 
-    <!-- 菜单底部 -->
+    <!-- 菜单底部：主题切换 + 联系按钮 -->
     <div id="menu-footer">
-      <!-- 主题切换按钮 -->
-      <button
-        id="theme-toggle"
-        type="button"
-        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        aria-label="切换主题"
-      >
-        <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-      </button>
+      <ToggleTheme iconClass="w-6 h-6" />
       {
         actions?.length ? (
           actions.map((btnProps) => (
@@ -274,7 +345,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // ===== 菜单控制 =====
       const menu = document.getElementById('mobile-menu');
       const overlay = document.getElementById('menu-overlay');
       const toggle = document.querySelector('[data-aw-toggle-menu]');
@@ -284,7 +354,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         menu.classList.add('open');
         overlay.classList.add('open');
         if (toggle) toggle.classList.add('expanded');
-        document.body.style.overflow = 'hidden'; // 防止滚动穿透
+        document.body.style.overflow = 'hidden';
       }
 
       function closeMenu() {
@@ -297,7 +367,9 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       if (toggle) {
         toggle.addEventListener('click', function(e) {
           e.stopPropagation();
-          menu.classList.contains('open') ? closeMenu() : openMenu();
+          const isOpen = menu.classList.contains('open');
+          if (isOpen) closeMenu();
+          else openMenu();
         });
       }
 
@@ -318,45 +390,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         });
       }
 
-      // 桌面尺寸时关闭菜单
+      // 窗口尺寸变化，桌面时关闭
       window.addEventListener('resize', function() {
         if (window.innerWidth >= 768 && menu.classList.contains('open')) {
           closeMenu();
         }
-      });
-
-      // ===== 主题切换 =====
-      function toggleTheme() {
-        const html = document.documentElement;
-        const isDark = html.classList.contains('dark');
-        html.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        updateIcon();
-      }
-
-      function updateIcon() {
-        const isDark = document.documentElement.classList.contains('dark');
-        const svg = document.getElementById('theme-icon');
-        if (svg) {
-          if (isDark) {
-            svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
-          } else {
-            svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
-          }
-        }
-      }
-
-      // 初始化主题
-      const saved = localStorage.getItem('theme');
-      if (saved === 'dark') document.documentElement.classList.add('dark');
-      else if (saved === 'light') document.documentElement.classList.remove('dark');
-      else if (window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark');
-      updateIcon();
-
-      document.getElementById('theme-toggle')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleTheme();
       });
     });
   </script>
