@@ -56,6 +56,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   {...isSticky ? { 'data-aw-sticky-header': true } : {}}
   {...id ? { id } : {}}
 >
+  <!-- 强制所有子元素背景透明 -->
   <style>
     header#header * {
       background: transparent !important;
@@ -75,109 +76,78 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     .dark header#header a:hover {
       background: rgba(255,255,255,0.05) !important;
     }
-
-    /* 手机菜单浮层 */
-    #mobile-menu {
-      position: fixed !important;
-      top: 0 !important;
-      right: 0 !important;
-      height: 100vh !important;
-      width: 280px !important;
-      background: rgba(255,255,255,0.95) !important;
-      backdrop-filter: blur(16px) !important;
-      -webkit-backdrop-filter: blur(16px) !important;
-      box-shadow: -4px 0 20px rgba(0,0,0,0.1) !important;
-      z-index: 9999 !important;
-      transform: translateX(100%) !important;
-      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      padding: 80px 24px 24px 24px !important;
-      overflow-y: auto !important;
-    }
-    .dark #mobile-menu {
-      background: rgba(17, 24, 39, 0.95) !important;
-    }
-    #mobile-menu.open {
-      transform: translateX(0) !important;
-    }
-
-    /* 遮罩层 */
-    #menu-overlay {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      background: rgba(0,0,0,0.3) !important;
-      z-index: 9998 !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-      transition: opacity 0.35s ease !important;
-    }
-    #menu-overlay.open {
-      opacity: 1 !important;
-      pointer-events: auto !important;
-    }
-
-    .menu-close-btn {
-      position: absolute !important;
-      top: 20px !important;
-      right: 20px !important;
-      font-size: 24px !important;
-      color: #666 !important;
-      cursor: pointer !important;
-      background: none !important;
-      border: none !important;
-      z-index: 10000 !important;
-    }
-    .dark .menu-close-btn {
-      color: #ccc !important;
-    }
-    .menu-close-btn:hover {
-      color: #000 !important;
-    }
-    .dark .menu-close-btn:hover {
-      color: #fff !important;
-    }
-
-    /* 桌面导航显示，手机隐藏 */
-    @media (max-width: 767px) {
-      .desktop-nav {
-        display: none !important;
-      }
-    }
-    @media (min-width: 768px) {
-      .desktop-nav {
-        display: flex !important;
-      }
-    }
   </style>
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
-  <div class="relative text-default py-3 px-3 md:px-6 mx-auto w-full flex items-center justify-between">
-    <!-- Logo -->
-    <a class="flex items-center" href={getHomePermalink()}>
-      <Logo />
-    </a>
+  <div
+    class:list={[
+      'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
+      {
+        'md:flex md:justify-between': position !== 'center',
+      },
+      {
+        'md:grid md:grid-cols-3 md:items-center': position === 'center',
+      },
+      {
+        'max-w-7xl': !isFullWidth,
+      },
+    ]}
+  >
+    <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
+      <a class="flex items-center" href={getHomePermalink()}>
+        <Logo />
+      </a>
+      <div class="flex items-center md:hidden">
+        <ToggleMenu />
+      </div>
+    </div>
 
-    <!-- 桌面导航 -->
-    <nav class="desktop-nav items-center md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center" aria-label="Main navigation">
-      <ul class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center">
+    <!-- 导航菜单 -->
+    <nav
+      class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
+      aria-label="Main navigation"
+    >
+      <ul
+        class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
+      >
         {
           links.map(({ text, href, links }) => (
             <li class={links?.length ? 'dropdown' : ''}>
               {links?.length ? (
                 <>
-                  <button type="button" class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap">
-                    {text} <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
+                  <button
+                    type="button"
+                    class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
+                  >
+                    {text}{' '}
+                    <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
                   </button>
                   <ul class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl">
                     {links.map(({ text: text2, href: href2 }) => (
-                      <li><a class:list={['first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap', { 'aw-link-active': href2 === currentPath }]} href={href2}>{text2}</a></li>
+                      <li>
+                        <a
+                          class:list={[
+                            'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
+                            { 'aw-link-active': href2 === currentPath },
+                          ]}
+                          href={href2}
+                        >
+                          {text2}
+                        </a>
+                      </li>
                     ))}
                   </ul>
                 </>
               ) : (
-                <a class:list={['hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap', { 'aw-link-active': href === currentPath }]} href={href}>{text}</a>
+                <a
+                  class:list={[
+                    'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
+                    { 'aw-link-active': href === currentPath },
+                  ]}
+                  href={href}
+                >
+                  {text}
+                </a>
               )}
             </li>
           ))
@@ -185,71 +155,39 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- 右侧控件 -->
-    <div class="flex items-center gap-2 md:gap-3 flex-nowrap">
-      {showToggleTheme && <ToggleTheme iconClass="w-5 h-5 md:w-5 md:h-5 lg:w-6 lg:h-6" />}
-      {actions?.length ? (
-        <span class="hidden sm:inline-block">
-          {actions.map((btnProps) => <Button {...btnProps} class="py-1.5 px-3 md:py-2 md:px-4 lg:py-2.5 lg:px-5 font-semibold shadow-none text-xs md:text-sm whitespace-nowrap" />)}
-        </span>
-      ) : ''}
-      <div class="md:hidden flex items-center"><ToggleMenu /></div>
+    <div
+      class:list={[
+        { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
+        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
+      ]}
+    >
+      <div class="items-center flex justify-between w-full md:w-auto">
+        <div class="flex">
+          {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
+          {
+            showRssFeed && (
+              <a
+                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
+                aria-label="RSS Feed"
+                href={getAsset('/rss.xml')}
+              >
+                <Icon name="tabler:rss" class="w-5 h-5" />
+              </a>
+            )
+          }
+        </div>
+        {
+          actions?.length ? (
+            <span class="ml-4 rtl:ml-0 rtl:mr-4">
+              {actions.map((btnProps) => (
+                <Button {...btnProps} class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto" />
+              ))}
+            </span>
+          ) : (
+            ''
+          )
+        }
+      </div>
     </div>
   </div>
-
-  <!-- 遮罩层 -->
-  <div id="menu-overlay"></div>
-
-  <!-- 手机菜单 -->
-  <div id="mobile-menu">
-    <button class="menu-close-btn" id="close-menu-btn" aria-label="关闭菜单">✕</button>
-    <ul class="flex flex-col w-full text-lg font-medium">
-      {links.map(({ text, href, links }) => (
-        <li class={links?.length ? 'dropdown' : ''}>
-          {links?.length ? (
-            <>
-              <button type="button" class="hover:text-blue-600 dark:hover:text-blue-400 py-3 flex items-center w-full border-b border-gray-100 dark:border-gray-700">
-                {text} <Icon name="tabler:chevron-down" class="w-4 h-4 ml-auto" />
-              </button>
-              <ul class="pl-4">
-                {links.map(({ text: text2, href: href2 }) => (
-                  <li><a class:list={['block py-2 hover:text-blue-600 dark:hover:text-blue-400', { 'text-blue-600 dark:text-blue-400': href2 === currentPath }]} href={href2}>{text2}</a></li>
-                ))}
-              </ul>
-            </>
-          ) : (
-            <a class:list={['block py-3 border-b border-gray-100 dark:border-gray-700 hover:text-blue-600 dark:hover:text-blue-400', { 'text-blue-600 dark:text-blue-400': href === currentPath }]} href={href}>{text}</a>
-          )}
-        </li>
-      ))}
-    </ul>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const menu = document.getElementById('mobile-menu');
-      const overlay = document.getElementById('menu-overlay');
-      const toggle = document.querySelector('[data-aw-toggle-menu]');
-      const closeBtn = document.getElementById('close-menu-btn');
-
-      function openMenu() {
-        menu.classList.add('open');
-        overlay.classList.add('open');
-        if (toggle) toggle.classList.add('expanded');
-        document.body.style.overflow = 'hidden';
-      }
-
-      function closeMenu() {
-        menu.classList.remove('open');
-        overlay.classList.remove('open');
-        if (toggle) toggle.classList.remove('expanded');
-        document.body.style.overflow = '';
-      }
-
-      if (toggle) toggle.addEventListener('click', function(e) { e.stopPropagation(); menu.classList.contains('open') ? closeMenu() : openMenu(); });
-      if (closeBtn) closeBtn.addEventListener('click', closeMenu);
-      if (overlay) overlay.addEventListener('click', closeMenu);
-      if (menu) menu.querySelectorAll('a, button:not(#close-menu-btn)').forEach(el => el.addEventListener('click', closeMenu));
-    });
-  </script>
 </header>
