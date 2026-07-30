@@ -2,6 +2,7 @@
 import { Icon } from 'astro-icon/components';
 import Logo from '~/components/Logo.astro';
 import ToggleTheme from '~/components/common/ToggleTheme.astro';
+import ToggleMenu from '~/components/common/ToggleMenu.astro';
 import Button from '~/components/ui/Button.astro';
 
 import { getHomePermalink } from '~/utils/permalinks';
@@ -75,68 +76,24 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.05) !important;
     }
 
-    /* 自定义汉堡按钮 - 三条线变 X */
-    .hamburger {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 28px;
-      height: 20px;
-      cursor: pointer;
-      background: transparent;
-      border: none;
-      padding: 0;
-    }
-    .hamburger span {
-      display: block;
-      height: 2.5px;
-      width: 100%;
-      background-color: currentColor;
-      border-radius: 2px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      transform-origin: center;
-    }
-    .hamburger.expanded span:nth-child(1) {
-      transform: translateY(8.5px) rotate(45deg);
-    }
-    .hamburger.expanded span:nth-child(2) {
-      opacity: 0;
-      transform: scaleX(0);
-    }
-    .hamburger.expanded span:nth-child(3) {
-      transform: translateY(-8.5px) rotate(-45deg);
-    }
-
-    /* 手机端半覆盖菜单浮层 - 覆盖右侧75% */
+    /* 手机端菜单 - 直接在导航下方展开，不浮层，不覆盖 */
     .mobile-nav-list {
       display: none;
-      position: absolute;
-      top: 100%;
-      right: 0;
-      left: auto;
-      width: 75%;
-      margin-top: 0;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-radius: 0 0 0 20px;
-      box-shadow: -8px 12px 40px rgba(0,0,0,0.08);
-      padding: 16px 0 12px 0;
-      max-height: 70vh;
-      overflow: hidden;
-      z-index: 50;
+      flex-direction: column;
+      width: 100%;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 0 0 16px 16px;
+      padding: 12px 0;
+      margin-top: 4px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
     }
     .dark .mobile-nav-list {
-      background: rgba(17, 24, 39, 0.92);
+      background: rgba(17, 24, 39, 0.95);
     }
     .mobile-nav-list.open {
-      display: block;
-    }
-
-    .mobile-nav-scroll {
-      max-height: calc(70vh - 80px);
-      overflow-y: auto;
-      padding: 0 0 4px 0;
+      display: flex;
     }
 
     .mobile-nav-list > div {
@@ -188,17 +145,12 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       border-radius: 10px;
       background: transparent;
     }
-    .mobile-nav-list .dropdown-sub a:hover {
-      background: rgba(0,0,0,0.04);
-    }
-    .dark .mobile-nav-list .dropdown-sub a:hover {
-      background: rgba(255,255,255,0.04);
-    }
 
+    /* 底部主题切换 */
     .menu-theme-item {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 10px;
       padding: 12px 16px;
       margin: 0 16px;
       margin-top: 8px;
@@ -232,34 +184,25 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
   <div
-    class="relative text-default py-3 px-3 md:px-6 mx-auto w-full"
-    style="position: relative;"
+    class:list={[
+      'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
+      {
+        'md:flex md:justify-between': position !== 'center',
+      },
+      {
+        'md:grid md:grid-cols-3 md:items-center': position === 'center',
+      },
+      {
+        'max-w-7xl': !isFullWidth,
+      },
+    ]}
   >
-    <div class="flex items-center justify-between">
+    <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
       <a class="flex items-center" href={getHomePermalink()}>
         <Logo />
       </a>
-      <div class="flex items-center gap-2">
-        <div class="hidden md:flex items-center gap-2">
-          {showToggleTheme && <ToggleTheme iconClass="w-5 h-5" />}
-          {
-            actions?.length ? (
-              actions.map((btnProps) => (
-                <Button {...btnProps} class="py-1.5 px-4 text-sm font-semibold shadow-none" />
-              ))
-            ) : ''
-          }
-        </div>
-        <!-- 自定义汉堡按钮 -->
-        <button
-          id="hamburger-btn"
-          class="hamburger flex items-center md:hidden"
-          aria-label="切换菜单"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+      <div class="flex items-center md:hidden">
+        <ToggleMenu />
       </div>
     </div>
 
@@ -316,35 +259,68 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- 手机端半覆盖菜单浮层 -->
-    <div id="mobile-nav" class="mobile-nav-list">
-      <div class="mobile-nav-scroll">
+    <div
+      class:list={[
+        { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
+        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
+      ]}
+    >
+      <div class="items-center flex justify-between w-full md:w-auto">
+        <div class="flex">
+          {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
+          {
+            showRssFeed && (
+              <a
+                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
+                aria-label="RSS Feed"
+                href={getAsset('/rss.xml')}
+              >
+                <Icon name="tabler:rss" class="w-5 h-5" />
+              </a>
+            )
+          }
+        </div>
         {
-          links.map(({ text, href, links }) => (
-            <div>
-              {links?.length ? (
-                <>
-                  <button
-                    type="button"
-                    class="flex items-center justify-between w-full"
-                    onclick="this.nextElementSibling.classList.toggle('open')"
-                  >
-                    {text}
-                    <Icon name="tabler:chevron-down" class="w-4 h-4 transition-transform" />
-                  </button>
-                  <div class="dropdown-sub">
-                    {links.map(({ text: t, href: h }) => (
-                      <a href={h} class="block">{t}</a>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <a href={href}>{text}</a>
-              )}
-            </div>
-          ))
+          actions?.length ? (
+            <span class="ml-4 rtl:ml-0 rtl:mr-4">
+              {actions.map((btnProps) => (
+                <Button {...btnProps} class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto" />
+              ))}
+            </span>
+          ) : (
+            ''
+          )
         }
       </div>
+    </div>
+
+    <!-- 手机端菜单（流式展开，在导航下方） -->
+    <div id="mobile-nav" class="mobile-nav-list">
+      {
+        links.map(({ text, href, links }) => (
+          <div>
+            {links?.length ? (
+              <>
+                <button
+                  type="button"
+                  class="flex items-center justify-between w-full"
+                  onclick="this.nextElementSibling.classList.toggle('open')"
+                >
+                  {text}
+                  <Icon name="tabler:chevron-down" class="w-4 h-4 transition-transform" />
+                </button>
+                <div class="dropdown-sub">
+                  {links.map(({ text: t, href: h }) => (
+                    <a href={h} class="block">{t}</a>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <a href={href}>{text}</a>
+            )}
+          </div>
+        ))
+      }
       <div class="menu-theme-item">
         <ToggleTheme iconClass="w-5 h-5" />
         <span>切换主题</span>
@@ -353,58 +329,52 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 
   <script>
-    function initMobileMenu() {
-      const hamburger = document.getElementById('hamburger-btn');
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggleBtn = document.querySelector('[data-aw-toggle-menu]');
       const mobileNav = document.getElementById('mobile-nav');
-      if (!hamburger || !mobileNav) return;
 
-      // 移除之前可能绑定的监听器（防止重复）
-      const toggleHandler = function(e) {
-        e.stopPropagation();
-        mobileNav.classList.toggle('open');
-        hamburger.classList.toggle('expanded');
-      };
-      // 移除旧监听器（如果有）
-      hamburger.removeEventListener('click', toggleHandler);
-      hamburger.addEventListener('click', toggleHandler);
-
-      const closeMenu = function() {
-        mobileNav.classList.remove('open');
-        hamburger.classList.remove('expanded');
-      };
-
-      // 为菜单内链接和按钮绑定关闭事件
-      mobileNav.querySelectorAll('a, button').forEach(el => {
-        // 移除旧监听器
-        el.removeEventListener('click', closeMenu);
-        el.addEventListener('click', function(e) {
-          if (this.closest('.dropdown-sub')) return;
-          closeMenu();
+      if (toggleBtn && mobileNav) {
+        toggleBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          mobileNav.classList.toggle('open');
+          this.classList.toggle('expanded');
         });
-      });
+      }
+
+      if (mobileNav) {
+        mobileNav.querySelectorAll('a, button').forEach(function(el) {
+          el.addEventListener('click', function() {
+            if (this.closest('.dropdown-sub')) return;
+            mobileNav.classList.remove('open');
+            if (toggleBtn) toggleBtn.classList.remove('expanded');
+          });
+        });
+      }
 
       // 点击外部关闭
-      const outsideClose = function(e) {
-        if (!mobileNav.contains(e.target) && !hamburger.contains(e.target)) {
-          closeMenu();
+      document.addEventListener('click', function(e) {
+        if (mobileNav && toggleBtn) {
+          if (!mobileNav.contains(e.target) && !toggleBtn.contains(e.target)) {
+            mobileNav.classList.remove('open');
+            toggleBtn.classList.remove('expanded');
+          }
         }
-      };
-      document.removeEventListener('click', outsideClose);
-      document.addEventListener('click', outsideClose);
+      });
+    });
 
-      // 当窗口 resize 到桌面时关闭菜单
-      const resizeClose = function() {
-        if (window.innerWidth >= 768 && mobileNav.classList.contains('open')) {
-          closeMenu();
-        }
-      };
-      window.removeEventListener('resize', resizeClose);
-      window.addEventListener('resize', resizeClose);
-    }
+    // 支持 Astro View Transitions
+    document.addEventListener('astro:after-swap', function() {
+      const toggleBtn = document.querySelector('[data-aw-toggle-menu]');
+      const mobileNav = document.getElementById('mobile-nav');
 
-    // 首次加载时初始化
-    document.addEventListener('DOMContentLoaded', initMobileMenu);
-    // Astro 视图切换后重新初始化
-    document.addEventListener('astro:after-swap', initMobileMenu);
+      if (toggleBtn && mobileNav) {
+        // 重新绑定事件
+        toggleBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          mobileNav.classList.toggle('open');
+          this.classList.toggle('expanded');
+        });
+      }
+    });
   </script>
 </header>
