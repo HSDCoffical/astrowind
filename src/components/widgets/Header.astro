@@ -1,7 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
 import Logo from '~/components/Logo.astro';
-import ToggleTheme from '~/components/common/ToggleTheme.astro';
 import ToggleMenu from '~/components/common/ToggleMenu.astro';
 import Button from '~/components/ui/Button.astro';
 
@@ -27,7 +26,6 @@ export interface Props {
   isSticky?: boolean;
   isDark?: boolean;
   isFullWidth?: boolean;
-  showToggleTheme?: boolean;
   showRssFeed?: boolean;
   position?: string;
 }
@@ -39,7 +37,6 @@ const {
   isSticky = false,
   isDark = false,
   isFullWidth = false,
-  showToggleTheme = false,
   showRssFeed = false,
   position = 'center',
 } = Astro.props;
@@ -112,14 +109,12 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      pointer-events: none; /* 默认不接收点击，打开时再允许 */
     }
     .dark #mobile-menu {
       background: rgba(17, 24, 39, 0.7) !important;
     }
     #mobile-menu.open {
       transform: translateX(0);
-      pointer-events: auto;
     }
 
     /* 关闭按钮（X） */
@@ -161,6 +156,12 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     }
     .dark #menu-footer {
       border-top-color: rgba(255,255,255,0.06);
+    }
+
+    /* 汉堡按钮始终在顶层 */
+    .mobile-toggle {
+      z-index: 10001 !important;
+      position: relative;
     }
 
     /* 桌面导航 */
@@ -220,8 +221,19 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
     <!-- 右侧控件 -->
     <div class="flex items-center gap-2 flex-nowrap">
+      <!-- 主题切换 - 直接实现，避免组件跳转 -->
+      <button
+        id="theme-toggle"
+        type="button"
+        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        aria-label="切换主题"
+      >
+        <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      </button>
+      <!-- 桌面端联系按钮 -->
       <div class="hidden md:flex items-center gap-2">
-        <ToggleTheme iconClass="w-5 h-5" />
         {
           actions?.length ? (
             actions.map((btnProps) => (
@@ -270,7 +282,17 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
     <!-- 菜单底部 -->
     <div id="menu-footer">
-      <ToggleTheme iconClass="w-6 h-6" />
+      <!-- 手机端主题切换 -->
+      <button
+        id="theme-toggle-mobile"
+        type="button"
+        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        aria-label="切换主题"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      </button>
       {
         actions?.length ? (
           actions.map((btnProps) => (
@@ -283,6 +305,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // ===== 手机菜单控制 =====
       const menu = document.getElementById('mobile-menu');
       const overlay = document.getElementById('menu-overlay');
       const toggle = document.querySelector('[data-aw-toggle-menu]');
@@ -292,7 +315,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         menu.classList.add('open');
         overlay.classList.add('open');
         if (toggle) toggle.classList.add('expanded');
-        // 不再禁用 body 滚动，让内容保持可滚动
       }
 
       function closeMenu() {
@@ -327,19 +349,64 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         });
       }
 
-      // 窗口尺寸变化，桌面时关闭菜单
       window.addEventListener('resize', function() {
         if (window.innerWidth >= 768 && menu.classList.contains('open')) {
           closeMenu();
         }
       });
 
-      // 拦截主题切换按钮的点击，阻止任何可能的页面跳转
-      document.querySelectorAll('[data-aw-toggle-color-scheme]').forEach(function(btn) {
+      // ===== 主题切换逻辑 =====
+      function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+        if (isDark) {
+          html.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+        // 更新图标（太阳/月亮）
+        updateIcons();
+      }
+
+      function updateIcons() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const icons = document.querySelectorAll('#theme-toggle svg, #theme-toggle-mobile svg');
+        icons.forEach(svg => {
+          if (isDark) {
+            svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
+          } else {
+            svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
+          }
+        });
+      }
+
+      // 初始化主题和图标
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+      updateIcons();
+
+      // 绑定点击事件
+      document.querySelectorAll('#theme-toggle, #theme-toggle-mobile').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
-          // 切换主题的逻辑由 ToggleTheme 组件内部处理，我们只阻止冒泡
+          toggleTheme();
+        });
+      });
+
+      // 兼容原 ToggleTheme 可能触发的跳转，阻止所有带有 data-aw-toggle-color-scheme 的默认行为
+      document.querySelectorAll('[data-aw-toggle-color-scheme]').forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
         });
       });
     });
