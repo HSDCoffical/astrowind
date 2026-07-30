@@ -11,12 +11,12 @@ export const headerData = {
       href: getBlogPermalink(),
     },
     {
-      text: '关于我们',
-      href: getPermalink('/about'),
-    },
-    {
       text: '社区中心',
       href: 'https://hono-bbs-9qj.pages.dev',
+    },
+    {
+      text: '关于我们',
+      href: getPermalink('/about'),
     },
   ],
   actions: [
