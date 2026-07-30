@@ -73,7 +73,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.05) !important;
     }
 
-    /* 遮罩层 - 完全透明，仅用于点击关闭 */
+    /* 遮罩层 */
     #menu-overlay {
       position: fixed;
       top: 0;
@@ -82,12 +82,10 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       height: 100vh;
       background: transparent !important;
       z-index: 9998;
-      opacity: 0;
       pointer-events: none;
-      transition: opacity 0.35s ease;
+      transition: opacity 0.3s ease;
     }
     #menu-overlay.open {
-      opacity: 1;
       pointer-events: auto;
     }
 
@@ -98,56 +96,46 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       right: 0;
       height: 100vh;
       width: 280px;
-      background: rgba(255,255,255,0.7) !important;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: -4px 0 30px rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.85) !important;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: -4px 0 20px rgba(0,0,0,0.08);
       z-index: 9999;
       transform: translateX(100%);
-      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      padding: 80px 24px 70px 24px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 80px 24px 24px 24px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
     }
     .dark #mobile-menu {
-      background: rgba(17, 24, 39, 0.7) !important;
+      background: rgba(17, 24, 39, 0.85) !important;
     }
     #mobile-menu.open {
       transform: translateX(0);
     }
 
-    /* 关闭按钮（X） */
+    /* 关闭按钮 */
     #menu-close-btn {
       position: absolute;
       top: 20px;
       right: 20px;
-      font-size: 28px;
-      line-height: 1;
+      font-size: 24px;
       color: #333;
       background: none;
       border: none;
       cursor: pointer;
       z-index: 10000;
       padding: 4px 8px;
-      border-radius: 8px;
-      transition: background 0.2s;
-    }
-    #menu-close-btn:hover {
-      background: rgba(0,0,0,0.05);
     }
     .dark #menu-close-btn {
       color: #eee;
     }
-    .dark #menu-close-btn:hover {
-      background: rgba(255,255,255,0.05);
-    }
 
-    /* 菜单底部按钮区域 */
+    /* 菜单底部 */
     #menu-footer {
       margin-top: auto;
       padding-top: 16px;
-      padding-bottom: 8px;
       border-top: 1px solid rgba(0,0,0,0.06);
       display: flex;
       align-items: center;
@@ -158,35 +146,24 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       border-top-color: rgba(255,255,255,0.06);
     }
 
-    /* 汉堡按钮始终在顶层 */
+    /* 汉堡按钮始终可见 */
     .mobile-toggle {
       z-index: 10001 !important;
       position: relative;
     }
 
-    /* 桌面导航 */
     @media (max-width: 767px) {
-      .desktop-nav {
-        display: none !important;
-      }
-      .mobile-toggle {
-        display: flex !important;
-      }
+      .desktop-nav { display: none !important; }
+      .mobile-toggle { display: flex !important; }
     }
     @media (min-width: 768px) {
-      .desktop-nav {
-        display: flex !important;
-      }
-      .mobile-toggle {
-        display: none !important;
-      }
+      .desktop-nav { display: flex !important; }
+      .mobile-toggle { display: none !important; }
     }
   </style>
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
-  <div
-    class="relative text-default py-3 px-3 md:px-6 mx-auto w-full flex items-center justify-between"
-  >
+  <div class="relative text-default py-3 px-3 md:px-6 mx-auto w-full flex items-center justify-between">
     <!-- Logo -->
     <a class="flex items-center" href={getHomePermalink()}>
       <Logo />
@@ -219,20 +196,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- 右侧控件 -->
+    <!-- 右侧：桌面端联系按钮 + 手机端汉堡 -->
     <div class="flex items-center gap-2 flex-nowrap">
-      <!-- 主题切换 - 直接实现，避免组件跳转 -->
-      <button
-        id="theme-toggle"
-        type="button"
-        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        aria-label="切换主题"
-      >
-        <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-      </button>
-      <!-- 桌面端联系按钮 -->
       <div class="hidden md:flex items-center gap-2">
         {
           actions?.length ? (
@@ -248,12 +213,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     </div>
   </div>
 
-  <!-- 遮罩层（透明） -->
+  <!-- 遮罩层 -->
   <div id="menu-overlay"></div>
 
   <!-- 手机菜单 -->
   <div id="mobile-menu">
-    <!-- 关闭按钮（X） -->
     <button id="menu-close-btn" aria-label="关闭菜单">✕</button>
 
     <ul class="flex flex-col w-full text-lg font-medium">
@@ -280,16 +244,16 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     </ul>
 
-    <!-- 菜单底部 -->
+    <!-- 菜单底部：主题切换 + 联系我们 -->
     <div id="menu-footer">
-      <!-- 手机端主题切换 -->
+      <!-- 主题切换按钮 -->
       <button
-        id="theme-toggle-mobile"
+        id="theme-toggle"
         type="button"
         class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         aria-label="切换主题"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
       </button>
@@ -305,7 +269,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // ===== 手机菜单控制 =====
+      // ===== 菜单控制 =====
       const menu = document.getElementById('mobile-menu');
       const overlay = document.getElementById('menu-overlay');
       const toggle = document.querySelector('[data-aw-toggle-menu]');
@@ -326,22 +290,12 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       if (toggle) {
         toggle.addEventListener('click', function(e) {
           e.stopPropagation();
-          const isOpen = menu.classList.contains('open');
-          if (isOpen) closeMenu();
-          else openMenu();
+          menu.classList.contains('open') ? closeMenu() : openMenu();
         });
       }
 
-      if (closeBtn) {
-        closeBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          closeMenu();
-        });
-      }
-
-      if (overlay) {
-        overlay.addEventListener('click', closeMenu);
-      }
+      if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+      if (overlay) overlay.addEventListener('click', closeMenu);
 
       if (menu) {
         menu.querySelectorAll('a, button:not(#menu-close-btn)').forEach(function(el) {
@@ -349,65 +303,38 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         });
       }
 
-      window.addEventListener('resize', function() {
-        if (window.innerWidth >= 768 && menu.classList.contains('open')) {
-          closeMenu();
-        }
-      });
-
-      // ===== 主题切换逻辑 =====
+      // ===== 主题切换 =====
       function toggleTheme() {
         const html = document.documentElement;
         const isDark = html.classList.contains('dark');
-        if (isDark) {
-          html.classList.remove('dark');
-          localStorage.setItem('theme', 'light');
-        } else {
-          html.classList.add('dark');
-          localStorage.setItem('theme', 'dark');
-        }
-        // 更新图标（太阳/月亮）
-        updateIcons();
+        html.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        updateIcon();
       }
 
-      function updateIcons() {
+      function updateIcon() {
         const isDark = document.documentElement.classList.contains('dark');
-        const icons = document.querySelectorAll('#theme-toggle svg, #theme-toggle-mobile svg');
-        icons.forEach(svg => {
+        const svg = document.getElementById('theme-icon');
+        if (svg) {
           if (isDark) {
             svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
           } else {
             svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
           }
-        });
+        }
       }
 
-      // 初始化主题和图标
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else if (savedTheme === 'light') {
-        document.documentElement.classList.remove('dark');
-      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-      }
-      updateIcons();
+      // 初始化主题
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') document.documentElement.classList.add('dark');
+      else if (saved === 'light') document.documentElement.classList.remove('dark');
+      else if (window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark');
+      updateIcon();
 
-      // 绑定点击事件
-      document.querySelectorAll('#theme-toggle, #theme-toggle-mobile').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleTheme();
-        });
-      });
-
-      // 兼容原 ToggleTheme 可能触发的跳转，阻止所有带有 data-aw-toggle-color-scheme 的默认行为
-      document.querySelectorAll('[data-aw-toggle-color-scheme]').forEach(el => {
-        el.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-        });
+      document.getElementById('theme-toggle')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleTheme();
       });
     });
   </script>
