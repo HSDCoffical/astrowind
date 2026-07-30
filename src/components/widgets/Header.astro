@@ -163,7 +163,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     >
       <div class="items-center flex justify-between w-full md:w-auto">
         <div class="flex">
-          {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
+          <!-- ===== 强制显示主题切换按钮（移除条件判断） ===== -->
+          <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />
           {
             showRssFeed && (
               <a
