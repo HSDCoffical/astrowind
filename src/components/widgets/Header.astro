@@ -76,24 +76,24 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.05) !important;
     }
 
-    /* 手机端半覆盖菜单浮层 - 与桌面端完全分离 */
+    /* 手机端半覆盖菜单浮层 */
     .mobile-nav-list {
       display: none;
       position: absolute;
       top: 100%;
-      left: 0;
       right: 0;
+      left: auto;
+      width: 80%;
       margin-top: 0;
       background: rgba(255,255,255,0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border-radius: 0 0 20px 20px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+      border-radius: 0 0 0 20px;
+      box-shadow: -8px 12px 40px rgba(0,0,0,0.08);
       padding: 16px 0 12px 0;
       max-height: 70vh;
       overflow: hidden;
       z-index: 50;
-      /* 确保模糊不溢出圆角 */
     }
     .dark .mobile-nav-list {
       background: rgba(17, 24, 39, 0.92);
@@ -102,7 +102,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       display: block;
     }
 
-    /* 菜单项容器 - 可滚动 */
     .mobile-nav-scroll {
       max-height: calc(70vh - 80px);
       overflow-y: auto;
@@ -143,7 +142,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.06);
     }
 
-    /* 子菜单 */
     .mobile-nav-list .dropdown-sub {
       padding-left: 20px;
       margin-top: 2px;
@@ -166,7 +164,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.04);
     }
 
-    /* 底部主题切换项 */
     .menu-theme-item {
       display: flex;
       align-items: center;
@@ -187,7 +184,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       font-weight: 500;
     }
 
-    /* 桌面端：隐藏手机菜单，显示桌面导航 */
     @media (min-width: 768px) {
       .mobile-nav-list {
         display: none !important;
@@ -196,7 +192,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: none !important;
       }
     }
-    /* 手机端：隐藏桌面导航 */
     @media (max-width: 767px) {
       .desktop-nav {
         display: none !important;
@@ -230,7 +225,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </div>
     </div>
 
-    <!-- 桌面导航（仅在桌面显示） -->
+    <!-- 桌面导航 -->
     <nav
       class="desktop-nav items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
       aria-label="Main navigation"
@@ -283,7 +278,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- 手机端半覆盖菜单浮层（仅在手机显示） -->
+    <!-- 手机端半覆盖菜单浮层 -->
     <div id="mobile-nav" class="mobile-nav-list">
       <div class="mobile-nav-scroll">
         {
@@ -312,7 +307,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           ))
         }
       </div>
-      <!-- 主题切换项 -->
       <div class="menu-theme-item">
         <ToggleTheme iconClass="w-5 h-5" />
         <span>切换主题</span>
@@ -328,7 +322,9 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       if (toggleBtn && mobileNav) {
         toggleBtn.addEventListener('click', function(e) {
           e.stopPropagation();
+          // 切换菜单展开状态
           mobileNav.classList.toggle('open');
+          // 切换 ToggleMenu 的 expanded 类，触发 X 动画
           this.classList.toggle('expanded');
         });
       }
@@ -342,6 +338,16 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           });
         });
       }
+
+      // 点击页面其他区域关闭菜单
+      document.addEventListener('click', function(e) {
+        if (mobileNav && toggleBtn) {
+          if (!mobileNav.contains(e.target) && !toggleBtn.contains(e.target)) {
+            mobileNav.classList.remove('open');
+            toggleBtn.classList.remove('expanded');
+          }
+        }
+      });
     });
   </script>
 </header>
