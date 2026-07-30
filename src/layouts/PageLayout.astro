@@ -20,7 +20,8 @@ const { metadata } = Astro.props;
     <Announcement />
   </slot>
   <slot name="header">
-    <Header {...headerData} isSticky showToggleTheme />
+    <!-- 显式传递 showToggleTheme={true} 确保主题切换按钮显示 -->
+    <Header {...headerData} isSticky showRssFeed={false} showToggleTheme={true} />
   </slot>
   <main>
     <slot />
