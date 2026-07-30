@@ -48,21 +48,21 @@ const { language, textDirection } = I18N;
   <body class="antialiased text-default bg-page tracking-tight">
     <slot />
 
-    <!-- ===== 底部毛玻璃模糊效果（类似橘子6） ===== -->
+    <!-- ===== 底部毛玻璃模糊效果（柔和版） ===== -->
     <!-- 亮色模式 -->
-    <div class="fixed bottom-0 left-0 w-full h-24 md:h-32 pointer-events-none z-30 block dark:hidden"
-         style="background: linear-gradient(to top, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%); 
-                backdrop-filter: blur(12px); 
-                -webkit-backdrop-filter: blur(12px);">
+    <div class="fixed bottom-0 left-0 w-full h-12 md:h-16 pointer-events-none z-30 block dark:hidden"
+         style="background: linear-gradient(to top, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 100%); 
+                backdrop-filter: blur(6px); 
+                -webkit-backdrop-filter: blur(6px);">
     </div>
     <!-- 暗色模式 -->
-    <div class="fixed bottom-0 left-0 w-full h-24 md:h-32 pointer-events-none z-30 hidden dark:block"
-         style="background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%); 
-                backdrop-filter: blur(12px); 
-                -webkit-backdrop-filter: blur(12px);">
+    <div class="fixed bottom-0 left-0 w-full h-12 md:h-16 pointer-events-none z-30 hidden dark:block"
+         style="background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%); 
+                backdrop-filter: blur(6px); 
+                -webkit-backdrop-filter: blur(6px);">
     </div>
-    <!-- 底部渐变过渡层（消除硬边） -->
-    <div class="fixed bottom-0 left-0 w-full h-8 pointer-events-none z-30"
+    <!-- 底部纯色过渡层（消除硬边） -->
+    <div class="fixed bottom-0 left-0 w-full h-4 pointer-events-none z-30"
          style="background: linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%);">
     </div>
 
