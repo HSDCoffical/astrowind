@@ -1,7 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
 import Logo from '~/components/Logo.astro';
-import ToggleTheme from '~/components/common/ToggleTheme.astro';
 import ToggleMenu from '~/components/common/ToggleMenu.astro';
 import Button from '~/components/ui/Button.astro';
 
@@ -76,7 +75,32 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.05) !important;
     }
 
-    /* 手机端菜单 - 直接在导航下方展开，不浮层，不覆盖 */
+    /* 自定义主题切换按钮 */
+    .theme-toggle-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.04);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      color: #333;
+    }
+    .theme-toggle-btn:hover {
+      background: rgba(0,0,0,0.08);
+    }
+    .dark .theme-toggle-btn {
+      color: #eee;
+      background: rgba(255,255,255,0.06);
+    }
+    .dark .theme-toggle-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* 手机端菜单 - 流式展开 */
     .mobile-nav-list {
       display: none;
       flex-direction: column;
@@ -146,7 +170,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: transparent;
     }
 
-    /* 底部主题切换 */
+    /* 底部主题切换项 */
     .menu-theme-item {
       display: flex;
       align-items: center;
@@ -266,8 +290,17 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       ]}
     >
       <div class="items-center flex justify-between w-full md:w-auto">
-        <div class="flex">
-          {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
+        <div class="flex items-center gap-2">
+          <!-- 自定义主题切换（桌面） -->
+          <button
+            id="theme-toggle-desktop"
+            class="theme-toggle-btn"
+            aria-label="切换主题"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </button>
           {
             showRssFeed && (
               <a
@@ -294,7 +327,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </div>
     </div>
 
-    <!-- 手机端菜单（流式展开，在导航下方） -->
+    <!-- 手机端菜单（流式展开） -->
     <div id="mobile-nav" class="mobile-nav-list">
       {
         links.map(({ text, href, links }) => (
@@ -321,8 +354,17 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           </div>
         ))
       }
+      <!-- 主题切换（手机菜单底部） -->
       <div class="menu-theme-item">
-        <ToggleTheme iconClass="w-5 h-5" />
+        <button
+          id="theme-toggle-mobile"
+          class="theme-toggle-btn"
+          aria-label="切换主题"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </button>
         <span>切换主题</span>
       </div>
     </div>
@@ -330,6 +372,53 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // ===== 主题切换逻辑 =====
+      function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+        if (isDark) {
+          html.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+        updateIcons();
+      }
+
+      function updateIcons() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const icons = document.querySelectorAll('#theme-toggle-desktop svg, #theme-toggle-mobile svg');
+        icons.forEach(svg => {
+          if (isDark) {
+            svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
+          } else {
+            svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
+          }
+        });
+      }
+
+      // 初始化主题
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else if (saved === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+      updateIcons();
+
+      // 绑定主题切换按钮
+      document.querySelectorAll('#theme-toggle-desktop, #theme-toggle-mobile').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleTheme();
+        });
+      });
+
+      // ===== 菜单控制 =====
       const toggleBtn = document.querySelector('[data-aw-toggle-menu]');
       const mobileNav = document.getElementById('mobile-nav');
 
@@ -342,7 +431,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
 
       if (mobileNav) {
-        mobileNav.querySelectorAll('a, button').forEach(function(el) {
+        mobileNav.querySelectorAll('a, button:not(#theme-toggle-mobile)').forEach(function(el) {
           el.addEventListener('click', function() {
             if (this.closest('.dropdown-sub')) return;
             mobileNav.classList.remove('open');
@@ -351,7 +440,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         });
       }
 
-      // 点击外部关闭
       document.addEventListener('click', function(e) {
         if (mobileNav && toggleBtn) {
           if (!mobileNav.contains(e.target) && !toggleBtn.contains(e.target)) {
@@ -364,16 +452,43 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
     // 支持 Astro View Transitions
     document.addEventListener('astro:after-swap', function() {
+      // 重新绑定主题切换
+      document.querySelectorAll('#theme-toggle-desktop, #theme-toggle-mobile').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          // 复用 toggleTheme 函数（由于函数在 DOMContentLoaded 中定义，此处需重新获取）
+          const html = document.documentElement;
+          const isDark = html.classList.contains('dark');
+          if (isDark) {
+            html.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+          } else {
+            html.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+          }
+          // 更新图标
+          const icons = document.querySelectorAll('#theme-toggle-desktop svg, #theme-toggle-mobile svg');
+          icons.forEach(svg => {
+            if (html.classList.contains('dark')) {
+              svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
+            } else {
+              svg.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />`;
+            }
+          });
+        });
+      });
+
+      // 重新绑定菜单
       const toggleBtn = document.querySelector('[data-aw-toggle-menu]');
       const mobileNav = document.getElementById('mobile-nav');
-
       if (toggleBtn && mobileNav) {
-        // 重新绑定事件
         toggleBtn.addEventListener('click', function(e) {
           e.stopPropagation();
           mobileNav.classList.toggle('open');
           this.classList.toggle('expanded');
         });
+        // 关闭菜单的绑定（略，可复用之前的）
       }
     });
   </script>
