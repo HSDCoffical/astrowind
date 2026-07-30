@@ -2,7 +2,6 @@
 import { Icon } from 'astro-icon/components';
 import Logo from '~/components/Logo.astro';
 import ToggleTheme from '~/components/common/ToggleTheme.astro';
-import ToggleMenu from '~/components/common/ToggleMenu.astro';
 import Button from '~/components/ui/Button.astro';
 
 import { getHomePermalink } from '~/utils/permalinks';
@@ -76,24 +75,56 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.05) !important;
     }
 
-    /* 手机端半覆盖菜单浮层 - 与桌面端完全分离 */
+    /* 自定义汉堡按钮 - 三条线变 X */
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 28px;
+      height: 20px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+    .hamburger span {
+      display: block;
+      height: 2.5px;
+      width: 100%;
+      background-color: currentColor;
+      border-radius: 2px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: center;
+    }
+    .hamburger.expanded span:nth-child(1) {
+      transform: translateY(8.5px) rotate(45deg);
+    }
+    .hamburger.expanded span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    .hamburger.expanded span:nth-child(3) {
+      transform: translateY(-8.5px) rotate(-45deg);
+    }
+
+    /* 手机端半覆盖菜单浮层 - 覆盖右侧75% */
     .mobile-nav-list {
       display: none;
       position: absolute;
       top: 100%;
-      left: 0;
       right: 0;
+      left: auto;
+      width: 75%;
       margin-top: 0;
       background: rgba(255,255,255,0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border-radius: 0 0 20px 20px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+      border-radius: 0 0 0 20px;
+      box-shadow: -8px 12px 40px rgba(0,0,0,0.08);
       padding: 16px 0 12px 0;
       max-height: 70vh;
       overflow: hidden;
       z-index: 50;
-      /* 确保模糊不溢出圆角 */
     }
     .dark .mobile-nav-list {
       background: rgba(17, 24, 39, 0.92);
@@ -102,7 +133,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       display: block;
     }
 
-    /* 菜单项容器 - 可滚动 */
     .mobile-nav-scroll {
       max-height: calc(70vh - 80px);
       overflow-y: auto;
@@ -143,7 +173,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.06);
     }
 
-    /* 子菜单 */
     .mobile-nav-list .dropdown-sub {
       padding-left: 20px;
       margin-top: 2px;
@@ -166,7 +195,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.04);
     }
 
-    /* 底部主题切换项 */
     .menu-theme-item {
       display: flex;
       align-items: center;
@@ -187,7 +215,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       font-weight: 500;
     }
 
-    /* 桌面端：隐藏手机菜单，显示桌面导航 */
     @media (min-width: 768px) {
       .mobile-nav-list {
         display: none !important;
@@ -196,7 +223,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: none !important;
       }
     }
-    /* 手机端：隐藏桌面导航 */
     @media (max-width: 767px) {
       .desktop-nav {
         display: none !important;
@@ -224,13 +250,20 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             ) : ''
           }
         </div>
-        <div class="flex items-center md:hidden">
-          <ToggleMenu />
-        </div>
+        <!-- 自定义汉堡按钮 -->
+        <button
+          id="hamburger-btn"
+          class="hamburger flex items-center md:hidden"
+          aria-label="切换菜单"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </div>
 
-    <!-- 桌面导航（仅在桌面显示） -->
+    <!-- 桌面导航 -->
     <nav
       class="desktop-nav items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
       aria-label="Main navigation"
@@ -283,7 +316,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- 手机端半覆盖菜单浮层（仅在手机显示） -->
+    <!-- 手机端半覆盖菜单浮层 -->
     <div id="mobile-nav" class="mobile-nav-list">
       <div class="mobile-nav-scroll">
         {
@@ -312,7 +345,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           ))
         }
       </div>
-      <!-- 主题切换项 -->
       <div class="menu-theme-item">
         <ToggleTheme iconClass="w-5 h-5" />
         <span>切换主题</span>
@@ -321,27 +353,58 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const toggleBtn = document.querySelector('[data-aw-toggle-menu]');
+    function initMobileMenu() {
+      const hamburger = document.getElementById('hamburger-btn');
       const mobileNav = document.getElementById('mobile-nav');
+      if (!hamburger || !mobileNav) return;
 
-      if (toggleBtn && mobileNav) {
-        toggleBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          mobileNav.classList.toggle('open');
-          this.classList.toggle('expanded');
-        });
-      }
+      // 移除之前可能绑定的监听器（防止重复）
+      const toggleHandler = function(e) {
+        e.stopPropagation();
+        mobileNav.classList.toggle('open');
+        hamburger.classList.toggle('expanded');
+      };
+      // 移除旧监听器（如果有）
+      hamburger.removeEventListener('click', toggleHandler);
+      hamburger.addEventListener('click', toggleHandler);
 
-      if (mobileNav) {
-        mobileNav.querySelectorAll('a, button').forEach(function(el) {
-          el.addEventListener('click', function() {
-            if (this.closest('.dropdown-sub')) return;
-            mobileNav.classList.remove('open');
-            if (toggleBtn) toggleBtn.classList.remove('expanded');
-          });
+      const closeMenu = function() {
+        mobileNav.classList.remove('open');
+        hamburger.classList.remove('expanded');
+      };
+
+      // 为菜单内链接和按钮绑定关闭事件
+      mobileNav.querySelectorAll('a, button').forEach(el => {
+        // 移除旧监听器
+        el.removeEventListener('click', closeMenu);
+        el.addEventListener('click', function(e) {
+          if (this.closest('.dropdown-sub')) return;
+          closeMenu();
         });
-      }
-    });
+      });
+
+      // 点击外部关闭
+      const outsideClose = function(e) {
+        if (!mobileNav.contains(e.target) && !hamburger.contains(e.target)) {
+          closeMenu();
+        }
+      };
+      document.removeEventListener('click', outsideClose);
+      document.addEventListener('click', outsideClose);
+
+      // 当窗口 resize 到桌面时关闭菜单
+      const resizeClose = function() {
+        if (window.innerWidth >= 768 && mobileNav.classList.contains('open')) {
+          closeMenu();
+        }
+      };
+      window.removeEventListener('resize', resizeClose);
+      window.addEventListener('resize', resizeClose);
+    }
+
+    // 首次加载时初始化
+    document.addEventListener('DOMContentLoaded', initMobileMenu);
+    // Astro 视图切换后重新初始化
+    document.addEventListener('astro:after-swap', initMobileMenu);
   </script>
 </header>
