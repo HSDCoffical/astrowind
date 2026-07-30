@@ -76,52 +76,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.05) !important;
     }
 
-    /* 手机菜单 - 使用 CSS 控制，不与桌面分离 */
-    #mobile-menu {
-      position: fixed;
-      top: 0;
-      right: 0;
-      height: 100vh;
-      width: 280px;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: -4px 0 20px rgba(0,0,0,0.1);
-      z-index: 9999;
-      transform: translateX(100%);
-      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      padding: 80px 24px 24px 24px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-    .dark #mobile-menu {
-      background: rgba(17, 24, 39, 0.95);
-    }
-    #mobile-menu.open {
-      transform: translateX(0);
-    }
-
-    #menu-footer {
-      margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid rgba(0,0,0,0.06);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .dark #menu-footer {
-      border-top-color: rgba(255,255,255,0.06);
-    }
-
+    /* 遮罩层 */
     #menu-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.4);
       z-index: 9998;
       opacity: 0;
       pointer-events: none;
@@ -132,10 +94,80 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       pointer-events: auto;
     }
 
-    /* 桌面导航默认显示，手机隐藏 */
+    /* 手机菜单 */
+    #mobile-menu {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      width: 280px;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: -4px 0 30px rgba(0,0,0,0.15);
+      z-index: 9999;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 80px 24px 70px 24px; /* 底部留足空间 */
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .dark #mobile-menu {
+      background: rgba(17, 24, 39, 0.96);
+    }
+    #mobile-menu.open {
+      transform: translateX(0);
+    }
+
+    /* 关闭按钮（X） */
+    #menu-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 28px;
+      line-height: 1;
+      color: #333;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 10000;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    #menu-close-btn:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    .dark #menu-close-btn {
+      color: #eee;
+    }
+    .dark #menu-close-btn:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* 菜单底部按钮区域 */
+    #menu-footer {
+      margin-top: auto;
+      padding-top: 16px;
+      padding-bottom: 8px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .dark #menu-footer {
+      border-top-color: rgba(255,255,255,0.06);
+    }
+
+    /* 桌面导航 */
     @media (max-width: 767px) {
       .desktop-nav {
         display: none !important;
+      }
+      .mobile-toggle {
+        display: flex !important;
       }
     }
     @media (min-width: 768px) {
@@ -150,16 +182,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
   <div
-    class:list={[
-      'relative text-default py-3 px-3 md:px-6 mx-auto w-full flex items-center justify-between',
-    ]}
+    class="relative text-default py-3 px-3 md:px-6 mx-auto w-full flex items-center justify-between"
   >
     <!-- Logo -->
     <a class="flex items-center" href={getHomePermalink()}>
       <Logo />
     </a>
 
-    <!-- ===== 桌面导航（共用 links 数据） ===== -->
+    <!-- 桌面导航 -->
     <nav class="desktop-nav items-center md:flex md:mx-5 text-default" aria-label="Main navigation">
       <ul class="flex flex-row items-center text-[0.9375rem] font-medium gap-1">
         {
@@ -186,9 +216,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- ===== 右侧控件 ===== -->
+    <!-- 右侧控件 -->
     <div class="flex items-center gap-2 flex-nowrap">
-      <!-- 桌面端显示主题切换和联系按钮 -->
       <div class="hidden md:flex items-center gap-2">
         <ToggleTheme iconClass="w-5 h-5" />
         {
@@ -199,18 +228,20 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           ) : ''
         }
       </div>
-      <!-- 手机端汉堡菜单 -->
       <div class="mobile-toggle flex items-center md:hidden">
         <ToggleMenu />
       </div>
     </div>
   </div>
 
-  <!-- ===== 遮罩层 ===== -->
+  <!-- 遮罩层 -->
   <div id="menu-overlay"></div>
 
-  <!-- ===== 手机菜单 ===== -->
+  <!-- 手机菜单 -->
   <div id="mobile-menu">
+    <!-- 关闭按钮（X） -->
+    <button id="menu-close-btn" aria-label="关闭菜单">✕</button>
+
     <ul class="flex flex-col w-full text-lg font-medium">
       {
         links.map(({ text, href, links }) => (
@@ -235,7 +266,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     </ul>
 
-    <!-- 手机菜单底部 -->
+    <!-- 菜单底部 -->
     <div id="menu-footer">
       <ToggleTheme iconClass="w-6 h-6" />
       {
@@ -253,6 +284,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       const menu = document.getElementById('mobile-menu');
       const overlay = document.getElementById('menu-overlay');
       const toggle = document.querySelector('[data-aw-toggle-menu]');
+      const closeBtn = document.getElementById('menu-close-btn');
 
       function openMenu() {
         menu.classList.add('open');
@@ -268,6 +300,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         document.body.style.overflow = '';
       }
 
+      // 汉堡菜单点击
       if (toggle) {
         toggle.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -277,17 +310,27 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         });
       }
 
+      // X 关闭按钮
+      if (closeBtn) {
+        closeBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          closeMenu();
+        });
+      }
+
+      // 点击遮罩关闭
       if (overlay) {
         overlay.addEventListener('click', closeMenu);
       }
 
+      // 菜单内链接点击关闭
       if (menu) {
-        menu.querySelectorAll('a, button').forEach(function(el) {
+        menu.querySelectorAll('a, button:not(#menu-close-btn)').forEach(function(el) {
           el.addEventListener('click', closeMenu);
         });
       }
 
-      // 窗口尺寸变化时，如果菜单打开且变为桌面，关闭菜单
+      // 窗口大小变化，桌面时关闭
       window.addEventListener('resize', function() {
         if (window.innerWidth >= 768 && menu.classList.contains('open')) {
           closeMenu();
