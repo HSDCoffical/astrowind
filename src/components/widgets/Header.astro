@@ -76,7 +76,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.05) !important;
     }
 
-    /* 手机端导航菜单展开（直接流式，非浮层） */
+    /* 手机端导航菜单展开 */
     .mobile-nav-list {
       display: none;
       flex-direction: column;
@@ -84,9 +84,10 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.95);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      border-radius: 0 0 12px 12px;
-      padding: 12px 0;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      border-radius: 0 0 16px 16px;
+      padding: 20px 0 16px 0;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+      margin-top: 8px;
     }
     .dark .mobile-nav-list {
       background: rgba(17, 24, 39, 0.95);
@@ -94,29 +95,79 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     .mobile-nav-list.open {
       display: flex;
     }
+
+    /* 菜单项样式 - 加大间距 */
+    .mobile-nav-list > div {
+      padding: 0 16px;
+      margin-bottom: 4px;
+    }
+    .mobile-nav-list > div:last-child {
+      margin-bottom: 0;
+    }
     .mobile-nav-list a,
     .mobile-nav-list button {
-      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
       color: #333;
       font-weight: 500;
-      border-bottom: 1px solid rgba(0,0,0,0.04);
+      font-size: 1.05rem;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.02);
       transition: background 0.2s;
+      width: 100%;
+      border: none;
+      cursor: pointer;
     }
     .dark .mobile-nav-list a,
     .dark .mobile-nav-list button {
       color: #eee;
-      border-bottom-color: rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.03);
     }
     .mobile-nav-list a:hover,
     .mobile-nav-list button:hover {
-      background: rgba(0,0,0,0.03);
+      background: rgba(0,0,0,0.06);
     }
     .dark .mobile-nav-list a:hover,
     .dark .mobile-nav-list button:hover {
-      background: rgba(255,255,255,0.03);
+      background: rgba(255,255,255,0.06);
     }
+
+    /* 子菜单 */
     .mobile-nav-list .dropdown-sub {
       padding-left: 20px;
+      margin-top: 4px;
+      display: none;
+    }
+    .mobile-nav-list .dropdown-sub.open {
+      display: block;
+    }
+    .mobile-nav-list .dropdown-sub a {
+      padding: 12px 18px;
+      font-size: 0.95rem;
+      font-weight: 400;
+      border-radius: 10px;
+      background: transparent;
+    }
+    .mobile-nav-list .dropdown-sub a:hover {
+      background: rgba(0,0,0,0.04);
+    }
+    .dark .mobile-nav-list .dropdown-sub a:hover {
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* 底部操作区 */
+    .mobile-nav-footer {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px 4px 20px;
+      margin-top: 12px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+    .dark .mobile-nav-footer {
+      border-top-color: rgba(255,255,255,0.06);
     }
 
     /* 桌面导航 */
@@ -135,7 +186,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   <div
     class="relative text-default py-3 px-3 md:px-6 mx-auto w-full"
   >
-    <!-- 顶部行：Logo + 右侧控件 -->
+    <!-- 顶部行 -->
     <div class="flex items-center justify-between">
       <a class="flex items-center" href={getHomePermalink()}>
         <Logo />
@@ -210,7 +261,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- 手机端展开菜单（流式，非浮层） -->
+    <!-- 手机端展开菜单 -->
     <div id="mobile-nav" class="mobile-nav-list">
       {
         links.map(({ text, href, links }) => (
@@ -220,12 +271,12 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
                 <button
                   type="button"
                   class="flex items-center justify-between w-full"
-                  onclick="this.nextElementSibling.classList.toggle('hidden')"
+                  onclick="this.nextElementSibling.classList.toggle('open')"
                 >
                   {text}
-                  <Icon name="tabler:chevron-down" class="w-4 h-4" />
+                  <Icon name="tabler:chevron-down" class="w-4 h-4 transition-transform" />
                 </button>
-                <div class="dropdown-sub hidden">
+                <div class="dropdown-sub">
                   {links.map(({ text: t, href: h }) => (
                     <a href={h} class="block">{t}</a>
                   ))}
@@ -237,8 +288,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           </div>
         ))
       }
-      <!-- 底部额外操作（主题切换和联系按钮） -->
-      <div class="flex items-center gap-3 px-4 pt-3 border-t border-gray-200 dark:border-gray-700 mt-2">
+      <!-- 底部操作区 -->
+      <div class="mobile-nav-footer">
         <ToggleTheme iconClass="w-5 h-5" />
         {
           actions?.length ? (
@@ -264,10 +315,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         });
       }
 
-      // 点击菜单链接后关闭菜单
       if (mobileNav) {
         mobileNav.querySelectorAll('a, button').forEach(function(el) {
           el.addEventListener('click', function() {
+            // 如果是子菜单按钮，不关闭整个菜单
+            if (this.closest('.dropdown-sub')) return;
             mobileNav.classList.remove('open');
             if (toggleBtn) toggleBtn.classList.remove('expanded');
           });
