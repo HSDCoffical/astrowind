@@ -76,7 +76,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.05) !important;
     }
 
-    /* 遮罩层 - 完全透明，只用于捕获点击关闭 */
+    /* 遮罩层 - 完全透明，仅用于点击关闭 */
     #menu-overlay {
       position: fixed;
       top: 0;
@@ -112,12 +112,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+      pointer-events: none; /* 默认不接收点击，打开时再允许 */
     }
     .dark #mobile-menu {
       background: rgba(17, 24, 39, 0.7) !important;
     }
     #mobile-menu.open {
       transform: translateX(0);
+      pointer-events: auto;
     }
 
     /* 关闭按钮（X） */
@@ -290,14 +292,13 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         menu.classList.add('open');
         overlay.classList.add('open');
         if (toggle) toggle.classList.add('expanded');
-        document.body.style.overflow = 'hidden';
+        // 不再禁用 body 滚动，让内容保持可滚动
       }
 
       function closeMenu() {
         menu.classList.remove('open');
         overlay.classList.remove('open');
         if (toggle) toggle.classList.remove('expanded');
-        document.body.style.overflow = '';
       }
 
       if (toggle) {
@@ -326,10 +327,20 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         });
       }
 
+      // 窗口尺寸变化，桌面时关闭菜单
       window.addEventListener('resize', function() {
         if (window.innerWidth >= 768 && menu.classList.contains('open')) {
           closeMenu();
         }
+      });
+
+      // 拦截主题切换按钮的点击，阻止任何可能的页面跳转
+      document.querySelectorAll('[data-aw-toggle-color-scheme]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          // 切换主题的逻辑由 ToggleTheme 组件内部处理，我们只阻止冒泡
+        });
       });
     });
   </script>
