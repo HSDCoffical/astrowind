@@ -76,14 +76,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: rgba(255,255,255,0.05) !important;
     }
 
-    /* 手机端半覆盖菜单浮层 */
+    /* 手机端半覆盖菜单浮层 - 覆盖右侧75% */
     .mobile-nav-list {
       display: none;
       position: absolute;
       top: 100%;
       right: 0;
       left: auto;
-      width: 80%;
+      width: 75%;
       margin-top: 0;
       background: rgba(255,255,255,0.92);
       backdrop-filter: blur(16px);
@@ -184,6 +184,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       font-weight: 500;
     }
 
+    /* 桌面端隐藏手机菜单 */
     @media (min-width: 768px) {
       .mobile-nav-list {
         display: none !important;
@@ -278,7 +279,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- 手机端半覆盖菜单浮层 -->
+    <!-- 手机端半覆盖菜单浮层（右侧75%） -->
     <div id="mobile-nav" class="mobile-nav-list">
       <div class="mobile-nav-scroll">
         {
@@ -322,9 +323,10 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       if (toggleBtn && mobileNav) {
         toggleBtn.addEventListener('click', function(e) {
           e.stopPropagation();
-          // 切换菜单展开状态
+          const isOpen = mobileNav.classList.contains('open');
+          // 切换菜单状态
           mobileNav.classList.toggle('open');
-          // 切换 ToggleMenu 的 expanded 类，触发 X 动画
+          // 切换汉堡按钮的 expanded 类，触发 X 动画
           this.classList.toggle('expanded');
         });
       }
@@ -332,6 +334,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       if (mobileNav) {
         mobileNav.querySelectorAll('a, button').forEach(function(el) {
           el.addEventListener('click', function() {
+            // 如果是子菜单按钮，不关闭整个菜单
             if (this.closest('.dropdown-sub')) return;
             mobileNav.classList.remove('open');
             if (toggleBtn) toggleBtn.classList.remove('expanded');
