@@ -1,0 +1,131 @@
+---
+// src/pages/workshop.astro
+// ⚠️ 把下面这行换成你的 Worker 实际域名！
+const API_URL = 'https://github-upload.2791389901.workers.dev';
+---
+
+<html>
+  <head>
+    <title>凉宫工坊</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 700px; margin: 0 auto; padding: 20px; background: #f8fafc; }
+      h1 { color: #1e293b; }
+      .upload-area { background: white; border: 2px dashed #cbd5e1; padding: 30px; text-align: center; border-radius: 16px; margin: 20px 0; }
+      .upload-area input[type="file"] { margin: 10px 0; }
+      .upload-area input[type="text"] { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; width: 200px; }
+      button { background: #3b82f6; color: white; border: none; padding: 12px 28px; border-radius: 10px; font-size: 16px; cursor: pointer; }
+      button:disabled { opacity: 0.5; }
+      .file-item { background: white; padding: 14px 18px; border-radius: 12px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+      .file-item a { color: #3b82f6; text-decoration: none; word-break: break-all; }
+      .file-item .meta { font-size: 12px; color: #94a3b8; }
+      .file-item .delete-btn { color: #ef4444; cursor: pointer; background: none; border: none; font-size: 18px; }
+      .result { margin: 10px 0; padding: 12px; border-radius: 8px; }
+      .result.success { background: #dcfce7; color: #166534; }
+      .result.error { background: #fee2e2; color: #991b1b; }
+      .result.loading { background: #fef9c3; color: #854d0e; }
+    </style>
+  </head>
+  <body>
+    <h1>📦 凉宫工坊</h1>
+    <p>上传你的作品，分享给社区</p>
+
+    <div class="upload-area">
+      <input type="file" id="fileInput" />
+      <br /><br />
+      <input type="text" id="uploaderInput" placeholder="你的名字（可选）" maxlength="20" />
+      <br /><br />
+      <button onclick="uploadFile()" id="uploadBtn">上传文件</button>
+    </div>
+
+    <div id="result"></div>
+    <h2>📂 已上传的文件</h2>
+    <div id="fileList"><p style="color:#94a3b8;">加载中...</p></div>
+
+    <script>
+      const API_URL = '${API_URL}';
+
+      async function uploadFile() {
+        const input = document.getElementById('fileInput');
+        const uploader = document.getElementById('uploaderInput').value || '匿名';
+        const result = document.getElementById('result');
+        const btn = document.getElementById('uploadBtn');
+
+        if (!input.files[0]) {
+          result.innerHTML = '<div class="result error">请先选择文件</div>';
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', input.files[0]);
+        formData.append('uploader', uploader);
+
+        btn.disabled = true;
+        btn.textContent = '上传中...';
+        result.innerHTML = '<div class="result loading">⏳ 上传中...</div>';
+
+        try {
+          const res = await fetch(`${API_URL}/upload`, {
+            method: 'POST',
+            body: formData,
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            result.innerHTML = `<div class="result success">✅ 上传成功！<br><a href="${data.url}" target="_blank">${data.url}</a></div>`;
+            loadFiles();
+            input.value = '';
+          } else {
+            result.innerHTML = `<div class="result error">❌ 上传失败：${data.error || '未知错误'}</div>`;
+          }
+        } catch (e) {
+          result.innerHTML = `<div class="result error">❌ 网络错误：${e.message}</div>`;
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '上传文件';
+        }
+      }
+
+      async function loadFiles() {
+        try {
+          const res = await fetch(`${API_URL}/files`);
+          const files = await res.json();
+          const list = document.getElementById('fileList');
+
+          if (!files || files.length === 0) {
+            list.innerHTML = '<p style="color:#94a3b8;">暂无文件，快来上传第一个吧！</p>';
+            return;
+          }
+
+          list.innerHTML = files.map(f => `
+            <div class="file-item">
+              <div>
+                <a href="https://raw.githubusercontent.com/HSDCoffical/astrowind/main/workshop/${f.filename}" target="_blank">${f.original_name}</a>
+                <div class="meta">上传者: ${f.uploader || '匿名'} · ${(f.size/1024).toFixed(1)} KB · ${new Date(f.created_at).toLocaleString()}</div>
+              </div>
+              <button class="delete-btn" onclick="deleteFile('${f.filename}')" title="删除">✕</button>
+            </div>
+          `).join('');
+        } catch (e) {
+          document.getElementById('fileList').innerHTML = '<p style="color:#94a3b8;">加载文件列表失败</p>';
+        }
+      }
+
+      async function deleteFile(filename) {
+        if (!confirm(`确定要删除 "${filename}" 吗？`)) return;
+        try {
+          const res = await fetch(`${API_URL}/files/${filename}`, { method: 'DELETE' });
+          const data = await res.json();
+          if (data.success) {
+            loadFiles();
+          } else {
+            alert('删除失败: ' + (data.error || '未知错误'));
+          }
+        } catch (e) {
+          alert('删除失败: ' + e.message);
+        }
+      }
+
+      loadFiles();
+    </script>
+  </body>
+</html>
