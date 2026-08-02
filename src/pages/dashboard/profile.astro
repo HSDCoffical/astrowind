@@ -1,4 +1,5 @@
 ---
+export const prerender = true;
 import DashboardLayout from "~/components/DashboardLayout.astro";
 ---
 
@@ -16,7 +17,6 @@ import DashboardLayout from "~/components/DashboardLayout.astro";
   </div>
 
   <script>
-    // 加载资料表单
     const loadProfile = async () => {
       const res = await fetch('/api/auth/session', { credentials: 'include' });
       const data = await res.json();
@@ -25,7 +25,6 @@ import DashboardLayout from "~/components/DashboardLayout.astro";
         return;
       }
       const user = data.user;
-      // 额外获取 profile 信息
       const profileRes = await fetch('/api/profile', { credentials: 'include' });
       const profile = profileRes.ok ? await profileRes.json() : {};
 
@@ -48,7 +47,6 @@ import DashboardLayout from "~/components/DashboardLayout.astro";
         </form>
       `;
 
-      // 绑定表单提交事件
       document.getElementById('profile-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const form = e.target;
@@ -76,7 +74,6 @@ import DashboardLayout from "~/components/DashboardLayout.astro";
       });
     };
 
-    // 加载密码表单
     const loadPassword = () => {
       document.getElementById('password-container').innerHTML = `
         <form id="password-form" class="space-y-4 max-w-md">
