@@ -1,32 +1,78 @@
 ---
-export const prerender = false;
-
 import DashboardLayout from "~/components/DashboardLayout.astro";
-import { getSession } from "~/lib/api";
-
-const user = await getSession();
-
-if (user?.role !== "admin") {
-  return Astro.redirect("/dashboard");
-}
 ---
 
 <DashboardLayout>
   <h1 class="text-2xl font-bold mb-4">发送系统通知</h1>
-  <form action="/api/messages/admin/send" method="post" class="space-y-4 max-w-2xl">
-    <div>
-      <label class="block text-sm font-medium">收件人</label>
-      <select name="receiver_id" class="w-full px-3 py-2 border rounded">
-        <option value="0">所有用户</option>
-        <!-- 可动态加载用户列表 -->
-      </select>
-    </div>
-    <div>
-      <label class="block text-sm font-medium">消息内容</label>
-      <textarea name="content" rows="5" required class="w-full px-3 py-2 border rounded"></textarea>
-    </div>
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-      发送消息
-    </button>
-  </form>
+  <div id="admin-send-form">
+    <p>检查权限...</p>
+  </div>
+
+  <script>
+    const loadForm = async () => {
+      // 先检查是否是管理员
+      const sessionRes = await fetch('/api/auth/session', { credentials: 'include' });
+      const session = await sessionRes.json();
+      if (!session?.user || session.user.role !== 'admin') {
+        document.getElementById('admin-send-form').innerHTML = '<p class="text-red-500">权限不足，仅管理员可访问</p>';
+        return;
+      }
+
+      // 加载用户列表
+      const usersRes = await fetch('/api/messages/users', { credentials: 'include' });
+      let users = [];
+      try {
+        const uData = await usersRes.json();
+        if (Array.isArray(uData)) users = uData;
+      } catch {}
+
+      document.getElementById('admin-send-form').innerHTML = `
+        <form id="send-form" class="space-y-4 max-w-2xl">
+          <div>
+            <label class="block text-sm font-medium">收件人</label>
+            <select name="receiver_id" class="w-full px-3 py-2 border rounded">
+              <option value="0">所有用户</option>
+              ${users.map(u => `<option value="${u.id}">${u.username}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium">消息内容</label>
+            <textarea name="content" rows="5" required class="w-full px-3 py-2 border rounded"></textarea>
+          </div>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">发送消息</button>
+          <div id="send-msg" class="text-sm"></div>
+        </form>
+      `;
+
+      document.getElementById('send-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const data = {
+          receiver_id: parseInt(form.receiver_id.value),
+          content: form.content.value,
+        };
+        const msg = document.getElementById('send-msg');
+        msg.textContent = '发送中...';
+        try {
+          const res = await fetch('/api/messages/admin/send', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+          const result = await res.json();
+          if (result.success) {
+            msg.textContent = '✅ 发送成功';
+            form.content.value = '';
+          } else {
+            msg.textContent = '❌ ' + (result.error || '发送失败');
+          }
+        } catch {
+          msg.textContent = '❌ 网络错误';
+        }
+      });
+    };
+
+    loadForm();
+  </script>
 </DashboardLayout>
