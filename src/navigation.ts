@@ -15,8 +15,8 @@ export const headerData = {
       href: 'https://hono-bbs-9qj.pages.dev',
     },
     {
-      text: '工具中心',        // 新增
-      href: 'https://it-toolbox-19l.pages.dev/', // 替换为你的实际地址
+      text: '工具中心',        
+      href: 'https://it-toolbox-19l.pages.dev/'
     },
     {
       text: '关于我们',
