@@ -1,9 +1,8 @@
 ---
-export const prerender = true;
-import DashboardLayout from "~/components/DashboardLayout.astro";
+import { DashboardLayout } from "~/components/DashboardLayout";
 ---
 
-<DashboardLayout>
+<DashboardLayout client:load>
   <h1 class="text-2xl font-bold mb-4">个人资料</h1>
   <div id="profile-container">
     <p>加载中...</p>
