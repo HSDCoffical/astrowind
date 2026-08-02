@@ -14,6 +14,8 @@ import compress from 'astro-compress';
 import type { AstroIntegration } from 'astro';
 import react from '@astrojs/react';
 
+import cloudflare from '@astrojs/cloudflare';  // ← 新增
+
 import astrowind from './vendor/integration';
 
 import { readingTimeRemarkPlugin, responsiveTablesRehypePlugin } from './src/utils/frontmatter';
@@ -25,7 +27,10 @@ const whenExternalScripts = (items: (() => AstroIntegration) | (() => AstroInteg
   hasExternalScripts ? (Array.isArray(items) ? items.map((item) => item()) : [items()]) : [];
 
 export default defineConfig({
-  output: 'static',
+  output: 'server',                     // ← 改为 server
+  adapter: cloudflare({                 // ← 新增适配器
+    runtime: 'off',                     // 或 'local'，根据实际情况调整
+  }),
 
   integrations: [
     sitemap(),
@@ -88,18 +93,6 @@ export default defineConfig({
     resolve: {
       alias: {
         '~': path.resolve(__dirname, './src'),
-      },
-    },
-  },
-
-  // ========== 强制生成 dashboard 页面 ==========
-  build: {
-    rollupOptions: {
-      input: {
-        dashboard: 'src/pages/dashboard/index.astro',
-        profile: 'src/pages/dashboard/profile.astro',
-        messages: 'src/pages/dashboard/messages.astro',
-        admin_send: 'src/pages/dashboard/admin/send.astro',
       },
     },
   },
