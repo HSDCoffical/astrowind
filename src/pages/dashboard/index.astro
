@@ -1,26 +1,38 @@
 ---
-export const prerender = false;
-
-import DashboardLayout from "~/components/DashboardLayout.astro";
-import { getSession } from "~/lib/api";
-
-const user = await getSession();
+// 不在服务端获取数据
 ---
 
 <DashboardLayout>
   <h1 class="text-2xl font-bold mb-4">概览</h1>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div id="user-info" class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
       <p class="text-gray-500">用户名</p>
-      <p class="text-xl font-bold">{user?.username}</p>
+      <p class="text-xl font-bold" id="username">加载中...</p>
     </div>
     <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
       <p class="text-gray-500">邮箱</p>
-      <p class="text-xl font-bold">{user?.email}</p>
+      <p class="text-xl font-bold" id="email">加载中...</p>
     </div>
     <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
       <p class="text-gray-500">角色</p>
-      <p class="text-xl font-bold">{user?.role === "admin" ? "管理员" : "用户"}</p>
+      <p class="text-xl font-bold" id="role">加载中...</p>
     </div>
   </div>
+
+  <script>
+    fetch('/api/auth/session', { credentials: 'include' })
+      .then(res => res.json())
+      .then(data => {
+        if (data?.user) {
+          document.getElementById('username').textContent = data.user.username;
+          document.getElementById('email').textContent = data.user.email;
+          document.getElementById('role').textContent = data.user.role === 'admin' ? '管理员' : '用户';
+        } else {
+          window.location.href = '/user/login';
+        }
+      })
+      .catch(() => {
+        window.location.href = '/user/login';
+      });
+  </script>
 </DashboardLayout>
