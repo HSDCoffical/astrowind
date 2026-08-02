@@ -20,7 +20,7 @@ export const headerData = {
     },
     {
       text: '个人中心',
-      href: '/dashboard',
+      href: 'https://hono-bbs-9qj.pages.dev/messages',
     },
     {
       text: '关于我们',
