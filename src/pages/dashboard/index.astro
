@@ -1,5 +1,5 @@
 ---
-// 不在服务端获取数据
+export const prerender = true;
 ---
 
 <DashboardLayout>
