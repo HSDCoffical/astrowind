@@ -1,24 +1,39 @@
 ---
-import { getSession } from "~/lib/api";
-
-const user = await getSession();
-if (!user) return Astro.redirect("/user/login");
+// 不再在服务端请求数据，改为客户端获取
 ---
 
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900" id="dashboard-root">
   <div class="flex h-screen">
     <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
       <div class="p-4 border-b"><h2 class="text-lg font-bold">凉宫数据</h2></div>
-      <nav class="p-4 space-y-2">
+      <nav class="p-4 space-y-2" id="dashboard-nav">
         <a href="/dashboard" class="block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">📊 概览</a>
         <a href="/dashboard/profile" class="block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">👤 个人资料</a>
         <a href="/dashboard/messages" class="block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">💬 消息中心</a>
-        {user.role === "admin" && (
+        <!-- admin 链接由 JS 动态控制 -->
+        <div id="admin-link" style="display:none;">
           <a href="/dashboard/admin/send" class="block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-600">📨 发送通知</a>
-        )}
+        </div>
         <a href="/user/logout" class="block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-600">🚪 退出</a>
       </nav>
     </aside>
-    <main class="flex-1 overflow-y-auto p-6"><slot /></main>
+    <main class="flex-1 overflow-y-auto p-6">
+      <slot />
+    </main>
   </div>
 </div>
+
+<script>
+  // 客户端获取用户信息，控制管理员链接显示
+  fetch('/api/auth/session', {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data?.user?.role === 'admin') {
+        document.getElementById('admin-link').style.display = 'block';
+      }
+    })
+    .catch(() => {});
+</script>
