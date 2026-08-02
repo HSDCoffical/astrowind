@@ -19,8 +19,8 @@ export const headerData = {
       href: 'https://it-toolbox-19l.pages.dev/'
     },
     {
-  text: '个人中心',
-  href: '/dashboard',
+      text: '个人中心',
+      href: '/dashboard',
     },
     {
       text: '关于我们',
