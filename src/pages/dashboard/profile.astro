@@ -1,0 +1,17 @@
+---
+import DashboardLayout from "~/components/DashboardLayout.astro";
+import { ProfileForm } from "~/components/ProfileForm";
+import { PasswordForm } from "~/components/PasswordForm";
+import { getSession } from "~/lib/api";
+
+const user = await getSession();
+---
+
+<DashboardLayout>
+  <h1 class="text-2xl font-bold mb-4">个人资料</h1>
+  <div class="space-y-8">
+    <div><h2 class="text-lg font-semibold mb-2">基本信息</h2><ProfileForm initialData={user} /></div>
+    <hr />
+    <div><h2 class="text-lg font-semibold mb-2">修改密码</h2><PasswordForm /></div>
+  </div>
+</DashboardLayout>
