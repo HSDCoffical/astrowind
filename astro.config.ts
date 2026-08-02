@@ -1,99 +1,76 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-import { defineConfig } from 'astro/config';
-
-import { unified } from '@astrojs/markdown-remark';
-
-import sitemap from '@astrojs/sitemap';
-import tailwindcss from '@tailwindcss/vite';
-import mdx from '@astrojs/mdx';
-import partytown from '@astrojs/partytown';
-import icon from 'astro-icon';
-import compress from 'astro-compress';
-import type { AstroIntegration } from 'astro';
-import react from '@astrojs/react';
-
-import cloudflare from '@astrojs/cloudflare';  // ← 新增
-
-import astrowind from './vendor/integration';
-
-import { readingTimeRemarkPlugin, responsiveTablesRehypePlugin } from './src/utils/frontmatter';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const hasExternalScripts = false;
-const whenExternalScripts = (items: (() => AstroIntegration) | (() => AstroIntegration)[] = []) =>
-  hasExternalScripts ? (Array.isArray(items) ? items.map((item) => item()) : [items()]) : [];
-
-export default defineConfig({
-  output: 'server',                     // ← 改为 server
-  adapter: cloudflare({                 // ← 新增适配器
-    runtime: 'off',                     // 或 'local'，根据实际情况调整
-  }),
-
-  integrations: [
-    sitemap(),
-    react(),
-    mdx(),
-    icon({
-      include: {
-        tabler: ['*'],
-        'flat-color-icons': [
-          'template',
-          'gallery',
-          'approval',
-          'document',
-          'advertising',
-          'currency-exchange',
-          'voice-presentation',
-          'business-contact',
-          'database',
-        ],
-      },
-    }),
-
-    ...whenExternalScripts(() =>
-      partytown({
-        config: { forward: ['dataLayer.push'] },
-      })
-    ),
-
-    compress({
-      CSS: true,
-      HTML: {
-        'html-minifier-terser': {
-          removeAttributeQuotes: false,
-        },
-      },
-      Image: false,
-      JavaScript: true,
-      SVG: false,
-      Logger: 1,
-    }),
-
-    astrowind({
-      config: './src/config.yaml',
-    }),
-  ],
-
-  image: {
-    domains: ['cdn.pixabay.com'],
+{
+  "name": "@onwidget/astrowind",
+  "version": "1.0.0-beta.63",
+  "description": "AstroWind: A free template using Astro 6 and Tailwind CSS v4. Astro starter theme.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
   },
-
-  markdown: {
-    processor: unified({
-      remarkPlugins: [readingTimeRemarkPlugin],
-      rehypePlugins: [responsiveTablesRehypePlugin],
-    }),
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "npm run check:astro && npm run check:eslint && npm run check:prettier",
+    "check:astro": "astro check",
+    "check:eslint": "eslint .",
+    "check:prettier": "prettier --check .",
+    "fix": "npm run fix:eslint && npm run fix:prettier",
+    "fix:eslint": "eslint --fix .",
+    "fix:prettier": "prettier -w ."
   },
-
-  vite: {
-    plugins: [tailwindcss()],
-    resolve: {
-      alias: {
-        '~': path.resolve(__dirname, './src'),
-      },
-    },
+  "dependencies": {
+    "@astrojs/react": "^3.0.0",
+    "@astrojs/rss": "^4.0.18",
+    "@astrojs/sitemap": "^3.7.3",
+    "@fontsource-variable/inter": "^5.2.8",
+    "astro": "^6.4.2",
+    "astro-embed": "^0.13.0",
+    "astro-icon": "^1.1.5",
+    "astro-seo": "^1.1.0",
+    "better-auth": "1.0.0",
+    "limax": "4.2.3",
+    "lodash.merge": "^4.6.2",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "unpic": "^4.2.2"
   },
-});
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/mdx": "^6.0.1",
+    "@astrojs/partytown": "^2.1.7",
+    "@eslint/js": "^10.0.1",
+    "@iconify-json/flat-color-icons": "^1.2.3",
+    "@iconify-json/tabler": "^1.2.35",
+    "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/lodash.merge": "^4.6.9",
+    "@types/mdx": "^2.0.13",
+    "@typescript-eslint/eslint-plugin": "^8.60.0",
+    "@typescript-eslint/parser": "^8.60.0",
+    "astro-compress": "^2.4.1",
+    "astro-eslint-parser": "^1.4.0",
+    "eslint": "^10.4.0",
+    "eslint-plugin-astro": "^1.7.0",
+    "globals": "^17.6.0",
+    "js-yaml": "^4.1.1",
+    "mdast-util-to-string": "^4.0.0",
+    "prettier": "^3.8.3",
+    "prettier-plugin-astro": "^0.14.1",
+    "reading-time": "^1.5.0",
+    "sharp": "0.34.5",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.60.0"
+  },
+  "overrides": {
+    "yaml": ">=2.8.3",
+    "vite": "^7",
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7"
+  }
+}
