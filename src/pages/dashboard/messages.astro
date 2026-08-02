@@ -1,9 +1,8 @@
 ---
-export const prerender = true;
-import DashboardLayout from "~/components/DashboardLayout.astro";
+import { DashboardLayout } from "~/components/DashboardLayout";
 ---
 
-<DashboardLayout>
+<DashboardLayout client:load>
   <div class="flex justify-between items-center mb-4">
     <h1 class="text-2xl font-bold">消息中心</h1>
   </div>
