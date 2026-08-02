@@ -90,7 +90,7 @@ export default defineConfig({
     },
   },
 
-  // 忽略 DashboardLayout.astro 的导入错误（临时方案）
+  // 🔥 忽略 DashboardLayout 的导入错误（因为文件已被删除）
   build: {
     rollupOptions: {
       external: ['~/components/DashboardLayout.astro'],
