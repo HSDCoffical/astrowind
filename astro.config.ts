@@ -82,18 +82,27 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [
+      tailwindcss(),
+      // 关键：mock 掉 DashboardLayout.astro，阻止解析错误
+      {
+        name: 'mock-dashboard-layout',
+        resolveId(id) {
+          if (id.includes('DashboardLayout.astro')) {
+            return '\0mock-dashboard';
+          }
+        },
+        load(id) {
+          if (id === '\0mock-dashboard') {
+            return 'export default {};';
+          }
+        },
+      },
+    ],
     resolve: {
       alias: {
         '~': path.resolve(__dirname, './src'),
       },
-    },
-  },
-
-  // 🔥 忽略 DashboardLayout 的导入错误（因为文件已被删除）
-  build: {
-    rollupOptions: {
-      external: ['~/components/DashboardLayout.astro'],
     },
   },
 });
