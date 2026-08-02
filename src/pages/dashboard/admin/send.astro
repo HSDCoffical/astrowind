@@ -1,0 +1,21 @@
+---
+import DashboardLayout from "~/components/DashboardLayout.astro";
+import { getSession } from "~/lib/api";
+
+const user = await getSession();
+if (user?.role !== "admin") return Astro.redirect("/dashboard");
+---
+
+<DashboardLayout>
+  <h1 class="text-2xl font-bold mb-4">发送系统通知</h1>
+  <form action="/api/messages/admin/send" method="post" class="space-y-4 max-w-2xl">
+    <div><label class="block text-sm font-medium">收件人</label>
+      <select name="receiver_id" class="w-full px-3 py-2 border rounded">
+        <option value="0">所有用户</option>
+        <!-- 可选：动态加载用户列表 -->
+      </select>
+    </div>
+    <div><label class="block text-sm font-medium">消息内容</label><textarea name="content" rows="5" required class="w-full px-3 py-2 border rounded"></textarea></div>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">发送消息</button>
+  </form>
+</DashboardLayout>
