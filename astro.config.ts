@@ -12,7 +12,7 @@ import partytown from '@astrojs/partytown';
 import icon from 'astro-icon';
 import compress from 'astro-compress';
 import type { AstroIntegration } from 'astro';
-import react from '@astrojs/react'; // ← 新增
+import react from '@astrojs/react';
 
 import astrowind from './vendor/integration';
 
@@ -29,7 +29,7 @@ export default defineConfig({
 
   integrations: [
     sitemap(),
-    react(), // ← 新增
+    react(),
     mdx(),
     icon({
       include: {
@@ -88,6 +88,18 @@ export default defineConfig({
     resolve: {
       alias: {
         '~': path.resolve(__dirname, './src'),
+      },
+    },
+  },
+
+  // ========== 强制生成 dashboard 页面 ==========
+  build: {
+    rollupOptions: {
+      input: {
+        dashboard: 'src/pages/dashboard/index.astro',
+        profile: 'src/pages/dashboard/profile.astro',
+        messages: 'src/pages/dashboard/messages.astro',
+        admin_send: 'src/pages/dashboard/admin/send.astro',
       },
     },
   },
