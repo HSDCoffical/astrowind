@@ -1,28 +1,124 @@
 ---
-export const prerender = false;
-
 import DashboardLayout from "~/components/DashboardLayout.astro";
-import { ProfileForm } from "~/components/ProfileForm";
-import { PasswordForm } from "~/components/PasswordForm";
-import { getSession } from "~/lib/api";
-
-const user = await getSession();
 ---
 
 <DashboardLayout>
   <h1 class="text-2xl font-bold mb-4">个人资料</h1>
-
-  <div class="space-y-8">
-    <div>
-      <h2 class="text-lg font-semibold mb-2">基本信息</h2>
-      <ProfileForm initialData={user} />
-    </div>
-
-    <hr />
-
-    <div>
-      <h2 class="text-lg font-semibold mb-2">修改密码</h2>
-      <PasswordForm />
-    </div>
+  <div id="profile-container">
+    <p>加载中...</p>
   </div>
+
+  <hr class="my-8" />
+
+  <h2 class="text-lg font-semibold mb-2">修改密码</h2>
+  <div id="password-container">
+    <p>加载中...</p>
+  </div>
+
+  <script>
+    // 加载资料表单
+    const loadProfile = async () => {
+      const res = await fetch('/api/auth/session', { credentials: 'include' });
+      const data = await res.json();
+      if (!data?.user) {
+        window.location.href = '/user/login';
+        return;
+      }
+      const user = data.user;
+      // 额外获取 profile 信息
+      const profileRes = await fetch('/api/profile', { credentials: 'include' });
+      const profile = profileRes.ok ? await profileRes.json() : {};
+
+      document.getElementById('profile-container').innerHTML = `
+        <form id="profile-form" class="space-y-4 max-w-2xl">
+          <div><label class="block text-sm font-medium">用户名</label>
+            <input value="${user.username}" disabled class="w-full px-3 py-2 border rounded bg-gray-100" /></div>
+          <div><label class="block text-sm font-medium">邮箱</label>
+            <input type="email" name="email" value="${user.email}" class="w-full px-3 py-2 border rounded" /></div>
+          <div><label class="block text-sm font-medium">头像 URL</label>
+            <input type="text" name="avatar" value="${profile.avatar || ''}" class="w-full px-3 py-2 border rounded" /></div>
+          <div><label class="block text-sm font-medium">简介</label>
+            <textarea name="bio" rows="3" class="w-full px-3 py-2 border rounded">${profile.bio || ''}</textarea></div>
+          <div><label class="block text-sm font-medium">个人网站</label>
+            <input type="text" name="website" value="${profile.website || ''}" class="w-full px-3 py-2 border rounded" /></div>
+          <div><label class="block text-sm font-medium">所在地</label>
+            <input type="text" name="location" value="${profile.location || ''}" class="w-full px-3 py-2 border rounded" /></div>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">保存修改</button>
+          <div id="profile-msg" class="text-sm"></div>
+        </form>
+      `;
+
+      // 绑定表单提交事件
+      document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const data = {
+          email: form.email.value,
+          avatar: form.avatar.value,
+          bio: form.bio.value,
+          website: form.website.value,
+          location: form.location.value,
+        };
+        const msg = document.getElementById('profile-msg');
+        msg.textContent = '保存中...';
+        try {
+          const res = await fetch('/api/profile/update', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+          const result = await res.json();
+          msg.textContent = result.success ? '✅ 更新成功' : '❌ ' + (result.error || '更新失败');
+        } catch {
+          msg.textContent = '❌ 网络错误';
+        }
+      });
+    };
+
+    // 加载密码表单
+    const loadPassword = () => {
+      document.getElementById('password-container').innerHTML = `
+        <form id="password-form" class="space-y-4 max-w-md">
+          <div><label class="block text-sm font-medium">当前密码</label>
+            <input type="password" name="old_password" required class="w-full px-3 py-2 border rounded" /></div>
+          <div><label class="block text-sm font-medium">新密码</label>
+            <input type="password" name="new_password" required class="w-full px-3 py-2 border rounded" /></div>
+          <div><label class="block text-sm font-medium">确认新密码</label>
+            <input type="password" name="confirm_password" required class="w-full px-3 py-2 border rounded" /></div>
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">修改密码</button>
+          <div id="password-msg" class="text-sm"></div>
+        </form>
+      `;
+
+      document.getElementById('password-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const old = form.old_password.value;
+        const newPwd = form.new_password.value;
+        const confirm = form.confirm_password.value;
+        const msg = document.getElementById('password-msg');
+        if (newPwd !== confirm) {
+          msg.textContent = '❌ 两次密码不一致';
+          return;
+        }
+        msg.textContent = '修改中...';
+        try {
+          const res = await fetch('/api/auth/change-password', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword: old, newPassword: newPwd }),
+          });
+          const result = await res.json();
+          msg.textContent = result.success ? '✅ 密码已修改' : '❌ ' + (result.error || '修改失败');
+        } catch {
+          msg.textContent = '❌ 网络错误';
+        }
+      });
+    };
+
+    loadProfile();
+    loadPassword();
+  </script>
 </DashboardLayout>
