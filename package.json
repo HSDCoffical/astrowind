@@ -26,7 +26,6 @@
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource-variable/inter": "^5.2.8",
-    "@daveyplate/better-auth-ui": "^0.0.4",
     "astro": "^6.4.2",
     "astro-embed": "^0.13.0",
     "astro-icon": "^1.1.5",
@@ -36,7 +35,6 @@
     "lodash.merge": "^4.6.2",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "sonner": "^1.5.0",
     "unpic": "^4.2.2"
   },
   "devDependencies": {
