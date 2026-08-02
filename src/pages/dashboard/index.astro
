@@ -1,8 +1,8 @@
 ---
-import { DashboardLayout } from "~/components/DashboardLayout";
+// 无 prerender，SSR 模式自动动态渲染
 ---
 
-<DashboardLayout client:load>
+<DashboardLayout>
   <h1 class="text-2xl font-bold mb-4">概览</h1>
   <div id="user-info" class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
