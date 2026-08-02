@@ -1,0 +1,13 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { AuthProvider } from "@/components/AuthProvider";
+import { SignInCard } from "@daveyplate/better-auth-ui";
+---
+
+<Layout>
+  <div class="flex min-h-screen items-center justify-center">
+    <AuthProvider>
+      <SignInCard />
+    </AuthProvider>
+  </div>
+</Layout>
