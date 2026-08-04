@@ -20,7 +20,7 @@ export const headerData = {
     },
     {
       text: '个人中心',
-      href: 'https://hono-bbs-9qj.pages.dev/messages',
+      href: 'https://users-manage-react.pages.dev/account?sessionId=',
     },
     {
       text: '关于我们',
