@@ -36,7 +36,8 @@ bgImage={true}
 bgOpacity={30}
 >
   <Fragment slot="title">
-     凉宫数据欢迎您！
+    <!-- ===== 动态欢迎文字 ===== -->
+    <span id="hero-welcome">凉宫数据欢迎您！</span>
   </Fragment>
 
   <Fragment slot="subtitle">
@@ -387,7 +388,32 @@ bgOpacity={30}
       电子邮箱地址
     </a>
     <p class="text-gray-400 dark:text-gray-500 text-xs mt-3">
-      xuexiang@lianggong.dpdns.org
+      xuexiang@lianggongoffice.dpdns.org
     </p>
   </div>
 </section>
+
+<!-- ===== 动态欢迎文字 JavaScript ===== -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const welcomeEl = document.getElementById('hero-welcome');
+    if (!welcomeEl) return;
+
+    fetch('https://workers-users.2791389901.workers.dev/load-user', {
+      credentials: 'include'
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Not logged in');
+      return res.json();
+    })
+    .then(data => {
+      if (data.username) {
+        welcomeEl.textContent = data.username + '，欢迎';
+      }
+    })
+    .catch(() => {
+      // 未登录，显示默认
+      welcomeEl.textContent = '凉宫数据欢迎您！';
+    });
+  });
+</script>
