@@ -27,13 +27,6 @@ export const headerData = {
       href: getPermalink('/about'),
     },
   ],
-  actions: [
-    {
-      text: '联系我们',
-      href: 'mailto:xuexiang@lianggong.dpdns.org',
-      style: 'background-color: white !important; color: black !important; border: 1px solid #d1d5db !important; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05) !important; padding: 6px 16px !important; border-radius: 40px !important;',
-    },
-  ],
 };
 
 export const footerData = {
