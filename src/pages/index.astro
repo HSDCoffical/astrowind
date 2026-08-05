@@ -36,8 +36,7 @@ bgImage={true}
 bgOpacity={30}
 >
   <Fragment slot="title">
-    <!-- ===== 动态欢迎文字 ===== -->
-    <span id="hero-welcome"> 欢迎！</span>
+     凉宫数据欢迎您！
   </Fragment>
 
   <Fragment slot="subtitle">
@@ -392,28 +391,3 @@ bgOpacity={30}
     </p>
   </div>
 </section>
-
-<!-- ===== 动态欢迎文字 JavaScript ===== -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const welcomeEl = document.getElementById('hero-welcome');
-    if (!welcomeEl) return;
-
-    fetch('https://workers-users.2791389901.workers.dev/load-user', {
-      credentials: 'include'
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('Not logged in');
-      return res.json();
-    })
-    .then(data => {
-      if (data.username) {
-        welcomeEl.textContent = data.username + '，欢迎';
-      }
-    })
-    .catch(() => {
-      // 未登录，显示默认
-      welcomeEl.textContent = ' 欢迎！';
-    });
-  });
-</script>
