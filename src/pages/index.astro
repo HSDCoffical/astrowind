@@ -24,12 +24,16 @@ const metadata = {
   <Hero
   actions={[
     {
-      variant: 'primary',
       text: '联系我们',
       href: '/contact',
       icon: 'tabler:download',
+      class: 'bg-white text-black hover:bg-gray-100 border border-gray-300 shadow-sm',
     },
-    { text: '了解更多', href: '#features' },
+    {
+      text: '了解更多',
+      href: '#features',
+      class: 'bg-white text-black hover:bg-gray-100 border border-gray-300 shadow-sm',
+    },
   ]}
   image={{ src: '/new.png', alt: '凉宫数据 ' }}
 bgImage={true}
