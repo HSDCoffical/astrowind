@@ -1,5 +1,4 @@
 ---
-import Image from '~/components/common/Image.astro';
 import Button from '~/components/ui/Button.astro';
 
 import type { Hero as Props } from '~/types';
@@ -16,15 +15,37 @@ const {
   id,
   bg = await Astro.slots.render('bg'),
 } = Astro.props;
+
+// 提取图片 URL（支持对象或字符串）
+let imageUrl = '';
+if (image) {
+  if (typeof image === 'object' && image.src) {
+    imageUrl = image.src;
+  } else if (typeof image === 'string') {
+    imageUrl = image;
+  }
+}
 ---
 
-<section class="relative md:-mt-[76px] not-prose" {...id ? { id } : {}}>
+<section class="relative md:-mt-[76px] not-prose overflow-hidden min-h-[600px] md:min-h-[700px] flex items-center" {...id ? { id } : {}}>
+  <!-- ===== 背景图片层（绝对定位，铺满全屏） ===== -->
+  {imageUrl && (
+    <div
+      class="absolute inset-0 w-full h-full bg-cover bg-center"
+      style={`background-image: url('${imageUrl}');`}
+    ></div>
+  )}
+  <!-- ===== 半透明遮罩（让文字更清晰，可调整透明度） ===== -->
+  {imageUrl && (
+    <div class="absolute inset-0 w-full h-full bg-black/40"></div>
+  )}
+
   <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
     <slot name="bg">
       {bg ? <Fragment set:html={bg} /> : null}
     </slot>
   </div>
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6">
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 z-10 w-full">
     <div class="pt-0 md:pt-[76px] pointer-events-none"></div>
     <div class="py-12 md:py-20">
       <div class="text-center pb-10 md:pb-16 max-w-5xl mx-auto">
@@ -39,7 +60,7 @@ const {
         {
           title && (
             <h1
-              class="text-5xl md:text-6xl font-bold leading-tighter tracking-tighter mb-4 font-heading dark:text-gray-200 intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
+              class="text-5xl md:text-6xl font-bold leading-tighter tracking-tighter mb-4 font-heading text-white drop-shadow-lg intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
               set:html={title}
             />
           )
@@ -48,7 +69,7 @@ const {
           {
             subtitle && (
               <p
-                class="text-xl text-muted mb-6 dark:text-slate-300 intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
+                class="text-xl text-white/90 mb-6 dark:text-slate-200 intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
                 set:html={subtitle}
               />
             )
@@ -71,31 +92,7 @@ const {
         </div>
         {content && <Fragment set:html={content} />}
       </div>
-      <div
-        class="intersect-once intersect-no-queue intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
-      >
-        {
-          image && (
-            <div class="relative m-auto max-w-5xl">
-              {typeof image === 'string' ? (
-                <Fragment set:html={image} />
-              ) : (
-                <Image
-                  class="mx-auto rounded-md w-full"
-                  widths={[400, 768, 1024, 2040]}
-                  sizes="(max-width: 767px) 400px, (max-width: 1023px) 768px, (max-width: 2039px) 1024px, 2040px"
-                  loading="eager"
-                  fetchpriority="high"
-                  width={1024}
-                  height={576}
-                  format="webp"
-                  {...image}
-                />
-              )}
-            </div>
-          )
-        }
-      </div>
+      <!-- ===== 原图片展示区域已移除（图片已作为背景） ===== -->
     </div>
   </div>
 </section>
