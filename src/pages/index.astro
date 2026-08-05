@@ -22,36 +22,37 @@ const metadata = {
   <!-- Hero Widget ******************* -->
 
   <Hero
-  actions={[
-    {
-      variant: 'primary',
-      text: '联系我们',
-      href: '/contact',
-      icon: 'tabler:download',
-    },
-    {
-  text: '了解更多',
-  href: '#features',
-  style: 'background-color: white !important; color: black !important; border: 1px solid #d1d5db !important;',
-}
-  image={{ src: '/new.png', alt: '凉宫数据 ' }}
-bgImage={true}
-bgOpacity={30}
->
-  <Fragment slot="title">
-     凉宫数据欢迎您！
-  </Fragment>
+    actions={[
+      {
+        variant: 'primary',
+        text: '联系我们',
+        href: '/contact',
+        icon: 'tabler:download',
+      },
+      {
+        text: '了解更多',
+        href: '#features',
+        style: 'background-color: white !important; color: black !important; border: 1px solid #d1d5db !important; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05) !important;',
+      },
+    ]}
+    image={{ src: '/new.png', alt: '凉宫数据 ' }}
+    bgImage={true}
+    bgOpacity={30}
+  >
+    <Fragment slot="title">
+      凉宫数据欢迎您！
+    </Fragment>
 
-  <Fragment slot="subtitle">
-    <span class="hidden sm:inline">
-      凉宫数据提供
-    </span>
-    <span class="block mb-1 sm:hidden font-bold text-blue-600">
-      凉宫数据office提供
-    </span>
-    创新型互联网企业
-  </Fragment>
-</Hero>
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        凉宫数据提供
+      </span>
+      <span class="block mb-1 sm:hidden font-bold text-blue-600">
+        凉宫数据office提供
+      </span>
+      创新型互联网企业
+    </Fragment>
+  </Hero>
 
   <!-- Note Widget ******************* -->
 
@@ -133,7 +134,7 @@ bgOpacity={30}
   >
     <Fragment slot="content">
       <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">新数据化</h3>
-     多效化 
+      多效化 
     </Fragment>
 
     <Fragment slot="bg">
