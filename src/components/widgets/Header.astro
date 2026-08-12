@@ -54,15 +54,18 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
-    /* ===== 修复向上滚动回弹 ===== */
+    /* ===== 终极修复回弹 ===== */
     html {
       overflow-anchor: none !important;
       overscroll-behavior-y: none !important;
+      scroll-behavior: auto !important; /* 禁用平滑滚动 */
+      touch-action: pan-y !important;   /* 只允许垂直滚动，禁用下拉刷新 */
     }
     body {
       min-height: 100vh;
       min-height: 100dvh;
       overscroll-behavior-y: none !important;
+      touch-action: pan-y !important;
     }
 
     header#header * {
@@ -246,16 +249,30 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- 清除 body 占位 + 强制重置滚动位置 -->
+<!-- 最终脚本：强制重置 + 持续监控 -->
 <script>
   (function() {
-    // ===== 强制重置滚动位置到顶部 =====
-    if (window.scrollY > 0) {
-      window.scrollTo(0, 0);
-    }
+    // === 1. 立即重置滚动位置 ===
+    window.scrollTo(0, 0);
     
-    // ===== 清除 body 占位 =====
+    // === 2. 清除 body 占位 ===
     document.body.style.paddingTop = '0px';
     document.body.style.marginTop = '0px';
+
+    // === 3. 页面加载完成后再次确认（防止延迟样式生效） ===
+    window.addEventListener('load', function() {
+      window.scrollTo(0, 0);
+    });
+
+    // === 4. 监听滚动，如果出现回弹则强制修正（但不要干扰正常滚动） ===
+    let lastScrollY = window.scrollY;
+    window.addEventListener('scroll', function() {
+      const currentScrollY = window.scrollY;
+      // 如果检测到回弹（滚动位置突然减小）且接近顶部，则强制归零
+      if (currentScrollY < 5 && currentScrollY > 0 && lastScrollY < 5) {
+        window.scrollTo(0, 0);
+      }
+      lastScrollY = currentScrollY;
+    }, { passive: true });
   })();
 </script>
