@@ -396,7 +396,7 @@ const metadata = {
   </div>
 </section>
 
-<!-- ===== 底部固定搜索框（点击图标切换站内/站外，图标不变） ===== -->
+<!-- ===== 底部固定搜索框（站内/站外切换，站内真正可用） ===== -->
 <div class="fixed bottom-4 left-0 right-0 z-50 px-4">
   <div class="max-w-2xl mx-auto">
     <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
@@ -409,7 +409,7 @@ const metadata = {
         placeholder="搜索本站内容..."
         class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
       />
-      <!-- 放大镜图标：点击切换模式（图标始终保持放大镜，不变X） -->
+      <!-- 放大镜图标：点击切换模式 -->
       <button
         id="search-toggle"
         type="button"
@@ -420,11 +420,13 @@ const metadata = {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </button>
-      <!-- 模式标签（显示当前模式） -->
+      <!-- 模式标签 -->
       <span id="mode-label" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full">
         站外
       </span>
     </form>
+    <!-- 搜索结果容器（站内模式使用） -->
+    <div id="search-results-container" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
   </div>
 </div>
 
@@ -435,13 +437,74 @@ const metadata = {
     const toggleBtn = document.getElementById('search-toggle');
     const modeLabel = document.getElementById('mode-label');
     const searchIcon = document.getElementById('search-icon');
+    const resultsContainer = document.getElementById('search-results-container');
 
     let mode = 'external'; // 'external' 或 'internal'
+    let searchData = null; // 缓存搜索索引
+
+    // 加载搜索索引
+    async function loadSearchData() {
+      try {
+        const resp = await fetch('/search.json');
+        if (resp.ok) {
+          searchData = await resp.json();
+          console.log('✅ 搜索索引已加载:', searchData.length, '个页面');
+        } else {
+          console.warn('⚠️ 搜索索引加载失败，状态码:', resp.status);
+        }
+      } catch (e) {
+        console.warn('⚠️ 搜索索引加载失败:', e);
+      }
+    }
+
+    // 站内搜索
+    function searchInternal(query) {
+      if (!searchData || !query.trim()) return [];
+      const q = query.toLowerCase().trim();
+      if (!q) return [];
+      
+      return searchData
+        .filter(page => {
+          const title = page.title.toLowerCase();
+          const desc = page.description.toLowerCase();
+          const content = page.content.toLowerCase();
+          return title.includes(q) || desc.includes(q) || content.includes(q);
+        })
+        .slice(0, 10); // 最多显示 10 条
+    }
+
+    // 显示站内搜索结果
+    function showInternalResults(results) {
+      resultsContainer.innerHTML = '';
+      if (results.length === 0) {
+        resultsContainer.classList.add('hidden');
+        return;
+      }
+
+      let html = '';
+      for (const page of results) {
+        html += `
+          <a href="${page.url}" class="block px-4 py-2 hover:bg-white/20 transition-colors border-b border-white/10 last:border-0">
+            <div class="font-medium text-gray-800">${page.title}</div>
+            <div class="text-sm text-gray-600 truncate">${page.description}</div>
+          </a>
+        `;
+      }
+      resultsContainer.innerHTML = html;
+      resultsContainer.classList.remove('hidden');
+    }
+
+    function clearResults() {
+      resultsContainer.innerHTML = '';
+      resultsContainer.classList.add('hidden');
+    }
 
     function updateMode(newMode) {
       mode = newMode;
+      clearResults();
+
       if (mode === 'external') {
-        // 站外模式：Bing 搜索，限定本站
+        // 站外模式
         form.action = 'https://www.bing.com/search';
         form.target = '_blank';
         let hiddenInput = form.querySelector('input[name="q1"]');
@@ -458,26 +521,57 @@ const metadata = {
         input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
         modeLabel.textContent = '站外';
         modeLabel.className = 'absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full';
-        // 图标始终保持放大镜
         searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
+        // 清空输入值可能残留
+        if (input.value.trim()) {
+          // 站外模式不显示结果
+        }
       } else {
-        // 站内模式：暂时禁用
+        // 站内模式
         form.action = '#';
         form.target = '';
         const hiddenInput = form.querySelector('input[name="q1"]');
         if (hiddenInput) hiddenInput.remove();
         input.name = '';
-        input.disabled = true;
-        input.placeholder = '站内搜索开发中...';
-        input.value = '';
-        input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-400 placeholder-gray-400 focus:outline-none shadow-lg cursor-not-allowed';
+        input.disabled = false; // 允许输入
+        input.placeholder = '输入关键词搜索本站...';
+        input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
         modeLabel.textContent = '站内';
-        modeLabel.className = 'absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full';
-        // 图标始终保持放大镜（不变X）
+        modeLabel.className = 'absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full';
         searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
+        // 如果已有输入，触发站内搜索
+        if (input.value.trim()) {
+          const results = searchInternal(input.value);
+          showInternalResults(results);
+        }
       }
     }
 
+    // 输入事件（站内模式实时搜索）
+    input.addEventListener('input', function() {
+      if (mode === 'internal') {
+        const query = this.value.trim();
+        if (!query) {
+          clearResults();
+          return;
+        }
+        const results = searchInternal(query);
+        showInternalResults(results);
+      } else {
+        // 站外模式不显示结果
+        clearResults();
+      }
+    });
+
+    // 点击其他地方清除结果
+    document.addEventListener('click', function(e) {
+      const searchArea = document.querySelector('.fixed.bottom-4');
+      if (searchArea && !searchArea.contains(e.target)) {
+        clearResults();
+      }
+    });
+
+    // 点击切换按钮
     toggleBtn.addEventListener('click', function(e) {
       e.preventDefault();
       if (mode === 'external') {
@@ -487,7 +581,8 @@ const metadata = {
       }
     });
 
-    // 初始化：站外模式
+    // 初始化：站外模式，加载搜索索引
     updateMode('external');
+    loadSearchData();
   })();
 </script>
