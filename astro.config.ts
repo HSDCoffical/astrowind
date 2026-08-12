@@ -3,7 +3,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { defineConfig } from 'astro/config';
-
 import { unified } from '@astrojs/markdown-remark';
 
 import sitemap from '@astrojs/sitemap';
@@ -13,6 +12,7 @@ import partytown from '@astrojs/partytown';
 import icon from 'astro-icon';
 import compress from 'astro-compress';
 import type { AstroIntegration } from 'astro';
+import { globby } from 'globby'; // 静态导入 globby
 
 import astrowind from './vendor/integration';
 
@@ -24,16 +24,13 @@ const hasExternalScripts = false;
 const whenExternalScripts = (items: (() => AstroIntegration) | (() => AstroIntegration)[] = []) =>
   hasExternalScripts ? (Array.isArray(items) ? items.map((item) => item()) : [items()]) : [];
 
-// ===== 自定义集成：生成搜索索引（使用静态导入，修复 Vite 运行器错误） =====
+// ===== 自定义集成：生成搜索索引 =====
 function searchIndex(): AstroIntegration {
   return {
     name: 'search-index',
     hooks: {
       'astro:build:done': async ({ dir }) => {
-        // 由于 globby 是 ESM 模块，需要在顶层导入
-        // 但为了兼容，使用动态 import 并确保在钩子外部已安装
-        const { globby } = await import('globby');
-        
+        // 直接使用静态导入的 globby
         const distDir = new URL('.', dir);
         const files = await globby('**/*.html', {
           cwd: new URL('.', dir).pathname,
@@ -123,8 +120,7 @@ export default defineConfig({
       config: './src/config.yaml',
     }),
 
-    // ===== 搜索索引生成 =====
-    searchIndex(),
+    searchIndex(), // 添加搜索索引生成
   ],
 
   image: {
