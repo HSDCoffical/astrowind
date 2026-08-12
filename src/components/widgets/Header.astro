@@ -50,8 +50,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 <header
   id={id}
   data-aw-sticky-header={isSticky ? true : undefined}
-  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30 transition-transform duration-300 ease-out will-change-transform backface-hidden"
-  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; transform: translateY(-100%);"
+  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30 will-change-transform backface-hidden"
+  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
     header#header * {
@@ -91,7 +91,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* 强制 GPU 加速，防止放大卡顿 */
+    /* GPU 加速，防止卡顿 */
     header#header {
       contain: layout style;
       will-change: transform, backdrop-filter;
@@ -218,39 +218,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- 最简脚本：控制显隐，无 body padding-top 干扰 -->
+<!-- 只清除 body 的 padding-top，无滚动监听 -->
 <script>
   (function() {
-    const header = document.querySelector('[data-aw-sticky-header]');
-    if (!header) return;
-
-    // 强制清除 body 的 padding-top 和 margin-top，确保内容从顶部开始
+    // 确保 body 无顶部内边距，内容从顶部开始
     document.body.style.paddingTop = '0px';
     document.body.style.marginTop = '0px';
-
-    let visible = false;
-    let ticking = false;
-    const OFFSET = 100;
-
-    const update = () => {
-      const show = window.scrollY > OFFSET;
-      if (show !== visible) {
-        header.style.transform = show ? 'translateY(0)' : 'translateY(-100%)';
-        visible = show;
-      }
-    };
-
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          update();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    });
-
-    // 初始状态
-    update();
   })();
 </script>
