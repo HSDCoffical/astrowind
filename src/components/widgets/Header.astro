@@ -49,13 +49,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 <header
   id={id}
-  data-aw-sticky-header={isSticky ? true : undefined}
   style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
-  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30 transition-transform duration-300 ease-out will-change-transform will-change-backdrop-filter backface-hidden contain-layout-style"
-  data-visible="false"
+  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30"
 >
   <style>
-    /* 所有原始样式保留 */
+    /* 原样式保留，只精简核心 */
     header#header * {
       background: transparent !important;
     }
@@ -92,25 +90,9 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: none !important;
       }
     }
-
-    /* 控制显隐（transform 动画） */
-    header#header {
-      transform: translateY(-100%);
-    }
-    header#header[data-visible="true"] {
-      transform: translateY(0);
-    }
-
-    /* 强制 GPU 合成层 & 隔离布局 */
-    header#header {
-      contain: layout style;
-      will-change: transform, backdrop-filter;
-      backface-visibility: hidden;
-    }
   </style>
 
-  <!-- 完全保留原始 HTML 结构 -->
-  <div class="absolute inset-0" style="background: transparent !important;"></div>
+  <!-- 完全保留原 HTML 结构，但移除多余的 absolute 背景层（避免干扰） -->
   <div
     class:list={[
       'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
@@ -134,7 +116,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </div>
     </div>
 
-    <!-- 导航菜单 -->
     <nav
       class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
       aria-label="Main navigation"
@@ -184,7 +165,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             </li>
           ))
         }
-        <!-- 手机端菜单底部主题切换 -->
         <li class="menu-theme-item">
           <ToggleTheme iconClass="w-5 h-5" />
           <span class="text-sm">切换主题</span>
@@ -229,46 +209,15 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- 干净脚本：控制显隐 + 自适应占位 -->
+<!-- 动态设置 body padding-top 仅此一个简单脚本 -->
 <script>
   (function() {
-    const header = document.querySelector('[data-aw-sticky-header]');
+    const header = document.getElementById('header');
     if (!header) return;
-
-    // 自适应占位
     function setPadding() {
       document.body.style.paddingTop = header.offsetHeight + 'px';
     }
     setPadding();
-    let timer;
-    window.addEventListener('resize', () => {
-      clearTimeout(timer);
-      timer = setTimeout(setPadding, 100);
-    });
-
-    // 滚动控制显隐
-    let visible = false;
-    let ticking = false;
-    const OFFSET = 100;
-
-    const update = () => {
-      const show = window.scrollY > OFFSET;
-      if (show !== visible) {
-        header.dataset.visible = show ? 'true' : 'false';
-        visible = show;
-      }
-    };
-
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          update();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    });
-
-    update();
+    window.addEventListener('resize', setPadding);
   })();
 </script>
