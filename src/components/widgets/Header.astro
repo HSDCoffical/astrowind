@@ -36,7 +36,7 @@ const {
   id = 'header',
   links = [],
   actions = [],
-  isSticky = false,
+  isSticky = false,  // 改为 false，默认不粘性
   isDark = false,
   isFullWidth = false,
   showToggleTheme = false,
@@ -48,14 +48,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 ---
 
 <header
+  id={id}
   style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;"
   class:list={[
-    { sticky: isSticky, relative: !isSticky, dark: isDark },
-    'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out border-b border-gray-200/30 dark:border-gray-700/30',
+    { dark: isDark },
+    'relative z-40 flex-none mx-auto w-full border-b border-gray-200/30 dark:border-gray-700/30',
   ]}
-  {...isSticky ? { 'data-aw-sticky-header': true } : {}}
-  {...id ? { id } : {}}
 >
+  <!-- 样式保持不变 -->
   <style>
     header#header * {
       background: transparent !important;
@@ -75,7 +75,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     .dark header#header a:hover {
       background: rgba(255,255,255,0.05) !important;
     }
-    /* 手机端菜单底部主题切换项 */
     .menu-theme-item {
       display: flex;
       align-items: center;
@@ -97,6 +96,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </style>
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
+  <!-- 内容与之前完全相同，只是不再是 sticky -->
   <div
     class:list={[
       'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
@@ -120,7 +120,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </div>
     </div>
 
-    <!-- 导航菜单 -->
     <nav
       class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
       aria-label="Main navigation"
@@ -170,7 +169,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             </li>
           ))
         }
-        <!-- 手机端菜单底部主题切换 -->
         <li class="menu-theme-item">
           <ToggleTheme iconClass="w-5 h-5" />
           <span class="text-sm">切换主题</span>
@@ -214,43 +212,3 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     </div>
   </div>
 </header>
-
-<!-- ===== 修复粘性头部滚动卡顿（添加 requestAnimationFrame 节流） ===== -->
-<script>
-  (function() {
-    const header = document.querySelector('[data-aw-sticky-header]');
-    if (!header) return;
-
-    let ticking = false;
-    const STICKY_OFFSET = 100;
-
-    const updateHeader = () => {
-      const isSticky = window.scrollY > STICKY_OFFSET;
-      if (isSticky) {
-        header.style.position = 'fixed';
-        header.style.top = '0';
-        header.style.width = '100%';
-        header.style.zIndex = '40';
-      } else {
-        header.style.position = '';
-        header.style.top = '';
-        header.style.width = '';
-        header.style.zIndex = '';
-      }
-    };
-
-    // 使用 requestAnimationFrame 节流，避免滚动事件过度触发
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          updateHeader();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    });
-
-    // 初始检查（页面加载时可能已滚动）
-    updateHeader();
-  })();
-</script>
