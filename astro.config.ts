@@ -1,3 +1,4 @@
+import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -23,16 +24,16 @@ const hasExternalScripts = false;
 const whenExternalScripts = (items: (() => AstroIntegration) | (() => AstroIntegration)[] = []) =>
   hasExternalScripts ? (Array.isArray(items) ? items.map((item) => item()) : [items()]) : [];
 
-// ===== 自定义集成：生成搜索索引 =====
+// ===== 自定义集成：生成搜索索引（使用静态导入，修复 Vite 运行器错误） =====
 function searchIndex(): AstroIntegration {
   return {
     name: 'search-index',
     hooks: {
       'astro:build:done': async ({ dir }) => {
-        const fs = await import('fs/promises');
+        // 由于 globby 是 ESM 模块，需要在顶层导入
+        // 但为了兼容，使用动态 import 并确保在钩子外部已安装
         const { globby } = await import('globby');
         
-        // 获取所有 HTML 文件
         const distDir = new URL('.', dir);
         const files = await globby('**/*.html', {
           cwd: new URL('.', dir).pathname,
@@ -122,7 +123,7 @@ export default defineConfig({
       config: './src/config.yaml',
     }),
 
-    // ===== 添加搜索索引生成 =====
+    // ===== 搜索索引生成 =====
     searchIndex(),
   ],
 
@@ -140,7 +141,6 @@ export default defineConfig({
   vite: {
     plugins: [
       tailwindcss(),
-      // 关键：mock 掉 DashboardLayout.astro，阻止解析错误
       {
         name: 'mock-dashboard-layout',
         resolveId(id) {
@@ -160,7 +160,6 @@ export default defineConfig({
         '~': path.resolve(__dirname, './src'),
       },
     },
-    // 告诉 Vite 在构建时忽略 /pagefind/pagefind.js（如果不需要可以删掉）
     build: {
       rollupOptions: {
         external: ['/pagefind/pagefind.js'],
