@@ -30,7 +30,6 @@ export interface Props {
   showToggleTheme?: boolean;
   showRssFeed?: boolean;
   position?: string;
-  headerMode?: 'default' | 'compact'; // 新增：控制 header 紧凑程度
 }
 
 const {
@@ -43,7 +42,6 @@ const {
   showToggleTheme = false,
   showRssFeed = false,
   position = 'center',
-  headerMode = 'default', // 默认为 default
 } = Astro.props;
 
 const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
@@ -52,19 +50,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 <header
   id={id}
   data-aw-sticky-header={isSticky ? true : undefined}
-  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30 will-change-transform backface-hidden"
+  class:list={[
+    { sticky: isSticky, relative: !isSticky, dark: isDark },
+    'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out border-b border-gray-200/30 dark:border-gray-700/30',
+  ]}
   style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
+  {...id ? { id } : {}}
 >
   <style>
-    /* ===== 修复回弹 ===== */
-    html {
-      overflow-anchor: none !important;
-    }
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-    }
-
     header#header * {
       background: transparent !important;
     }
@@ -101,56 +94,12 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: none !important;
       }
     }
-
-    /* GPU 加速 */
-    header#header {
-      contain: layout style;
-      will-change: transform, backdrop-filter;
-      backface-visibility: hidden;
-    }
-
-    /* ===== 强制 Logo 文字为白色 ===== */
-    header#header a span,
-    header#header a svg text,
-    header#header a svg *[fill],
-    header#header a svg *[stroke] {
-      color: white !important;
-      fill: white !important;
-      stroke: white !important;
-    }
-    header#header a .logo-text,
-    header#header a .text-default,
-    header#header a .text-gray-800,
-    header#header a .dark\:text-white {
-      color: white !important;
-    }
-
-    /* ===== compact 模式：减小内边距 ===== */
-    header#header.compact {
-      padding-top: 0.25rem !important;
-      padding-bottom: 0.25rem !important;
-    }
-    header#header.compact > div {
-      padding-top: 0.25rem !important;
-      padding-bottom: 0.25rem !important;
-    }
-    /* 移动端适配 */
-    @media (max-width: 767px) {
-      header#header.compact {
-        padding-top: 0.15rem !important;
-        padding-bottom: 0.15rem !important;
-      }
-      header#header.compact > div {
-        padding-top: 0.15rem !important;
-        padding-bottom: 0.15rem !important;
-      }
-    }
   </style>
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
   <div
     class:list={[
-      'relative text-default mx-auto w-full',
+      'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
       {
         'md:flex md:justify-between': position !== 'center',
       },
@@ -160,15 +109,10 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       {
         'max-w-7xl': !isFullWidth,
       },
-      // 默认 padding，compact 模式由 CSS 控制
-      'py-2 px-3 md:px-6',
-      // 如果是 compact 模式，额外添加类
-      { 'compact': headerMode === 'compact' },
     ]}
   >
-    <!-- Logo 靠左 -->
-    <div class="flex justify-between items-center w-full">
-      <a class="flex items-center ml-0 pl-0" href={getHomePermalink()}>
+    <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
+      <a class="flex items-center" href={getHomePermalink()}>
         <Logo />
       </a>
       <div class="flex items-center md:hidden">
@@ -270,11 +214,3 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     </div>
   </div>
 </header>
-
-<!-- 清除 body 占位 -->
-<script>
-  (function() {
-    document.body.style.paddingTop = '0px';
-    document.body.style.marginTop = '0px';
-  })();
-</script>
