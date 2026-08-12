@@ -104,5 +104,11 @@ export default defineConfig({
         '~': path.resolve(__dirname, './src'),
       },
     },
+    // ===== 新增：告诉 Vite 在构建时忽略 /pagefind/pagefind.js =====
+    build: {
+      rollupOptions: {
+        external: ['/pagefind/pagefind.js'],
+      },
+    },
   },
 });
