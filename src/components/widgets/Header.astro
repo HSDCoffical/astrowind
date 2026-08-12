@@ -54,6 +54,15 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
+    /* ===== 修复回弹 ===== */
+    html {
+      overflow-anchor: none !important;
+    }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
     header#header * {
       background: transparent !important;
     }
@@ -98,7 +107,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       backface-visibility: hidden;
     }
 
-    /* ===== 强制 Logo 文字为白色（覆盖 Logo.astro 中的任何颜色） ===== */
+    /* ===== 强制 Logo 文字为白色 ===== */
     header#header a span,
     header#header a svg text,
     header#header a svg *[fill],
@@ -107,7 +116,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       fill: white !important;
       stroke: white !important;
     }
-    /* 如果 Logo 中使用了其他类，也强制覆盖 */
     header#header a .logo-text,
     header#header a .text-default,
     header#header a .text-gray-800,
@@ -131,7 +139,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       },
     ]}
   >
-    <!-- Logo 靠左（已去掉左边距） -->
+    <!-- Logo 靠左 -->
     <div class="flex justify-between items-center w-full">
       <a class="flex items-center ml-0 pl-0" href={getHomePermalink()}>
         <Logo />
@@ -236,7 +244,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- 清除 body 占位，内容从顶部开始 -->
+<!-- 清除 body 占位 -->
 <script>
   (function() {
     document.body.style.paddingTop = '0px';
