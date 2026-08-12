@@ -23,6 +23,59 @@ const hasExternalScripts = false;
 const whenExternalScripts = (items: (() => AstroIntegration) | (() => AstroIntegration)[] = []) =>
   hasExternalScripts ? (Array.isArray(items) ? items.map((item) => item()) : [items()]) : [];
 
+// ===== 自定义集成：生成搜索索引 =====
+function searchIndex(): AstroIntegration {
+  return {
+    name: 'search-index',
+    hooks: {
+      'astro:build:done': async ({ dir }) => {
+        const fs = await import('fs/promises');
+        const { globby } = await import('globby');
+        
+        // 获取所有 HTML 文件
+        const distDir = new URL('.', dir);
+        const files = await globby('**/*.html', {
+          cwd: new URL('.', dir).pathname,
+          absolute: true,
+        });
+
+        const pages = [];
+
+        for (const file of files) {
+          const content = await fs.readFile(file, 'utf-8');
+          // 提取标题
+          const titleMatch = content.match(/<title[^>]*>([^<]*)<\/title>/);
+          const title = titleMatch ? titleMatch[1] : '无标题';
+          
+          // 提取正文文本（去除 HTML 标签）
+          const bodyMatch = content.match(/<main[^>]*>([\s\S]*?)<\/main>/);
+          const bodyText = bodyMatch ? bodyMatch[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() : '';
+          
+          // 提取描述（meta description）
+          const descMatch = content.match(/<meta name="description"[^>]*content="([^"]*)"[^>]*>/);
+          const description = descMatch ? descMatch[1] : bodyText.slice(0, 150);
+
+          // 获取相对 URL
+          const relPath = path.relative(new URL('.', dir).pathname, file);
+          const url = '/' + relPath.replace(/index\.html$/, '').replace(/\.html$/, '');
+
+          pages.push({
+            title,
+            url: url || '/',
+            description: description || bodyText.slice(0, 150),
+            content: bodyText.slice(0, 500),
+          });
+        }
+
+        // 写入 search.json
+        const outputPath = new URL('search.json', dir);
+        await fs.writeFile(outputPath, JSON.stringify(pages, null, 2), 'utf-8');
+        console.log(`✅ 搜索索引已生成: ${pages.length} 个页面`);
+      },
+    },
+  };
+}
+
 export default defineConfig({
   output: 'static',
 
@@ -68,6 +121,9 @@ export default defineConfig({
     astrowind({
       config: './src/config.yaml',
     }),
+
+    // ===== 添加搜索索引生成 =====
+    searchIndex(),
   ],
 
   image: {
@@ -104,7 +160,7 @@ export default defineConfig({
         '~': path.resolve(__dirname, './src'),
       },
     },
-    // ===== 新增：告诉 Vite 在构建时忽略 /pagefind/pagefind.js =====
+    // 告诉 Vite 在构建时忽略 /pagefind/pagefind.js（如果不需要可以删掉）
     build: {
       rollupOptions: {
         external: ['/pagefind/pagefind.js'],
