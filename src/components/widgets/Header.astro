@@ -91,10 +91,28 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
+    /* GPU 加速 */
     header#header {
       contain: layout style;
       will-change: transform, backdrop-filter;
       backface-visibility: hidden;
+    }
+
+    /* ===== 强制 Logo 文字为白色（覆盖 Logo.astro 中的任何颜色） ===== */
+    header#header a span,
+    header#header a svg text,
+    header#header a svg *[fill],
+    header#header a svg *[stroke] {
+      color: white !important;
+      fill: white !important;
+      stroke: white !important;
+    }
+    /* 如果 Logo 中使用了其他类，也强制覆盖 */
+    header#header a .logo-text,
+    header#header a .text-default,
+    header#header a .text-gray-800,
+    header#header a .dark\:text-white {
+      color: white !important;
     }
   </style>
 
@@ -113,13 +131,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       },
     ]}
   >
-    <!-- 修改点：Logo 和菜单按钮容器，让 Logo 靠左 -->
+    <!-- Logo 靠左（已去掉左边距） -->
     <div class="flex justify-between items-center w-full">
-      <!-- Logo 链接：去掉左边距，完全靠左 -->
       <a class="flex items-center ml-0 pl-0" href={getHomePermalink()}>
         <Logo />
       </a>
-      <!-- 移动端菜单按钮（手机显示） -->
       <div class="flex items-center md:hidden">
         <ToggleMenu />
       </div>
@@ -220,6 +236,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
+<!-- 清除 body 占位，内容从顶部开始 -->
 <script>
   (function() {
     document.body.style.paddingTop = '0px';
