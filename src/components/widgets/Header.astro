@@ -52,14 +52,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   class:list={[
     { sticky: isSticky, relative: !isSticky, dark: isDark },
     'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out border-b border-gray-200/30 dark:border-gray-700/30',
-    // ====== 新增：强制 GPU 加速 ======
-    'transform-gpu backface-hidden will-change-transform',
   ]}
   {...isSticky ? { 'data-aw-sticky-header': true } : {}}
   {...id ? { id } : {}}
 >
   <style>
-    /* ====== 原有样式全部保留 ====== */
     header#header * {
       background: transparent !important;
     }
@@ -97,30 +94,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: none !important;
       }
     }
-
-    /* ====== 新增：强制消除回弹 ====== */
-    /* 1. 禁用浏览器的滚动锚定，防止自动调整滚动位置 */
-    html {
-      overflow-anchor: none !important;
-    }
-
-    /* 2. 让 header 成为独立的合成层，隔离布局影响 */
-    header#header {
-      contain: layout style !important;
-      will-change: transform !important;
-      transition: none !important; /* 杜绝任何动画干扰 */
-    }
-
-    /* 3. 移动端降低模糊强度，减少 GPU 负担（可选） */
-    @media (max-width: 768px) {
-      header#header {
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
-      }
-    }
   </style>
 
-  <!-- ====== 以下 HTML 结构完全不变 ====== -->
   <div class="absolute inset-0" style="background: transparent !important;"></div>
   <div
     class:list={[
@@ -240,27 +215,50 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- ===== 原有的 JS 脚本完全保留（已添加节流） ===== -->
+<!-- ===== 替换为新的脚本（强制固定 + transform 显隐 + 自适应占位） ===== -->
 <script>
   (function() {
     const header = document.querySelector('[data-aw-sticky-header]');
     if (!header) return;
 
+    // ----- 1. 强制 header 固定定位，并初始隐藏（若需要） -----
+    // 覆盖原有 position（无论 class 里是什么）
+    header.style.position = 'fixed';
+    header.style.top = '0';
+    header.style.left = '0';
+    header.style.right = '0';
+    header.style.width = '100%';
+    header.style.zIndex = '40';
+    header.style.transform = 'translateY(-100%)';
+    header.style.transition = 'transform 0.3s ease-out';
+
+    // ----- 2. 动态设置 body padding-top（自适应） -----
+    function setBodyPadding() {
+      const height = header.offsetHeight;
+      document.body.style.paddingTop = height + 'px';
+    }
+    setBodyPadding();
+    // 窗口大小变化时重新计算
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(setBodyPadding, 100);
+    });
+
+    // ----- 3. 滚动控制显隐（保持节流） -----
+    let isVisible = false;
     let ticking = false;
     const STICKY_OFFSET = 100;
 
     const updateHeader = () => {
-      const isSticky = window.scrollY > STICKY_OFFSET;
-      if (isSticky) {
-        header.style.position = 'fixed';
-        header.style.top = '0';
-        header.style.width = '100%';
-        header.style.zIndex = '40';
-      } else {
-        header.style.position = '';
-        header.style.top = '';
-        header.style.width = '';
-        header.style.zIndex = '';
+      const shouldShow = window.scrollY > STICKY_OFFSET;
+      if (shouldShow !== isVisible) {
+        if (shouldShow) {
+          header.style.transform = 'translateY(0)';
+        } else {
+          header.style.transform = 'translateY(-100%)';
+        }
+        isVisible = shouldShow;
       }
     };
 
@@ -274,6 +272,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     });
 
+    // 初始检查
     updateHeader();
   })();
 </script>
