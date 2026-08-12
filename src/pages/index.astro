@@ -518,9 +518,9 @@ const metadata = {
         hiddenInput.value = 'site:hsdc.dpdns.org';
         input.name = 'q';
         input.disabled = false;
-        input.placeholder = '搜索本站内容...';
+        input.placeholder = '输入关键字以联网检索';
         input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
-        modeLabel.textContent = '站外';
+        modeLabel.textContent = '必应搜索';
         searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
       } else {
         form.action = '#';
@@ -529,9 +529,9 @@ const metadata = {
         if (hiddenInput) hiddenInput.remove();
         input.name = '';
         input.disabled = false;
-        input.placeholder = '输入关键词搜索本站...';
+        input.placeholder = '输入关键词检索本站';
         input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
-        modeLabel.textContent = '站内';
+        modeLabel.textContent = '站内检索';
         searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
         if (input.value.trim()) {
           const results = searchInternal(input.value);
