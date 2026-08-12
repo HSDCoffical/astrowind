@@ -19,189 +19,576 @@ const metadata = {
 ---
 
 <Layout metadata={metadata}>
-  <!-- 所有 Widget 内容完全保留（你的 Hero、Note、Features 等全部保留） -->
-  <!-- ... 此处省略，请保留你原有的所有 Widget ... -->
+  <!-- Hero Widget ******************* -->
 
-  <!-- ===== 邮箱地址 ===== -->
-  <section class="px-6 sm:px-6 py-8 sm:py-12 mx-auto max-w-4xl text-center">
-    <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
-      <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">联系我们</p>
-      <a
-        href="电子邮件地址"
-        class="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+  <Hero
+    actions={[
+      {
+        variant: 'primary',
+        text: '联系我们',
+        href: '/contact',
+        icon: 'tabler:download',
+      },
+      {
+        text: '了解更多',
+        href: '#features',
+        style: 'background-color: white !important; color: black !important; border: 1px solid #d1d5db !important; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05) !important; font-weight: 600 !important;',
+      }
+    ]}
+    image={{ src: '/new.png', alt: '凉宫数据 ' }}
+    bgImage={true}
+    bgOpacity={30}
+  >
+    <Fragment slot="title">
+      凉宫数据欢迎您！
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        凉宫数据提供
+      </span>
+      <span class="block mb-1 sm:hidden font-bold text-blue-600">
+        凉宫数据office提供
+      </span>
+      创新型互联网企业
+    </Fragment>
+  </Hero>
+
+  <!-- Note Widget ******************* -->
+
+  <Note title="我们的理念" description="创新·高新" />
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="features"
+    tagline="凉宫数据"
+    title="新方向·新发展"
+    items={[
+      {
+        title: '我们的理念',
+        description:
+          '创新，当代互联网高新技术产业已处于饱和状态，作为创新型企业，则必然需要开拓新型市场以及高新产业',
+        icon: 'tabler:brand-tailwind',
+      },
+      {
+        title: '我们的发展',
+        description:
+          '我们于2026/4/17成立，届时，我们一共发布了三个中心，其中，凉宫数据中央行政中心为最高管理中心',
+        icon: 'tabler:components',
+      },
+      {
+        title: '我们的目标',
+        description:
+          '我们正在不断的发展，拓展各个互联网方向，在发展的同时也在不断提升自我，以达到看一步，走一步，稳一步的效果',
+        icon: 'tabler:list-check',
+      },
+      {
+        title: '我们的数据',
+        description:
+          '凉宫数据现采用Cloudflare作为防火墙，后续将逐步改善，提高用户的浏览效率',
+        icon: 'tabler:rocket',
+      },
+      {
+        title: '我们的Ai',
+        description:
+          "凉宫数据现已完成移动端Ai项目部署，完成了主流平台的聊天/分析等功能，现逐步完善到网页端",
+        icon: 'tabler:arrows-right-left',
+      },
+      {
+        title: '我们的人员',
+        description:
+          '凉宫数据现有一名中央行政员，同时也欢迎各位加入我们，我们将会不断开放更多福利',
+        icon: 'tabler:bulb',
+      },
+    ]}
+  />
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    isReversed
+    tagline="——数据板块——"
+    title="凉宫数据数字安全化"
+    items={[
+      {
+        title: '安全性',
+        description:
+          '数据采用端到端加密的方式，任何人不能获取到私人信息，并且定期有安全管理员进行安全核查',
+      },
+      {
+        title: '时效性',
+        description:
+          '除验证码等具有时效性的数据，其他数据均有长期时效性，给用户提供更长时效性的数字化服务',
+      },
+      {
+        title: '链接性',
+        description:
+          '所有的数据直接发送到云端数据库，避免二次转发，达到更高销量的数据高效化',
+      },
+    ]}
+    image={{
+      src: '/01.png',
+      alt: '凉宫数据',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">新数据化</h3>
+      多效化 
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    isAfterContent
+    items={[
+      {
+        title: '中国',
+        description:'国内主要服务端，大部分云端服务由国内提供技术服务',
+      },
+      {
+        title: '美国',
+        description:
+          '防火墙提供商Cloudflare主干服务器位于美国，其安全性由该企业提供技术支持',
+      },
+      {
+        title: '新加坡',
+        description:
+          "Ai服务端联网信息获取资源网站，由其提供的联网Api获取实时资讯",
+      },
+      {
+        title: '未知',
+        description:
+          '待后续开放',
+      },
+    ]}
+    image={{
+      src: '/02.png',
+      alt: '凉宫数据',
+    }}
+  >
+    <Fragment slot="content">全球数据分布</Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    isReversed
+    isAfterContent
+    items={[
+      {
+        title: '子企总行政管理员',
+        description:
+          '凉宫数据中央行政中心作为主导中心，旗下还有“凉宫数据数字发行中心”及“凉宫数据硬件发行中心”，两个子企业也需要领导人，带领企业逐步发展',
+      },
+      {
+        title: '项目管理员',
+        description:
+          '负责中心下发的项目开发，完善等，带领团队高效的完成发布的项目，获取你的荣誉称号',
+      },
+      {
+        title: '新媒体运营',
+        description:
+          '即管理公司对外媒体运营账号，包含短视频账号，资讯类平台等，同时也及时了解用户反馈及建议',
+      },
+      {
+        title: '职员',
+        description: `作为职员，只需要完成中心下发的信息即可，入职时，会发放你的专属邮箱地址，并在辞职时回收`,
+      },
+    ]}
+    image={{
+      src: '/03.png',
+      alt: '凉宫数据',
+    }}
+  >
+    <Fragment slot="content">加入我们</Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Steps Widget ****************** -->
+
+  <Steps
+    title="入职流程"
+    items={[
+      {
+        title: '[1]: <span class="font-medium">发送申请</span>',
+        description:
+          "向中心发送入职申请，中心会在一周内通过原邮件地址返回报告",
+        icon: 'tabler:package',
+      },
+      {
+        title: '[2]: <span class="font-medium">返回报告</span>',
+        description:
+          "审核通过后会附赠一个联系人，添加联系人，并咨询",
+        icon: 'tabler:letter-case',
+      },
+      {
+        title: '[3]: <span class="font-medium">专属编号</span>',
+        description:
+          '中心下发专属邮件地址，并下发独立的编号',
+        icon: 'tabler:paint',
+      },
+      {
+        title: '成功，欢迎您加入凉宫数据！',
+        icon: 'tabler:check',
+      },
+    ]}
+    image={{
+      src: '/04.png',
+      alt: '凉宫数据',
+    }}
+  />
+
+  <!-- Features2 Widget ************** -->
+
+  <Features2
+    title="加入我们"
+    subtitle="成为我们的一员，并和我们一起发展进步"
+    tagline="——团队协作——"
+    items={[
+      {
+        title: '团队协作',
+        description: "多团队协作需要每个成员之间相互理解包容，在每一次协作时不断磨合，最终达成高效的协作能力",
+        icon: 'flat-color-icons:template',
+      },
+      {
+        title: '团队建设',
+        description:
+          "在一个大集体中，不存在高低之分，所有人都是一份子，从凉宫数据诞生之日起[公平]便是刻进企业骨子里的原则",
+        icon: 'flat-color-icons:gallery',
+      },
+      {
+        title: '团队意识',
+        description:
+          '抛弃传统的硬磨合，每一位成员都应该有自己的主见，无论是谁，都应该需要了解每一位员工的意见',
+        icon: 'flat-color-icons:approval',
+      },
+      {
+        title: '团队整体',
+        description:
+          "在大型表决会议中，每一位员工都应该表达自己的主见，不以职位高低评价一个人，不以富贵贫穷区分等级",
+        icon: 'flat-color-icons:document',
+      },
+      {
+        title: '团队专业',
+        description:
+          '作为一个合作性大集体，新员工都会由老员工带领，加入我们这个团体不会视而不见，每一位员工都值得被尊敬',
+        icon: 'flat-color-icons:advertising',
+      },
+      {
+        title: '团队意识',
+        description: '团队意识秉持着创立时的初衷[以民为本]，只有团队之间相互理解包容，才能在这条路上越走越远',
+        icon: 'flat-color-icons:currency-exchange',
+      },
+      {
+        title: '团队精神',
+        description: '走好每一步，让每一位成员都走好每一步，不需要急促的发展，需要每一位员工的参与，团队在此刻才会彰显出意义',
+        icon: 'flat-color-icons:voice-presentation',
+      },
+      {
+        title: '团队协调',
+        description:
+          '团队中的每一位都是不可缺少的一份子，只有每一位参与，协调才会更加强大',
+        icon: 'flat-color-icons:business-contact',
+      },
+      {
+        title: '团队衷心',
+        description: "有付出那么也会有收获",
+        icon: 'flat-color-icons:database',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Features2>
+
+  <!-- HighlightedPosts Widget ******* -->
+
+  <BlogLatestPosts
+    title="信息中心"
+    information={`资讯/实时
+                `}
+  />
+
+  <!-- FAQs Widget ******************* -->
+
+  <FAQs
+    title="更多事项"
+    subtitle="凉宫数据相关问题"
+    tagline="凉宫架构"
+    classes={{ container: 'max-w-6xl' }}
+    items={[
+      {
+        title: '我该如何辨认是不是企业发布?',
+        description:
+          "首先，发送申请后回执报告由xuexiang@lianggong.dpdns.org转发，如果源邮箱不对，请联系该邮箱获取帮助或视为冒充邮件",
+      },
+      {
+        title: '没有经验可以加入吗?',
+        description:
+          '先说答案，可以，因为我们本身就是刚起步的小行业，只要愿意，欢迎您加入我们',
+      },
+      {
+        title: '为什么有时网页加载很慢或报错?',
+        description:
+          "网页由Cloudflare托管，加载时间要按服务器响应时间来看，如果一直不行，请科学上网",
+      },
+      {
+        title: "凉宫数据是干什么的?",
+        description:
+          "凉宫数据是一家创新型互联网企业，我们会在Ai，数字数据等高新技术方面进行发展",
+      },
+      {
+        title: '为什么市面上没有凉宫数据?',
+        description:
+          "凉宫数据作为刚起步的小型企业，我们选择保守性，即等规模宏大了便注册实体资质",
+      },
+      {
+        title: '它能带来什么?',
+        description:
+          "对于新手来说，它能让你了解到互联网行业，对于老手来说，温故而知新，对于管理来说，是一次自我锻炼的机会",
+      },
+    ]}
+  />
+
+  <!-- Stats Widget ****************** -->
+
+  <Stats
+    stats={[
+      { title: '管理员', amount: '1名' },
+      { title: '建设者', amount: '1名' },
+      { title: '贡献者', amount: '1名' },
+      { title: '企业人数', amount: '1名' },
+    ]}
+  />
+
+  <CallToAction
+  actions={[]}
+>
+</CallToAction>
+
+<!-- ===== 直接显示邮箱地址 ===== -->
+<section class="px-6 sm:px-6 py-8 sm:py-12 mx-auto max-w-4xl text-center">
+  <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
+    <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">联系我们</p>
+    <a
+      href="电子邮件地址"
+      class="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+    >
+      电子邮箱地址
+    </a>
+    <p class="text-gray-400 dark:text-gray-500 text-xs mt-3">
+      xuexiang@lianggongoffice.dpdns.org
+    </p>
+  </div>
+</section>
+
+<!-- ===== 底部粘性搜索框（改为 sticky，不再 fixed） ===== -->
+<div class="sticky bottom-0 z-30 px-4 pb-4 bg-gradient-to-t from-white/80 to-transparent dark:from-gray-900/80">
+  <div class="max-w-2xl mx-auto">
+    <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
+      <!-- 站外搜索限定本站 -->
+      <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
+      <input
+        id="search-input"
+        type="text"
+        name="q"
+        placeholder="搜索本站内容..."
+        class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
+      />
+      <!-- 放大镜图标 -->
+      <button
+        id="search-toggle"
+        type="button"
+        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+        aria-label="聚焦搜索框"
       >
-        电子邮箱地址
-      </a>
-      <p class="text-gray-400 dark:text-gray-500 text-xs mt-3">
-        xuexiang@lianggongoffice.dpdns.org
-      </p>
-    </div>
-  </section>
+        <svg id="search-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </button>
+      <!-- 模式切换按钮 -->
+      <button
+        id="mode-toggle"
+        type="button"
+        class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full cursor-pointer hover:bg-white/50 transition-colors"
+      >
+        <span id="mode-label">站外</span>
+      </button>
+    </form>
+    <!-- 搜索结果容器 -->
+    <div id="search-results-container" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
+  </div>
+</div>
 
-  <!-- ===== 搜索框（普通流式布局，不固定，跟随页面滚动） ===== -->
-  <section class="px-4 pb-8 max-w-2xl mx-auto">
-    <div class="bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl p-4 shadow-lg">
-      <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
-        <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
-        <input
-          id="search-input"
-          type="text"
-          name="q"
-          placeholder="搜索本站内容..."
-          class="w-full py-3 px-6 pl-12 bg-white/30 border border-white/50 rounded-full text-gray-800 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <button
-          id="search-toggle"
-          type="button"
-          class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900 transition-colors"
-          aria-label="聚焦搜索框"
-        >
-          <svg id="search-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
-        <button
-          id="mode-toggle"
-          type="button"
-          class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-700 bg-white/40 backdrop-blur-sm px-2 py-1 rounded-full hover:bg-white/60 transition-colors"
-        >
-          <span id="mode-label">站外</span>
-        </button>
-      </form>
-      <div id="search-results-container" class="mt-3 max-h-60 overflow-y-auto hidden bg-white/30 backdrop-blur-sm rounded-xl border border-white/30"></div>
-    </div>
-  </section>
+<script>
+  (function() {
+    const form = document.getElementById('search-form');
+    const input = document.getElementById('search-input');
+    const toggleBtn = document.getElementById('search-toggle');
+    const modeToggle = document.getElementById('mode-toggle');
+    const modeLabel = document.getElementById('mode-label');
+    const searchIcon = document.getElementById('search-icon');
+    const resultsContainer = document.getElementById('search-results-container');
 
-  <script>
-    (function() {
-      const form = document.getElementById('search-form');
-      const input = document.getElementById('search-input');
-      const toggleBtn = document.getElementById('search-toggle');
-      const modeToggle = document.getElementById('mode-toggle');
-      const modeLabel = document.getElementById('mode-label');
-      const searchIcon = document.getElementById('search-icon');
-      const resultsContainer = document.getElementById('search-results-container');
+    let mode = 'external'; // 'external' 或 'internal'
+    let searchData = null; // 缓存搜索索引
 
-      let mode = 'external';
-      let searchData = null;
+    // 加载搜索索引
+    async function loadSearchData() {
+      try {
+        const resp = await fetch('/search.json');
+        if (resp.ok) {
+          searchData = await resp.json();
+          console.log('✅ 搜索索引已加载:', searchData.length, '个页面');
+        } else {
+          console.warn('⚠️ 搜索索引加载失败，状态码:', resp.status);
+        }
+      } catch (e) {
+        console.warn('⚠️ 搜索索引加载失败:', e);
+      }
+    }
 
-      async function loadSearchData() {
-        try {
-          const resp = await fetch('/search.json');
-          if (resp.ok) {
-            searchData = await resp.json();
-            console.log('✅ 搜索索引已加载:', searchData.length);
-          } else {
-            console.warn('⚠️ 搜索索引加载失败');
-          }
-        } catch (e) {
-          console.warn('⚠️ 搜索索引加载失败:', e);
+    // 站内搜索
+    function searchInternal(query) {
+      if (!searchData || !query.trim()) return [];
+      const q = query.toLowerCase().trim();
+      if (!q) return [];
+      
+      return searchData
+        .filter(page => {
+          const title = page.title.toLowerCase();
+          const desc = page.description.toLowerCase();
+          const content = page.content.toLowerCase();
+          return title.includes(q) || desc.includes(q) || content.includes(q);
+        })
+        .slice(0, 10);
+    }
+
+    // 显示站内搜索结果
+    function showInternalResults(results) {
+      resultsContainer.innerHTML = '';
+      if (results.length === 0) {
+        resultsContainer.classList.add('hidden');
+        return;
+      }
+
+      let html = '';
+      for (const page of results) {
+        html += `
+          <a href="${page.url}" class="block px-4 py-2 hover:bg-white/20 transition-colors border-b border-white/10 last:border-0">
+            <div class="font-medium text-gray-800">${page.title}</div>
+            <div class="text-sm text-gray-600 truncate">${page.description}</div>
+          </a>
+        `;
+      }
+      resultsContainer.innerHTML = html;
+      resultsContainer.classList.remove('hidden');
+    }
+
+    function clearResults() {
+      resultsContainer.innerHTML = '';
+      resultsContainer.classList.add('hidden');
+    }
+
+    function updateMode(newMode) {
+      mode = newMode;
+      clearResults();
+
+      if (mode === 'external') {
+        // 站外模式
+        form.action = 'https://www.bing.com/search';
+        form.target = '_blank';
+        let hiddenInput = form.querySelector('input[name="q1"]');
+        if (!hiddenInput) {
+          hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.name = 'q1';
+          form.appendChild(hiddenInput);
+        }
+        hiddenInput.value = 'site:hsdc.dpdns.org';
+        input.name = 'q';
+        input.disabled = false;
+        input.placeholder = '输入关键词以继续';
+        input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
+        modeLabel.textContent = '检索站外';
+        searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
+      } else {
+        // 站内模式
+        form.action = '#';
+        form.target = '';
+        const hiddenInput = form.querySelector('input[name="q1"]');
+        if (hiddenInput) hiddenInput.remove();
+        input.name = '';
+        input.disabled = false;
+        input.placeholder = '输入关键词检索站内';
+        input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
+        modeLabel.textContent = '检索站内';
+        searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
+        // 如果已有输入，触发站内搜索
+        if (input.value.trim()) {
+          const results = searchInternal(input.value);
+          showInternalResults(results);
         }
       }
+      // 保持输入框焦点
+      input.focus();
+    }
 
-      function searchInternal(query) {
-        if (!searchData || !query.trim()) return [];
-        const q = query.toLowerCase().trim();
-        if (!q) return [];
-        return searchData
-          .filter(page => {
-            const title = page.title.toLowerCase();
-            const desc = page.description.toLowerCase();
-            const content = page.content.toLowerCase();
-            return title.includes(q) || desc.includes(q) || content.includes(q);
-          })
-          .slice(0, 10);
-      }
-
-      function showInternalResults(results) {
-        resultsContainer.innerHTML = '';
-        if (results.length === 0) {
-          resultsContainer.classList.add('hidden');
+    // 输入事件（站内模式实时搜索）
+    input.addEventListener('input', function() {
+      if (mode === 'internal') {
+        const query = this.value.trim();
+        if (!query) {
+          clearResults();
           return;
         }
-        let html = '';
-        for (const page of results) {
-          html += `
-            <a href="${page.url}" class="block px-4 py-2 hover:bg-white/20 transition-colors border-b border-white/10 last:border-0">
-              <div class="font-medium text-gray-800">${page.title}</div>
-              <div class="text-sm text-gray-600 truncate">${page.description}</div>
-            </a>
-          `;
-        }
-        resultsContainer.innerHTML = html;
-        resultsContainer.classList.remove('hidden');
-      }
-
-      function clearResults() {
-        resultsContainer.innerHTML = '';
-        resultsContainer.classList.add('hidden');
-      }
-
-      function updateMode(newMode) {
-        mode = newMode;
+        const results = searchInternal(query);
+        showInternalResults(results);
+      } else {
         clearResults();
-        if (mode === 'external') {
-          form.action = 'https://www.bing.com/search';
-          form.target = '_blank';
-          let hidden = form.querySelector('input[name="q1"]');
-          if (!hidden) {
-            hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = 'q1';
-            form.appendChild(hidden);
-          }
-          hidden.value = 'site:hsdc.dpdns.org';
-          input.name = 'q';
-          input.placeholder = '输入关键词以继续';
-          modeLabel.textContent = '站外';
-        } else {
-          form.action = '#';
-          form.target = '';
-          const hidden = form.querySelector('input[name="q1"]');
-          if (hidden) hidden.remove();
-          input.name = '';
-          input.placeholder = '输入关键词检索站内';
-          modeLabel.textContent = '站内';
-          if (input.value.trim()) {
-            const results = searchInternal(input.value);
-            showInternalResults(results);
-          }
-        }
-        input.focus();
       }
+    });
 
-      input.addEventListener('input', function() {
-        if (mode === 'internal') {
-          const query = this.value.trim();
-          if (!query) { clearResults(); return; }
-          const results = searchInternal(query);
-          showInternalResults(results);
-        } else {
-          clearResults();
-        }
-      });
+    // 点击其他地方清除结果
+    document.addEventListener('click', function(e) {
+      const searchArea = document.querySelector('.sticky.bottom-0');
+      if (searchArea && !searchArea.contains(e.target)) {
+        clearResults();
+      }
+    });
 
-      document.addEventListener('click', function(e) {
-        const container = document.querySelector('.max-w-2xl.mx-auto');
-        if (container && !container.contains(e.target)) {
-          clearResults();
-        }
-      });
+    // 点击右侧模式按钮切换
+    modeToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const newMode = mode === 'external' ? 'internal' : 'external';
+      updateMode(newMode);
+    });
 
-      modeToggle.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const newMode = mode === 'external' ? 'internal' : 'external';
-        updateMode(newMode);
-      });
+    // 点击放大镜仅聚焦输入框
+    toggleBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      input.focus();
+    });
 
-      toggleBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        input.focus();
-      });
+    // 初始化：站外模式，加载搜索索引
+    updateMode('external');
+    loadSearchData();
+  })();
+</script>
 
-      updateMode('external');
-      loadSearchData();
-    })();
-  </script>
 </Layout>
