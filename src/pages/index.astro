@@ -435,7 +435,7 @@ const metadata = {
 </div>
 
 <script>
-  (function() {
+  function initSearch() {
     const form = document.getElementById('search-form');
     const input = document.getElementById('search-input');
     const toggleBtn = document.getElementById('search-toggle');
@@ -444,10 +444,11 @@ const metadata = {
     const searchIcon = document.getElementById('search-icon');
     const resultsContainer = document.getElementById('search-results-container');
 
-    let mode = 'external'; // 'external' 或 'internal'
-    let searchData = null; // 缓存搜索索引
+    if (!form || !input) return;
 
-    // 加载搜索索引
+    let mode = 'external';
+    let searchData = null;
+
     async function loadSearchData() {
       try {
         const resp = await fetch('/search.json');
@@ -462,12 +463,10 @@ const metadata = {
       }
     }
 
-    // 站内搜索
     function searchInternal(query) {
       if (!searchData || !query.trim()) return [];
       const q = query.toLowerCase().trim();
       if (!q) return [];
-      
       return searchData
         .filter(page => {
           const title = page.title.toLowerCase();
@@ -478,14 +477,12 @@ const metadata = {
         .slice(0, 10);
     }
 
-    // 显示站内搜索结果
     function showInternalResults(results) {
       resultsContainer.innerHTML = '';
       if (results.length === 0) {
         resultsContainer.classList.add('hidden');
         return;
       }
-
       let html = '';
       for (const page of results) {
         html += `
@@ -509,7 +506,6 @@ const metadata = {
       clearResults();
 
       if (mode === 'external') {
-        // 站外模式
         form.action = 'https://www.bing.com/search';
         form.target = '_blank';
         let hiddenInput = form.querySelector('input[name="q1"]');
@@ -522,34 +518,31 @@ const metadata = {
         hiddenInput.value = 'site:hsdc.dpdns.org';
         input.name = 'q';
         input.disabled = false;
-        input.placeholder = '输入关键字继续';
+        input.placeholder = '搜索本站内容...';
         input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
-        modeLabel.textContent = '必应搜索';
+        modeLabel.textContent = '站外';
         searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
       } else {
-        // 站内模式
         form.action = '#';
         form.target = '';
         const hiddenInput = form.querySelector('input[name="q1"]');
         if (hiddenInput) hiddenInput.remove();
         input.name = '';
         input.disabled = false;
-        input.placeholder = '输入关键词以检索本站.';
+        input.placeholder = '输入关键词搜索本站...';
         input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
-        modeLabel.textContent = '站内检索';
+        modeLabel.textContent = '站内';
         searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
-        // 如果已有输入，触发站内搜索
         if (input.value.trim()) {
           const results = searchInternal(input.value);
           showInternalResults(results);
         }
       }
-      // 保持输入框焦点
       input.focus();
     }
 
-    // 输入事件（站内模式实时搜索）
-    input.addEventListener('input', function() {
+    // 使用 onclick 替代 addEventListener，避免重复绑定
+    input.oninput = function() {
       if (mode === 'internal') {
         const query = this.value.trim();
         if (!query) {
@@ -561,9 +554,20 @@ const metadata = {
       } else {
         clearResults();
       }
-    });
+    };
 
-    // 点击其他地方清除结果
+    modeToggle.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const newMode = mode === 'external' ? 'internal' : 'external';
+      updateMode(newMode);
+    };
+
+    toggleBtn.onclick = function(e) {
+      e.preventDefault();
+      input.focus();
+    };
+
     document.addEventListener('click', function(e) {
       const searchArea = document.querySelector('.fixed.bottom-4');
       if (searchArea && !searchArea.contains(e.target)) {
@@ -571,24 +575,17 @@ const metadata = {
       }
     });
 
-    // 点击右侧模式按钮切换
-    modeToggle.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const newMode = mode === 'external' ? 'internal' : 'external';
-      updateMode(newMode);
-    });
-
-    // 点击放大镜仅聚焦输入框（不切换模式）
-    toggleBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      input.focus();
-    });
-
-    // 初始化：站外模式，加载搜索索引
     updateMode('external');
     loadSearchData();
-  })();
+  }
+
+  // === 页面加载执行 ===
+  initSearch();
+
+  // === SPA 导航后重新执行 ===
+  document.addEventListener('astro:after-swap', function() {
+    setTimeout(initSearch, 50);
+  });
 </script>
 
 </Layout>
