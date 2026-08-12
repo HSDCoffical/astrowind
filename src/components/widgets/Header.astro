@@ -215,53 +215,31 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- ===== 替换为新的脚本（强制固定 + transform 显隐 + 自适应占位） ===== -->
+<!-- ===== 修复粘性头部滚动卡顿（添加 requestAnimationFrame 节流） ===== -->
 <script>
   (function() {
     const header = document.querySelector('[data-aw-sticky-header]');
     if (!header) return;
 
-    // ----- 1. 强制 header 固定定位，并初始隐藏（若需要） -----
-    // 覆盖原有 position（无论 class 里是什么）
-    header.style.position = 'fixed';
-    header.style.top = '0';
-    header.style.left = '0';
-    header.style.right = '0';
-    header.style.width = '100%';
-    header.style.zIndex = '40';
-    header.style.transform = 'translateY(-100%)';
-    header.style.transition = 'transform 0.3s ease-out';
-
-    // ----- 2. 动态设置 body padding-top（自适应） -----
-    function setBodyPadding() {
-      const height = header.offsetHeight;
-      document.body.style.paddingTop = height + 'px';
-    }
-    setBodyPadding();
-    // 窗口大小变化时重新计算
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(setBodyPadding, 100);
-    });
-
-    // ----- 3. 滚动控制显隐（保持节流） -----
-    let isVisible = false;
     let ticking = false;
     const STICKY_OFFSET = 100;
 
     const updateHeader = () => {
-      const shouldShow = window.scrollY > STICKY_OFFSET;
-      if (shouldShow !== isVisible) {
-        if (shouldShow) {
-          header.style.transform = 'translateY(0)';
-        } else {
-          header.style.transform = 'translateY(-100%)';
-        }
-        isVisible = shouldShow;
+      const isSticky = window.scrollY > STICKY_OFFSET;
+      if (isSticky) {
+        header.style.position = 'fixed';
+        header.style.top = '0';
+        header.style.width = '100%';
+        header.style.zIndex = '40';
+      } else {
+        header.style.position = '';
+        header.style.top = '';
+        header.style.width = '';
+        header.style.zIndex = '';
       }
     };
 
+    // 使用 requestAnimationFrame 节流，避免滚动事件过度触发
     window.addEventListener('scroll', () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
@@ -272,7 +250,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     });
 
-    // 初始检查
+    // 初始检查（页面加载时可能已滚动）
     updateHeader();
   })();
 </script>
