@@ -396,12 +396,11 @@ const metadata = {
   </div>
 </section>
 
-<!-- ===== 底部固定站内搜索框（Pagefind） ===== -->
+<!-- ===== 底部固定搜索框（仅 UI，暂不可用） ===== -->
 <div class="fixed bottom-4 left-0 right-0 z-50 px-4">
   <div class="max-w-2xl mx-auto">
     <div class="relative">
       <input
-        id="search-input"
         type="text"
         placeholder="搜索本站内容..."
         class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400/50 shadow-lg"
@@ -412,54 +411,5 @@ const metadata = {
         </svg>
       </div>
     </div>
-    <!-- 搜索结果 -->
-    <div id="search-results" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
   </div>
 </div>
-
-<script>
-  // 加载 Pagefind 搜索模块
-  async function loadPagefind() {
-    if (typeof window.pagefind === 'undefined') {
-      await import('/pagefind/pagefind.js');
-    }
-    return window.pagefind;
-  }
-
-  const searchInput = document.getElementById('search-input');
-  const resultsContainer = document.getElementById('search-results');
-
-  searchInput.addEventListener('input', async (e) => {
-    const query = e.target.value.trim();
-    if (!query) {
-      resultsContainer.classList.add('hidden');
-      resultsContainer.innerHTML = '';
-      return;
-    }
-
-    try {
-      const pagefind = await loadPagefind();
-      const search = await pagefind.search(query);
-      if (search.results.length === 0) {
-        resultsContainer.innerHTML = '<div class="p-4 text-center text-gray-500">未找到相关内容</div>';
-        resultsContainer.classList.remove('hidden');
-        return;
-      }
-
-      let html = '';
-      for (const result of search.results) {
-        const data = await result.data();
-        html += `
-          <a href="${data.url}" class="block px-4 py-2 hover:bg-white/20 transition-colors border-b border-white/10 last:border-0">
-            <div class="font-medium text-gray-800">${data.meta.title || '无标题'}</div>
-            <div class="text-sm text-gray-600 truncate">${data.excerpt || ''}</div>
-          </a>
-        `;
-      }
-      resultsContainer.innerHTML = html;
-      resultsContainer.classList.remove('hidden');
-    } catch (e) {
-      console.warn('Pagefind not ready yet');
-    }
-  });
-</script>
