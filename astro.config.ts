@@ -12,7 +12,7 @@ import partytown from '@astrojs/partytown';
 import icon from 'astro-icon';
 import compress from 'astro-compress';
 import type { AstroIntegration } from 'astro';
-import { globby } from 'globby'; // 静态导入
+import { globby } from 'globby';
 
 import astrowind from './vendor/integration';
 
@@ -120,7 +120,7 @@ export default defineConfig({
       config: './src/config.yaml',
     }),
 
-    searchIndex(), // 恢复
+    searchIndex(), // ✅ 启用
   ],
 
   image: {
@@ -158,7 +158,7 @@ export default defineConfig({
     },
     build: {
       rollupOptions: {
-        external: ['/pagefind/pagefind.js'],
+        external: ['/pagefind/pagefind.js', 'globby'], // ✅ 添加 globby
       },
     },
   },
