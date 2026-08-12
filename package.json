@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build && npx pagefind --site dist",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "check": "npm run check:astro && npm run check:eslint && npm run check:prettier",
@@ -55,6 +55,7 @@
     "eslint": "^10.4.0",
     "eslint-plugin-astro": "^1.7.0",
     "globals": "^17.6.0",
+    "globby": "^14.0.2",
     "js-yaml": "^4.1.1",
     "mdast-util-to-string": "^4.0.0",
     "pagefind": "^1.0.0",
