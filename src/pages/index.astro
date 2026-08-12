@@ -522,9 +522,9 @@ const metadata = {
         hiddenInput.value = 'site:hsdc.dpdns.org';
         input.name = 'q';
         input.disabled = false;
-        input.placeholder = '输入关键词以继续';
+        input.placeholder = '输入关键字继续';
         input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
-        modeLabel.textContent = '检索站外';
+        modeLabel.textContent = '必应搜索';
         searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
       } else {
         // 站内模式
@@ -534,9 +534,9 @@ const metadata = {
         if (hiddenInput) hiddenInput.remove();
         input.name = '';
         input.disabled = false;
-        input.placeholder = '输入关键词检索站内';
+        input.placeholder = '输入关键词以检索本站.';
         input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
-        modeLabel.textContent = '检索站内';
+        modeLabel.textContent = '站内检索';
         searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
         // 如果已有输入，触发站内搜索
         if (input.value.trim()) {
