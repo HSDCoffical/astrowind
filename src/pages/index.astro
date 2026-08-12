@@ -403,10 +403,10 @@ const metadata = {
   </div>
 </section>
 
-<!-- ===== 底部固定搜索框（独立 fixed，不依赖任何父级） ===== -->
-<div class="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 pointer-events-none">
-  <div class="max-w-2xl mx-auto pointer-events-auto">
-    <div class="bg-white/20 dark:bg-gray-800/30 backdrop-blur-lg border border-white/30 dark:border-gray-700/30 rounded-2xl p-4 shadow-2xl">
+<!-- ===== 底部固定搜索框（保留固定 + 毛玻璃背景） ===== -->
+<div class="fixed bottom-0 left-0 right-0 z-40 px-4 pb-4">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-white/20 dark:bg-gray-800/30 backdrop-blur-lg border border-white/30 dark:border-gray-700/30 rounded-2xl p-4 shadow-xl">
       <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
         <!-- 站外搜索限定本站 -->
         <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
