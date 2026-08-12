@@ -54,13 +54,15 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
-    /* ===== 修复回弹 ===== */
+    /* ===== 修复向上滚动回弹（移动端弹性滚动） ===== */
     html {
       overflow-anchor: none !important;
+      overscroll-behavior-y: none !important;
     }
     body {
       min-height: 100vh;
       min-height: 100dvh;
+      overscroll-behavior-y: none !important;
     }
 
     header#header * {
