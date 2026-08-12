@@ -54,7 +54,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
-    /* ===== 修复向上滚动回弹（移动端弹性滚动） ===== */
+    /* ===== 修复向上滚动回弹 ===== */
     html {
       overflow-anchor: none !important;
       overscroll-behavior-y: none !important;
@@ -246,9 +246,15 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- 清除 body 占位 -->
+<!-- 清除 body 占位 + 强制重置滚动位置 -->
 <script>
   (function() {
+    // ===== 强制重置滚动位置到顶部 =====
+    if (window.scrollY > 0) {
+      window.scrollTo(0, 0);
+    }
+    
+    // ===== 清除 body 占位 =====
     document.body.style.paddingTop = '0px';
     document.body.style.marginTop = '0px';
   })();
