@@ -48,15 +48,18 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 ---
 
 <header
-  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;"
+  id={id}
+  data-aw-sticky-header={isSticky ? true : undefined}
   class:list={[
     { sticky: isSticky, relative: !isSticky, dark: isDark },
-    'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out border-b border-gray-200/30 dark:border-gray-700/30',
+    'top-0 z-40 flex-none mx-auto w-full border-b border-gray-200/30 dark:border-gray-700/30',
+    // 新增 GPU 加速类
+    'transform-gpu will-change-transform backface-hidden',
   ]}
-  {...isSticky ? { 'data-aw-sticky-header': true } : {}}
-  {...id ? { id } : {}}
+  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;"
 >
   <style>
+    /* 原有样式 */
     header#header * {
       background: transparent !important;
     }
@@ -75,7 +78,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     .dark header#header a:hover {
       background: rgba(255,255,255,0.05) !important;
     }
-    /* 手机端菜单底部主题切换项 */
     .menu-theme-item {
       display: flex;
       align-items: center;
@@ -94,8 +96,21 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: none !important;
       }
     }
+
+    /* 新增：确保 sticky 时的平滑表现 */
+    header#header {
+      transition: none; /* 避免任何过渡干扰 */
+    }
+    /* 为手机端优化 backdrop-filter 性能 */
+    @media (max-width: 768px) {
+      header#header {
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+    }
   </style>
 
+  <!-- 其余结构完全不变 -->
   <div class="absolute inset-0" style="background: transparent !important;"></div>
   <div
     class:list={[
@@ -170,7 +185,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             </li>
           ))
         }
-        <!-- 手机端菜单底部主题切换 -->
         <li class="menu-theme-item">
           <ToggleTheme iconClass="w-5 h-5" />
           <span class="text-sm">切换主题</span>
@@ -215,49 +229,4 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- ===== 修复粘性头部滚动卡顿（添加状态缓存 + requestAnimationFrame 节流） ===== -->
-<script>
-  (function() {
-    const header = document.querySelector('[data-aw-sticky-header]');
-    if (!header) return;
-
-    let ticking = false;
-    const STICKY_OFFSET = 100;
-    let lastStickyState = false; // 记录上一次粘性状态
-
-    const updateHeader = () => {
-      const isSticky = window.scrollY > STICKY_OFFSET;
-      
-      // 只有状态发生变化时才操作 DOM，避免不必要的重排
-      if (isSticky !== lastStickyState) {
-        if (isSticky) {
-          header.style.position = 'fixed';
-          header.style.top = '0';
-          header.style.width = '100%';
-          header.style.zIndex = '40';
-        } else {
-          // 恢复为默认样式（让 CSS 类控制）
-          header.style.position = '';
-          header.style.top = '';
-          header.style.width = '';
-          header.style.zIndex = '';
-        }
-        lastStickyState = isSticky;
-      }
-    };
-
-    // 使用 requestAnimationFrame 节流
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          updateHeader();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    });
-
-    // 初始检查（页面加载时可能已滚动）
-    updateHeader();
-  })();
-</script>
+<!-- 已删除所有 JavaScript 滚动监听，完全依靠 CSS sticky + GPU 加速 -->
