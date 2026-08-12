@@ -48,15 +48,17 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 ---
 
 <header
-  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;"
+  id={id}
+  data-aw-sticky-header={isSticky ? true : undefined}
+  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
   class:list={[
+    // 保留原有的 sticky/relative 类（由 isSticky prop 控制），但会被 .scrolled 覆盖
     { sticky: isSticky, relative: !isSticky, dark: isDark },
     'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out border-b border-gray-200/30 dark:border-gray-700/30',
   ]}
-  {...isSticky ? { 'data-aw-sticky-header': true } : {}}
-  {...id ? { id } : {}}
 >
   <style>
+    /* 原有样式全部保留，只增加 .scrolled 相关 */
     header#header * {
       background: transparent !important;
     }
@@ -75,7 +77,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     .dark header#header a:hover {
       background: rgba(255,255,255,0.05) !important;
     }
-    /* 手机端菜单底部主题切换项 */
     .menu-theme-item {
       display: flex;
       align-items: center;
@@ -94,8 +95,24 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: none !important;
       }
     }
+
+    /* ===== 新增：滚动时固定样式（覆盖 sticky/relative） ===== */
+    header#header.scrolled {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      z-index: 40 !important;
+      /* GPU 加速，消除放大卡顿 */
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      /* 确保背景模糊顺畅 */
+      will-change: transform;
+    }
   </style>
 
+  <!-- HTML 结构完全不变 -->
   <div class="absolute inset-0" style="background: transparent !important;"></div>
   <div
     class:list={[
@@ -215,7 +232,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- ===== 修复粘性头部滚动卡顿（添加 requestAnimationFrame 节流） ===== -->
+<!-- ===== 替换为更干净的脚本（用 class 控制，不操作 style） ===== -->
 <script>
   (function() {
     const header = document.querySelector('[data-aw-sticky-header]');
@@ -225,21 +242,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     const STICKY_OFFSET = 100;
 
     const updateHeader = () => {
-      const isSticky = window.scrollY > STICKY_OFFSET;
-      if (isSticky) {
-        header.style.position = 'fixed';
-        header.style.top = '0';
-        header.style.width = '100%';
-        header.style.zIndex = '40';
-      } else {
-        header.style.position = '';
-        header.style.top = '';
-        header.style.width = '';
-        header.style.zIndex = '';
-      }
+      const shouldBeFixed = window.scrollY > STICKY_OFFSET;
+      header.classList.toggle('scrolled', shouldBeFixed);
     };
 
-    // 使用 requestAnimationFrame 节流，避免滚动事件过度触发
+    // 使用 requestAnimationFrame 节流
     window.addEventListener('scroll', () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
@@ -250,7 +257,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     });
 
-    // 初始检查（页面加载时可能已滚动）
+    // 初始检查
     updateHeader();
   })();
 </script>
