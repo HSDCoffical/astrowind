@@ -396,7 +396,7 @@ const metadata = {
   </div>
 </section>
 
-<!-- ===== 底部固定搜索框（站内/站外切换，站内真正可用） ===== -->
+<!-- ===== 底部固定搜索框 ===== -->
 <div class="fixed bottom-4 left-0 right-0 z-50 px-4">
   <div class="max-w-2xl mx-auto">
     <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
@@ -409,21 +409,25 @@ const metadata = {
         placeholder="搜索本站内容..."
         class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
       />
-      <!-- 放大镜图标：点击切换模式 -->
+      <!-- 放大镜图标：点击仅聚焦输入框（不再切换模式） -->
       <button
         id="search-toggle"
         type="button"
         class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
-        aria-label="切换搜索模式"
+        aria-label="聚焦搜索框"
       >
         <svg id="search-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </button>
-      <!-- 模式标签 -->
-      <span id="mode-label" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full">
-        站外
-      </span>
+      <!-- 模式切换按钮（右侧） -->
+      <button
+        id="mode-toggle"
+        type="button"
+        class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full cursor-pointer hover:bg-white/50 transition-colors"
+      >
+        <span id="mode-label">站外</span>
+      </button>
     </form>
     <!-- 搜索结果容器（站内模式使用） -->
     <div id="search-results-container" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
@@ -435,6 +439,7 @@ const metadata = {
     const form = document.getElementById('search-form');
     const input = document.getElementById('search-input');
     const toggleBtn = document.getElementById('search-toggle');
+    const modeToggle = document.getElementById('mode-toggle');
     const modeLabel = document.getElementById('mode-label');
     const searchIcon = document.getElementById('search-icon');
     const resultsContainer = document.getElementById('search-results-container');
@@ -470,7 +475,7 @@ const metadata = {
           const content = page.content.toLowerCase();
           return title.includes(q) || desc.includes(q) || content.includes(q);
         })
-        .slice(0, 10); // 最多显示 10 条
+        .slice(0, 10);
     }
 
     // 显示站内搜索结果
@@ -520,12 +525,7 @@ const metadata = {
         input.placeholder = '搜索本站内容...';
         input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
         modeLabel.textContent = '站外';
-        modeLabel.className = 'absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full';
         searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
-        // 清空输入值可能残留
-        if (input.value.trim()) {
-          // 站外模式不显示结果
-        }
       } else {
         // 站内模式
         form.action = '#';
@@ -533,11 +533,10 @@ const metadata = {
         const hiddenInput = form.querySelector('input[name="q1"]');
         if (hiddenInput) hiddenInput.remove();
         input.name = '';
-        input.disabled = false; // 允许输入
+        input.disabled = false;
         input.placeholder = '输入关键词搜索本站...';
         input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
         modeLabel.textContent = '站内';
-        modeLabel.className = 'absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full';
         searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
         // 如果已有输入，触发站内搜索
         if (input.value.trim()) {
@@ -545,6 +544,8 @@ const metadata = {
           showInternalResults(results);
         }
       }
+      // 保持输入框焦点
+      input.focus();
     }
 
     // 输入事件（站内模式实时搜索）
@@ -558,7 +559,6 @@ const metadata = {
         const results = searchInternal(query);
         showInternalResults(results);
       } else {
-        // 站外模式不显示结果
         clearResults();
       }
     });
@@ -571,14 +571,18 @@ const metadata = {
       }
     });
 
-    // 点击切换按钮
+    // 点击右侧模式按钮切换
+    modeToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const newMode = mode === 'external' ? 'internal' : 'external';
+      updateMode(newMode);
+    });
+
+    // 点击放大镜仅聚焦输入框（不切换模式）
     toggleBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      if (mode === 'external') {
-        updateMode('internal');
-      } else {
-        updateMode('external');
-      }
+      input.focus();
     });
 
     // 初始化：站外模式，加载搜索索引
@@ -586,3 +590,5 @@ const metadata = {
     loadSearchData();
   })();
 </script>
+
+</Layout>
