@@ -54,6 +54,24 @@ const metadata = {
     </Fragment>
   </Hero>
 
+  <!-- ===== iOS 风格搜索框（玻璃效果） ===== -->
+  <div class="flex justify-center my-8 px-4">
+    <div class="w-full max-w-2xl">
+      <div class="relative">
+        <input
+          type="text"
+          placeholder="搜索凉宫数据..."
+          class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400/50 shadow-lg"
+        />
+        <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Note Widget ******************* -->
 
   <Note title="我们的理念" description="创新·高新" />
