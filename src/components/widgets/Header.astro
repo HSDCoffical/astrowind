@@ -50,7 +50,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 <header
   id={id}
   data-aw-sticky-header={isSticky ? true : undefined}
-  class="sticky top-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30 will-change-transform backface-hidden"
+  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30 will-change-transform backface-hidden"
   style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
@@ -98,7 +98,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       backface-visibility: hidden;
     }
 
-    /* 强制 Logo 文字为白色 */
+    /* ===== 强制 Logo 文字为白色（覆盖 Logo.astro 中的任何颜色） ===== */
     header#header a span,
     header#header a svg text,
     header#header a svg *[fill],
@@ -107,6 +107,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       fill: white !important;
       stroke: white !important;
     }
+    /* 如果 Logo 中使用了其他类，也强制覆盖 */
     header#header a .logo-text,
     header#header a .text-default,
     header#header a .text-gray-800,
@@ -115,7 +116,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     }
   </style>
 
-  <!-- 原有 HTML 结构不变 -->
   <div class="absolute inset-0" style="background: transparent !important;"></div>
   <div
     class:list={[
@@ -131,6 +131,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       },
     ]}
   >
+    <!-- Logo 靠左（已去掉左边距） -->
     <div class="flex justify-between items-center w-full">
       <a class="flex items-center ml-0 pl-0" href={getHomePermalink()}>
         <Logo />
@@ -190,6 +191,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             </li>
           ))
         }
+        <!-- 手机端菜单底部主题切换 -->
         <li class="menu-theme-item">
           <ToggleTheme iconClass="w-5 h-5" />
           <span class="text-sm">切换主题</span>
@@ -234,9 +236,10 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- 移除所有 JS 滚动监听，因为 sticky 已由浏览器原生处理 -->
+<!-- 清除 body 占位，内容从顶部开始 -->
 <script>
-  // 仅清除可能存在的 body padding（避免之前残留）
-  document.body.style.paddingTop = '0px';
-  document.body.style.marginTop = '0px';
+  (function() {
+    document.body.style.paddingTop = '0px';
+    document.body.style.marginTop = '0px';
+  })();
 </script>
