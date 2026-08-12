@@ -380,8 +380,8 @@ const metadata = {
 >
 </CallToAction>
 
-<!-- ===== 直接显示邮箱地址（增加底部内边距，防止被搜索框遮挡） ===== -->
-<section class="px-6 sm:px-6 py-8 sm:py-12 pb-16 sm:pb-20 mx-auto max-w-4xl text-center">
+<!-- ===== 直接显示邮箱地址（增加底部内边距 pb-24，为搜索框预留空间） ===== -->
+<section class="px-6 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-28 mx-auto max-w-4xl text-center">
   <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
     <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">联系我们</p>
     <a
@@ -409,7 +409,7 @@ const metadata = {
         placeholder="搜索本站内容..."
         class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
       />
-      <!-- 放大镜图标：点击仅聚焦输入框（不再切换模式） -->
+      <!-- 放大镜图标 -->
       <button
         id="search-toggle"
         type="button"
@@ -420,7 +420,7 @@ const metadata = {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </button>
-      <!-- 模式切换按钮（右侧） -->
+      <!-- 模式切换按钮 -->
       <button
         id="mode-toggle"
         type="button"
@@ -429,7 +429,7 @@ const metadata = {
         <span id="mode-label">站外</span>
       </button>
     </form>
-    <!-- 搜索结果容器（站内模式使用） -->
+    <!-- 搜索结果容器 -->
     <div id="search-results-container" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
   </div>
 </div>
