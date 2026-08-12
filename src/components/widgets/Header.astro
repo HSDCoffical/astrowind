@@ -215,7 +215,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- ===== 修复粘性头部滚动卡顿（添加 requestAnimationFrame 节流） ===== -->
+<!-- ===== 修复粘性头部滚动卡顿（添加状态缓存 + requestAnimationFrame 节流） ===== -->
 <script>
   (function() {
     const header = document.querySelector('[data-aw-sticky-header]');
@@ -223,23 +223,30 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
     let ticking = false;
     const STICKY_OFFSET = 100;
+    let lastStickyState = false; // 记录上一次粘性状态
 
     const updateHeader = () => {
       const isSticky = window.scrollY > STICKY_OFFSET;
-      if (isSticky) {
-        header.style.position = 'fixed';
-        header.style.top = '0';
-        header.style.width = '100%';
-        header.style.zIndex = '40';
-      } else {
-        header.style.position = '';
-        header.style.top = '';
-        header.style.width = '';
-        header.style.zIndex = '';
+      
+      // 只有状态发生变化时才操作 DOM，避免不必要的重排
+      if (isSticky !== lastStickyState) {
+        if (isSticky) {
+          header.style.position = 'fixed';
+          header.style.top = '0';
+          header.style.width = '100%';
+          header.style.zIndex = '40';
+        } else {
+          // 恢复为默认样式（让 CSS 类控制）
+          header.style.position = '';
+          header.style.top = '';
+          header.style.width = '';
+          header.style.zIndex = '';
+        }
+        lastStickyState = isSticky;
       }
     };
 
-    // 使用 requestAnimationFrame 节流，避免滚动事件过度触发
+    // 使用 requestAnimationFrame 节流
     window.addEventListener('scroll', () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
