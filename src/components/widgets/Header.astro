@@ -91,7 +91,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* GPU 加速，防止卡顿 */
     header#header {
       contain: layout style;
       will-change: transform, backdrop-filter;
@@ -114,10 +113,13 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       },
     ]}
   >
-    <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
-      <a class="flex items-center" href={getHomePermalink()}>
+    <!-- 修改点：Logo 和菜单按钮容器，让 Logo 靠左 -->
+    <div class="flex justify-between items-center w-full">
+      <!-- Logo 链接：去掉左边距，完全靠左 -->
+      <a class="flex items-center ml-0 pl-0" href={getHomePermalink()}>
         <Logo />
       </a>
+      <!-- 移动端菜单按钮（手机显示） -->
       <div class="flex items-center md:hidden">
         <ToggleMenu />
       </div>
@@ -218,10 +220,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- 只清除 body 的 padding-top，无滚动监听 -->
 <script>
   (function() {
-    // 确保 body 无顶部内边距，内容从顶部开始
     document.body.style.paddingTop = '0px';
     document.body.style.marginTop = '0px';
   })();
