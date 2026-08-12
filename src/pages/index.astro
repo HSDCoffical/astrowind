@@ -396,11 +396,11 @@ const metadata = {
   </div>
 </section>
 
-<!-- ===== 底部固定搜索框（点击图标切换站内/站外） ===== -->
+<!-- ===== 底部固定搜索框（点击图标切换站内/站外，图标不变） ===== -->
 <div class="fixed bottom-4 left-0 right-0 z-50 px-4">
   <div class="max-w-2xl mx-auto">
     <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
-      <!-- 隐藏参数：站外搜索限定本站 -->
+      <!-- 站外搜索限定本站 -->
       <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
       <input
         id="search-input"
@@ -409,14 +409,14 @@ const metadata = {
         placeholder="搜索本站内容..."
         class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
       />
-      <!-- 放大镜图标：点击切换模式 -->
+      <!-- 放大镜图标：点击切换模式（图标始终保持放大镜，不变X） -->
       <button
         id="search-toggle"
         type="button"
         class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
         aria-label="切换搜索模式"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg id="search-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </button>
@@ -434,16 +434,16 @@ const metadata = {
     const input = document.getElementById('search-input');
     const toggleBtn = document.getElementById('search-toggle');
     const modeLabel = document.getElementById('mode-label');
+    const searchIcon = document.getElementById('search-icon');
 
     let mode = 'external'; // 'external' 或 'internal'
 
     function updateMode(newMode) {
       mode = newMode;
       if (mode === 'external') {
-        // 站外模式：使用 Bing，限定本站
+        // 站外模式：Bing 搜索，限定本站
         form.action = 'https://www.bing.com/search';
         form.target = '_blank';
-        // 确保隐藏参数存在
         let hiddenInput = form.querySelector('input[name="q1"]');
         if (!hiddenInput) {
           hiddenInput = document.createElement('input');
@@ -455,29 +455,26 @@ const metadata = {
         input.name = 'q';
         input.disabled = false;
         input.placeholder = '搜索本站内容...';
+        input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
         modeLabel.textContent = '站外';
         modeLabel.className = 'absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full';
-        // 恢复图标（如果有变化）
-        toggleBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>`;
+        // 图标始终保持放大镜
+        searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
       } else {
         // 站内模式：暂时禁用
         form.action = '#';
         form.target = '';
-        // 移除隐藏参数
         const hiddenInput = form.querySelector('input[name="q1"]');
         if (hiddenInput) hiddenInput.remove();
         input.name = '';
         input.disabled = true;
         input.placeholder = '站内搜索开发中...';
         input.value = '';
+        input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-400 placeholder-gray-400 focus:outline-none shadow-lg cursor-not-allowed';
         modeLabel.textContent = '站内';
         modeLabel.className = 'absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-400 bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full';
-        // 更换图标（可选）
-        toggleBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>`;
+        // 图标始终保持放大镜（不变X）
+        searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
       }
     }
 
