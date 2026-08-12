@@ -119,6 +119,8 @@ import { UI } from 'astrowind:config';
       document.querySelector('#header > div > div:last-child')?.classList.add('hidden');
     });
 
+    // ===== 删除以下冲突的滚动逻辑 =====
+    /*
     function applyHeaderStylesOnScroll() {
       const header = document.querySelector('#header[data-aw-sticky-header]');
       if (!header) return;
@@ -133,7 +135,6 @@ import { UI } from 'astrowind:config';
 
     attachEvent([document], 'scroll', function () {
       lastKnownScrollPosition = window.scrollY;
-
       if (!ticking) {
         window.requestAnimationFrame(() => {
           applyHeaderStylesOnScroll();
@@ -141,7 +142,9 @@ import { UI } from 'astrowind:config';
         ticking = true;
       }
     });
+    */
   };
+
   const onPageShow = function () {
     document.documentElement.classList.add('motion-safe:scroll-smooth');
     const elem = document.querySelector('[data-aw-toggle-menu]');
