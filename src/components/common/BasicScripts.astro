@@ -119,7 +119,7 @@ import { UI } from 'astrowind:config';
       document.querySelector('#header > div > div:last-child')?.classList.add('hidden');
     });
 
-    // ===== 删除以下冲突的滚动逻辑 =====
+    // ===== 已注释冲突的滚动逻辑 =====
     /*
     function applyHeaderStylesOnScroll() {
       const header = document.querySelector('#header[data-aw-sticky-header]');
@@ -146,7 +146,8 @@ import { UI } from 'astrowind:config';
   };
 
   const onPageShow = function () {
-    document.documentElement.classList.add('motion-safe:scroll-smooth');
+    // ===== 注释掉可能导致回弹的平滑滚动 =====
+    // document.documentElement.classList.add('motion-safe:scroll-smooth');
     const elem = document.querySelector('[data-aw-toggle-menu]');
     if (elem) {
       elem.classList.remove('expanded');
