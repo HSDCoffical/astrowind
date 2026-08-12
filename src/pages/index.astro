@@ -396,20 +396,84 @@ const metadata = {
   </div>
 </section>
 
-<!-- ===== 底部固定搜索框（仅 UI，暂不可用） ===== -->
+<!-- ===== 底部固定搜索框（带站内/站外切换） ===== -->
 <div class="fixed bottom-4 left-0 right-0 z-50 px-4">
   <div class="max-w-2xl mx-auto">
+    <!-- 搜索模式切换 -->
+    <div class="flex justify-center gap-2 mb-2">
+      <button id="search-mode-internal" class="px-4 py-1.5 text-sm rounded-full bg-white/30 backdrop-blur-sm border border-white/40 text-gray-700 font-medium hover:bg-white/50 transition-colors">
+        🔍 站内
+      </button>
+      <button id="search-mode-external" class="px-4 py-1.5 text-sm rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-gray-600 hover:bg-white/40 transition-colors">
+        🌐 站外
+      </button>
+    </div>
+
+    <!-- 搜索框 -->
     <div class="relative">
-      <input
-        type="text"
-        placeholder="搜索本站内容..."
-        class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400/50 shadow-lg"
-      />
-      <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+      <!-- 站外搜索表单（默认显示） -->
+      <form id="external-search" action="https://www.bing.com/search" method="GET" target="_blank" class="relative">
+        <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
+        <input
+          type="text"
+          name="q"
+          placeholder="搜索本站内容..."
+          class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
+        />
+        <button type="submit" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+      </form>
+
+      <!-- 站内搜索表单（暂时禁用，显示提示） -->
+      <div id="internal-search" class="relative hidden">
+        <input
+          type="text"
+          placeholder="站内搜索功能开发中..."
+          class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-400 placeholder-gray-400 focus:outline-none shadow-lg cursor-not-allowed"
+          disabled
+        />
+        <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  (function() {
+    const internalBtn = document.getElementById('search-mode-internal');
+    const externalBtn = document.getElementById('search-mode-external');
+    const externalForm = document.getElementById('external-search');
+    const internalDiv = document.getElementById('internal-search');
+
+    function setMode(mode) {
+      if (mode === 'internal') {
+        internalBtn.classList.add('bg-white/30', 'border-white/40', 'text-gray-700');
+        internalBtn.classList.remove('bg-white/20', 'border-white/30', 'text-gray-600');
+        externalBtn.classList.remove('bg-white/30', 'border-white/40', 'text-gray-700');
+        externalBtn.classList.add('bg-white/20', 'border-white/30', 'text-gray-600');
+        externalForm.classList.add('hidden');
+        internalDiv.classList.remove('hidden');
+      } else {
+        externalBtn.classList.add('bg-white/30', 'border-white/40', 'text-gray-700');
+        externalBtn.classList.remove('bg-white/20', 'border-white/30', 'text-gray-600');
+        internalBtn.classList.remove('bg-white/30', 'border-white/40', 'text-gray-700');
+        internalBtn.classList.add('bg-white/20', 'border-white/30', 'text-gray-600');
+        externalForm.classList.remove('hidden');
+        internalDiv.classList.add('hidden');
+      }
+    }
+
+    internalBtn.addEventListener('click', () => setMode('internal'));
+    externalBtn.addEventListener('click', () => setMode('external'));
+
+    // 默认站外
+    setMode('external');
+  })();
+</script>
