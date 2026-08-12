@@ -49,11 +49,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 <header
   id={id}
-  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
-  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30"
+  data-aw-sticky-header={isSticky ? true : undefined}
+  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30 transition-transform duration-300 ease-out will-change-transform backface-hidden"
+  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; transform: translateY(-100%);"
 >
   <style>
-    /* 原样式保留，只精简核心 */
     header#header * {
       background: transparent !important;
     }
@@ -90,9 +90,16 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: none !important;
       }
     }
+
+    /* 强制 GPU 加速，防止放大卡顿 */
+    header#header {
+      contain: layout style;
+      will-change: transform, backdrop-filter;
+      backface-visibility: hidden;
+    }
   </style>
 
-  <!-- 完全保留原 HTML 结构，但移除多余的 absolute 背景层（避免干扰） -->
+  <div class="absolute inset-0" style="background: transparent !important;"></div>
   <div
     class:list={[
       'relative text-default py-3 px-3 md:px-6 mx-auto w-full',
@@ -116,6 +123,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </div>
     </div>
 
+    <!-- 导航菜单 -->
     <nav
       class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
       aria-label="Main navigation"
@@ -165,6 +173,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             </li>
           ))
         }
+        <!-- 手机端菜单底部主题切换 -->
         <li class="menu-theme-item">
           <ToggleTheme iconClass="w-5 h-5" />
           <span class="text-sm">切换主题</span>
@@ -209,15 +218,39 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- 动态设置 body padding-top 仅此一个简单脚本 -->
+<!-- 最简脚本：控制显隐，无 body padding-top 干扰 -->
 <script>
   (function() {
-    const header = document.getElementById('header');
+    const header = document.querySelector('[data-aw-sticky-header]');
     if (!header) return;
-    function setPadding() {
-      document.body.style.paddingTop = header.offsetHeight + 'px';
-    }
-    setPadding();
-    window.addEventListener('resize', setPadding);
+
+    // 强制清除 body 的 padding-top 和 margin-top，确保内容从顶部开始
+    document.body.style.paddingTop = '0px';
+    document.body.style.marginTop = '0px';
+
+    let visible = false;
+    let ticking = false;
+    const OFFSET = 100;
+
+    const update = () => {
+      const show = window.scrollY > OFFSET;
+      if (show !== visible) {
+        header.style.transform = show ? 'translateY(0)' : 'translateY(-100%)';
+        visible = show;
+      }
+    };
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          update();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    // 初始状态
+    update();
   })();
 </script>
