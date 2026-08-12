@@ -47,20 +47,14 @@ const {
 const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 ---
 
-<!-- 占位元素：仅在启用粘性时存在，防止内容被覆盖 -->
-{isSticky && <div id="header-placeholder" class="h-[72px] md:h-[80px] w-full"></div>}
-
 <header
   id={id}
   data-aw-sticky-header={isSticky ? true : undefined}
   class:list={[
-    // 始终固定定位
     'fixed top-0 left-0 right-0 z-40 w-full',
-    // 默认隐藏（当 isSticky 为 true 时启用动画）
+    // 默认隐藏（当 isSticky 为 true 时）
     { '-translate-y-full': isSticky },
-    // 当滚动超过阈值后显示
-    { 'translate-y-0': isSticky && false }, // 由 JS 控制
-    // 原有样式
+    // 由 JS 控制显示
     'border-b border-gray-200/30 dark:border-gray-700/30',
     'transform-gpu will-change-transform backface-hidden',
     'transition-transform duration-300 ease-out',
@@ -226,7 +220,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   </div>
 </header>
 
-<!-- ===== 控制显示/隐藏的脚本 ===== -->
+<!-- ===== 控制显示/隐藏 + 自适应占位 ===== -->
 <script>
   (function() {
     const header = document.querySelector('[data-aw-sticky-header]');
@@ -236,6 +230,29 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     let isVisible = false;
     let ticking = false;
 
+    // ========== 动态设置 body padding-top ==========
+    function updateBodyPadding() {
+      if (!header) return;
+      const height = header.offsetHeight;
+      document.body.style.paddingTop = height + 'px';
+    }
+
+    // 初始设置
+    updateBodyPadding();
+
+    // 窗口大小变化时重新计算
+    let resizeTicking = false;
+    window.addEventListener('resize', () => {
+      if (!resizeTicking) {
+        window.requestAnimationFrame(() => {
+          updateBodyPadding();
+          resizeTicking = false;
+        });
+        resizeTicking = true;
+      }
+    });
+
+    // ========== 控制显隐 ==========
     const updateHeader = () => {
       const shouldShow = window.scrollY > STICKY_OFFSET;
       if (shouldShow !== isVisible) {
