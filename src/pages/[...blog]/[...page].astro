@@ -5,7 +5,10 @@ import Layout from '~/layouts/PageLayout.astro';
 import BlogList from '~/components/blog/List.astro';
 import Headline from '~/components/blog/Headline.astro';
 import Pagination from '~/components/blog/Pagination.astro';
-// import PostTags from "~/components/blog/Tags.astro";
+
+// ===== 新增：导入 Header =====
+import Header from '~/components/common/Header.astro';
+import { headerData } from '~/navigation';
 
 import { blogListRobots, getStaticPathsBlogList } from '~/utils/blog';
 
@@ -20,9 +23,6 @@ type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 const { page } = Astro.props as Props;
 const currentPage = page.currentPage ?? 1;
 
-// const allCategories = await findCategories();
-// const allTags = await findTags();
-
 const metadata = {
   title: `凉宫数据开放平台${currentPage > 1 ? ` — 第${currentPage}页` : ''}`,
   robots: {
@@ -36,6 +36,10 @@ const metadata = {
 ---
 
 <Layout metadata={metadata}>
+  <!-- ===== 消息中心专用：Header + 占位 ===== -->
+  <Header links={headerData.links} isSticky={true} />
+  <div class="h-16 md:h-20 w-full"></div>
+
   <section class="px-6 sm:px-6 py-12 sm:py-16 lg:py-20 mx-auto max-w-4xl">
     <Headline
       subtitle="凉宫数据资讯"
@@ -44,9 +48,5 @@ const metadata = {
     </Headline>
     <BlogList posts={page.data} />
     <Pagination prevUrl={page.url.prev} nextUrl={page.url.next} />
-    <!--
-      <PostTags tags={allCategories} class="mb-2" title="Search by Categories:" isCategory />
-      <PostTags tags={allTags}  title="Search by Tags:" />
-    -->
   </section>
 </Layout>
