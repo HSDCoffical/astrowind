@@ -30,10 +30,10 @@ if (image) {
 <!-- 
   手机版：margin-top: 0（不上移）
   桌面版：margin-top: -76px（上移）
-  通过内联样式强制手机版 margin-top: 0，并用 style 覆盖桌面版
+  通过内联样式强制手机版 margin-top: 0
 -->
 <section 
-  class="relative not-prose min-h-[100dvh] flex items-center pointer-events-none bg-black md:-mt-[76px]"
+  class="relative not-prose min-h-[100dvh] flex items-center pointer-events-none bg-black"
   style="margin-top: 0;"
   {...id ? { id } : {}}
 >
@@ -55,6 +55,7 @@ if (image) {
   
   <!-- ===== 内容层 ===== -->
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 z-10 w-full pointer-events-auto">
+    <!-- 手机版不上移，桌面版上移 76px -->
     <div class="pt-0 md:pt-[76px]"></div>
     <div class="py-12 md:py-20">
       <div class="text-center pb-10 md:pb-16 max-w-5xl mx-auto">
