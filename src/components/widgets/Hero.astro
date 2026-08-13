@@ -27,8 +27,9 @@ if (image) {
 }
 ---
 
+<!-- ===== 修复：min-height 补偿 -mt-76px 的偏移 ===== -->
 <section 
-  class="relative md:-mt-[76px] not-prose min-h-screen flex items-center pointer-events-none bg-black"
+  class="relative md:-mt-[76px] not-prose min-h-[calc(100vh+76px)] flex items-center pointer-events-none bg-black"
   {...id ? { id } : {}}
 >
   <!-- ===== 背景图片层 ===== -->
