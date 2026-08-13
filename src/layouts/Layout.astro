@@ -28,6 +28,10 @@ export interface Props {
 const { metadata = {} } = Astro.props;
 const { language, textDirection } = I18N;
 
+// ===== 判断是否为首页（只有首页不加内边距） =====
+const currentPath = Astro.url.pathname;
+const isHomePage = currentPath === '/';
+
 // ===== 读取 JWT 获取用户名 =====
 const cookieHeader = Astro.request.headers.get('cookie') || '';
 const cookies = cookieHeader ? parse(cookieHeader) : {};
@@ -38,12 +42,10 @@ let userAvatar = '';
 
 if (authToken) {
   try {
-    // 解码 JWT
     const decoded = jwt.verify(authToken, import.meta.env.JWT_SECRET);
     username = decoded.username || '访客';
     userAvatar = decoded.avatar || '';
   } catch (error) {
-    // Token 无效或过期，保持访客
     console.log('Token 验证失败:', error.message);
   }
 }
@@ -60,27 +62,23 @@ if (authToken) {
     <SiteVerification />
     <Analytics />
 
-    <!-- ===== Bing 网站验证 ===== -->
     <meta name="msvalidate.01" content="78082B8B3536A479B13C484B31119863" />
 
     <link rel="preconnect" href="https://images.unsplash.com" />
 
     <ClientRouter fallback="swap" />
 
-    <!-- ===== 回弹修复 + View Transitions 动画 + 锚点平滑滚动 ===== -->
     <style is:global>
-      /* 禁用滚动干扰 */
       html, body {
         overscroll-behavior: none !important;
         overflow-anchor: none !important;
-        scroll-behavior: smooth !important; /* ← 新增：锚点平滑滚动 */
+        scroll-behavior: smooth !important;
       }
       * {
         overscroll-behavior: none !important;
         overflow-anchor: none !important;
       }
 
-      /* ===== 恢复页面切换过渡动画 ===== */
       ::view-transition-old(root),
       ::view-transition-new(root) {
         animation-duration: 0.3s;
@@ -107,17 +105,15 @@ if (authToken) {
   </head>
 
   <body class="antialiased text-default bg-page tracking-tight">
-    <!-- ===== 全局传递用户名（供 JS 读取） ===== -->
     <div id="global-user" data-username={username} data-avatar={userAvatar}></div>
 
-    <!-- ===== 所有页面统一添加顶部内边距，为 fixed Header 留空间 ===== -->
-    <div class="pt-16 md:pt-20">
+    <!-- ===== 只有首页不加顶部内边距，其余页面都加 ===== -->
+    <div class={isHomePage ? '' : 'pt-16 md:pt-20'}>
       <slot />
     </div>
 
     <BasicScripts />
 
-    <!-- ===== 手机端回弹终极修复 ===== -->
     <script>
       (function() {
         const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
