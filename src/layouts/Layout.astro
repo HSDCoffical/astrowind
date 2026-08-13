@@ -116,5 +116,26 @@ if (authToken) {
     </div>
 
     <BasicScripts />
+
+    <script>
+      (function() {
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (!isMobile) return;
+
+        function fixScroll() {
+          const currentScroll = window.scrollY;
+          window.scrollTo(0, 0);
+          setTimeout(function() {
+            window.scrollTo(0, currentScroll);
+          }, 50);
+        }
+
+        window.addEventListener('load', function() {
+          setTimeout(fixScroll, 200);
+          setTimeout(fixScroll, 500);
+          setTimeout(fixScroll, 800);
+        });
+      })();
+    </script>
   </body>
 </html>
