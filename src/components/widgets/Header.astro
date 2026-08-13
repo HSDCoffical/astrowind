@@ -50,8 +50,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 <header
   id={id}
   data-aw-sticky-header={isSticky ? true : undefined}
-  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30"
-  style="background: transparent !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
+  class="sticky top-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30"
+  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
     header#header * {
@@ -88,14 +88,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     @media (min-width: 768px) {
       .menu-theme-item {
         display: none !important;
-      }
-    }
-
-    /* 手机版禁用毛玻璃，防止白色采样 */
-    @media (max-width: 768px) {
-      header#header {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
       }
     }
   </style>
