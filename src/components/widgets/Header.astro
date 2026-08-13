@@ -175,6 +175,11 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
+    <!-- ===== 新增：欢迎语（手机+桌面都显示） ===== -->
+    <div class="flex items-center justify-center md:justify-end text-white/80 text-sm font-medium mt-2 md:mt-0">
+      欢迎，<span class="text-white font-semibold ml-1">xuexiang</span>
+    </div>
+
     <div
       class:list={[
         { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
