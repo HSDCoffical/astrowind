@@ -35,16 +35,6 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
 <!doctype html>
 <html lang={language} dir={textDirection} class="2xl:text-[20px]">
   <head>
-    <!-- ===== 必须在最前面：禁用滚动锚定 ===== -->
-    <style is:global>
-      html, body {
-        overflow-anchor: none !important;
-      }
-      * {
-        overflow-anchor: none !important;
-      }
-    </style>
-
     <CommonMeta />
     <Favicons />
     <CustomStyles />
@@ -60,13 +50,15 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
 
     <ClientRouter fallback="swap" />
 
-    <!-- ===== 回弹修复（备用） ===== -->
+    <!-- ===== 回弹修复 ===== -->
     <style is:global>
       html, body {
         overscroll-behavior: none !important;
+        overflow-anchor: none !important;
       }
       * {
         overscroll-behavior: none !important;
+        overflow-anchor: none !important;
       }
     </style>
   </head>
@@ -77,5 +69,33 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
     </div>
 
     <BasicScripts />
+
+    <!-- ===== 强制重置滚动位置，消除加载时回弹 ===== -->
+    <script>
+      (function() {
+        function resetScroll() {
+          if (window.scrollY < 10 && window.scrollY > 0) {
+            window.scrollTo(0, 0);
+          }
+        }
+
+        // 页面加载完成后多次重置
+        window.addEventListener('load', function() {
+          resetScroll();
+          setTimeout(resetScroll, 100);
+          setTimeout(resetScroll, 300);
+          setTimeout(resetScroll, 500);
+        });
+
+        // Astro SPA 导航后也重置
+        document.addEventListener('astro:after-swap', function() {
+          setTimeout(resetScroll, 50);
+          setTimeout(resetScroll, 200);
+        });
+
+        // 立即执行
+        resetScroll();
+      })();
+    </script>
   </body>
 </html>
