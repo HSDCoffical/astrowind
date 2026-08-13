@@ -19,6 +19,24 @@ const metadata = {
 ---
 
 <Layout metadata={metadata}>
+  <!-- ===== 只修复首页的滚轮 ===== -->
+  <style is:global>
+    /* 只针对首页的 Hero 组件修复 */
+    section.overflow-hidden.flex.items-center {
+      overflow: visible !important;
+      min-height: auto !important;
+      max-height: none !important;
+    }
+    /* 首页的背景遮罩层不拦截鼠标事件 */
+    .absolute.inset-0.pointer-events-none {
+      pointer-events: none !important;
+    }
+    /* 确保首页 body 可滚动 */
+    body {
+      overflow-y: auto !important;
+    }
+  </style>
+
   <!-- Hero Widget ******************* -->
 
   <Hero
