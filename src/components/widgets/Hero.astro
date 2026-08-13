@@ -27,9 +27,9 @@ if (image) {
 }
 ---
 
-<!-- 手机版不上移，桌面版上移 76px -->
+<!-- 手机版不上移，桌面版上移 76px，添加 bg-black 防止白边 -->
 <section 
-  class="relative not-prose min-h-[100dvh] flex items-center pointer-events-none bg-black md:-mt-[76px]"
+  class="relative not-prose min-h-[100vh] flex items-center pointer-events-none bg-black"
   {...id ? { id } : {}}
 >
   {imageUrl && (
@@ -99,4 +99,13 @@ if (image) {
       </div>
     </div>
   </div>
+
+  <!-- ===== 桌面版专用：整个 section 上移 76px ===== -->
+  <style>
+    @media (min-width: 768px) {
+      section.relative {
+        margin-top: -76px !important;
+      }
+    }
+  </style>
 </section>
