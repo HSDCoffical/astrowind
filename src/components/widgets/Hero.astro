@@ -31,16 +31,16 @@ if (image) {
   class="relative md:-mt-[76px] not-prose min-h-screen flex items-center pointer-events-none"
   {...id ? { id } : {}}
 >
-  <!-- ===== 背景图片层 ===== -->
+  <!-- ===== 背景图片层：手机版不上移，桌面版上移 76px ===== -->
   {imageUrl && (
     <div
-      class="absolute inset-0 w-full h-full bg-cover bg-center"
+      class="absolute inset-0 w-full h-full bg-cover bg-center md:-mt-[76px]"
       style={`background-image: url('${imageUrl}');`}
     ></div>
   )}
-  <!-- ===== 半透明遮罩 ===== -->
+  <!-- ===== 半透明遮罩：同步上移 ===== -->
   {imageUrl && (
-    <div class="absolute inset-0 w-full h-full bg-black/40"></div>
+    <div class="absolute inset-0 w-full h-full bg-black/40 md:-mt-[76px]"></div>
   )}
 
   <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
