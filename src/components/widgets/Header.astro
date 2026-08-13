@@ -91,11 +91,166 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* 手机版禁用毛玻璃，防止白色采样 */
+    /* 手机端禁用毛玻璃（避免白色采样） */
     @media (max-width: 768px) {
       header#header {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
+      }
+    }
+
+    /* 搜索框在 Header 中适配 */
+    #search-form {
+      width: 100%;
+    }
+    #search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.20);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      border-radius: 9999px;
+      padding: 8px 48px 8px 40px;
+      color: #1f2937;
+      font-size: 14px;
+      outline: none;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transition: border-color 0.2s;
+    }
+    .dark #search-input {
+      background: rgba(31, 41, 55, 0.30);
+      color: #f3f4f6;
+      border-color: rgba(255, 255, 255, 0.10);
+    }
+    #search-input::placeholder {
+      color: #9ca3af;
+    }
+    .dark #search-input::placeholder {
+      color: #6b7280;
+    }
+    #search-input:focus {
+      border-color: rgba(59, 130, 246, 0.5);
+    }
+    .search-icon-btn {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #6b7280;
+      padding: 4px;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .search-icon-btn:hover {
+      color: #1f2937;
+    }
+    .dark .search-icon-btn {
+      color: #9ca3af;
+    }
+    .dark .search-icon-btn:hover {
+      color: #f3f4f6;
+    }
+    .search-icon-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+    .search-mode-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.30);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: none;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-size: 10px;
+      color: #4b5563;
+      cursor: pointer;
+      transition: background 0.2s;
+      line-height: 1.6;
+    }
+    .dark .search-mode-btn {
+      background: rgba(55, 65, 81, 0.40);
+      color: #d1d5db;
+    }
+    .search-mode-btn:hover {
+      background: rgba(255, 255, 255, 0.50);
+    }
+    .dark .search-mode-btn:hover {
+      background: rgba(75, 85, 99, 0.60);
+    }
+    #search-results-container {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 4px);
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      max-height: 240px;
+      overflow-y: auto;
+      display: none;
+      z-index: 50;
+    }
+    .dark #search-results-container {
+      background: rgba(31, 41, 55, 0.95);
+      border-color: rgba(255, 255, 255, 0.10);
+    }
+    #search-results-container a {
+      display: block;
+      padding: 8px 16px;
+      color: #1f2937;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      transition: background 0.15s;
+    }
+    .dark #search-results-container a {
+      color: #f3f4f6;
+    }
+    #search-results-container a:last-child {
+      border-bottom: none;
+    }
+    #search-results-container a:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .dark #search-results-container a:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    #search-results-container .title {
+      font-weight: 500;
+      font-size: 13px;
+    }
+    #search-results-container .desc {
+      font-size: 11px;
+      color: #6b7280;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .dark #search-results-container .desc {
+      color: #9ca3af;
+    }
+    .hidden {
+      display: none !important;
+    }
+
+    /* 桌面端搜索框宽度限制 */
+    @media (min-width: 768px) {
+      .search-wrapper-desktop {
+        max-width: 320px;
       }
     }
   </style>
@@ -115,106 +270,360 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       },
     ]}
   >
-    <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
+    <!-- ===== Logo + 移动端菜单 ===== -->
+    <div class="flex items-center justify-between w-full md:hidden">
       <a class="flex items-center" href={getHomePermalink()}>
         <Logo />
       </a>
-      <div class="flex items-center md:hidden">
+      <div class="flex items-center gap-2">
+        <ToggleTheme iconClass="w-5 h-5" />
         <ToggleMenu />
       </div>
     </div>
 
-    <!-- 导航菜单 -->
-    <nav
-      class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
-      aria-label="Main navigation"
-    >
-      <ul
-        class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
-      >
+    <!-- ===== 手机端搜索框（在 Logo 下方） ===== -->
+    <div class="w-full mt-1 md:hidden">
+      <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
+        <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
+        <input
+          id="search-input"
+          type="text"
+          name="q"
+          placeholder="搜索本站内容..."
+          autocomplete="off"
+        />
+        <button type="button" id="search-toggle" class="search-icon-btn" aria-label="聚焦搜索框">
+          <svg viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+        <button type="button" id="mode-toggle" class="search-mode-btn"><span id="mode-label">站外</span></button>
+      </form>
+      <div id="search-results-container"></div>
+    </div>
+
+    <!-- ===== 桌面端布局 ===== -->
+    <div class="hidden md:flex items-center justify-between w-full gap-4">
+      <!-- Logo -->
+      <a class="flex items-center flex-shrink-0" href={getHomePermalink()}>
+        <Logo />
+      </a>
+
+      <!-- 桌面端导航菜单 -->
+      <nav class="flex items-center gap-4 text-sm font-medium">
         {
-          links.map(({ text, href, links }) => (
-            <li class={links?.length ? 'dropdown' : ''}>
-              {links?.length ? (
-                <>
-                  <button
-                    type="button"
-                    class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
-                  >
-                    {text}{' '}
-                    <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
-                  </button>
-                  <ul class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl">
-                    {links.map(({ text: text2, href: href2 }) => (
-                      <li>
-                        <a
-                          class:list={[
-                            'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
-                            { 'aw-link-active': href2 === currentPath },
-                          ]}
-                          href={href2}
-                        >
-                          {text2}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              ) : (
-                <a
-                  class:list={[
-                    'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
-                    { 'aw-link-active': href === currentPath },
-                  ]}
-                  href={href}
-                >
-                  {text}
-                </a>
-              )}
-            </li>
+          links.map(({ text, href }) => (
+            <a
+              href={href}
+              class={currentPath === href ? 'text-link' : 'hover:text-link'}
+            >
+              {text}
+            </a>
           ))
         }
-        <!-- 手机端菜单底部主题切换 -->
-        <li class="menu-theme-item">
-          <ToggleTheme iconClass="w-5 h-5" />
-          <span class="text-sm">切换主题</span>
-        </li>
-      </ul>
-    </nav>
+      </nav>
 
-    <div
-      class:list={[
-        { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
-        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
-      ]}
-    >
-      <div class="items-center flex justify-between w-full md:w-auto">
-        <div class="flex">
-          {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
-          {
-            showRssFeed && (
-              <a
-                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
-                aria-label="RSS Feed"
-                href={getAsset('/rss.xml')}
-              >
-                <Icon name="tabler:rss" class="w-5 h-5" />
-              </a>
-            )
-          }
+      <!-- 桌面端：搜索框 + 主题切换 + 操作按钮 -->
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <!-- 桌面端搜索框 -->
+        <div class="search-wrapper-desktop relative">
+          <form id="search-form-desktop" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
+            <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
+            <input
+              id="search-input-desktop"
+              type="text"
+              name="q"
+              placeholder="搜索..."
+              autocomplete="off"
+              class="w-full py-1.5 px-4 pl-9 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+            />
+            <button
+              id="search-toggle-desktop"
+              type="button"
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+              aria-label="聚焦搜索框"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+            <button
+              id="mode-toggle-desktop"
+              type="button"
+              class="absolute right-2 top-1/2 transform -translate-y-1/2 text-[10px] text-white/70 bg-white/20 backdrop-blur-sm px-1.5 py-0.5 rounded-full hover:bg-white/30 transition-colors"
+            >
+              <span id="mode-label-desktop">站外</span>
+            </button>
+          </form>
+          <div id="search-results-container-desktop" class="absolute left-0 right-0 mt-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden z-50"></div>
         </div>
-        {
-          actions?.length ? (
-            <span class="ml-4 rtl:ml-0 rtl:mr-4">
-              {actions.map((btnProps) => (
-                <Button {...btnProps} class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto" />
-              ))}
-            </span>
-          ) : (
-            ''
-          )
-        }
+
+        <ToggleTheme iconClass="w-5 h-5" />
+        {showRssFeed && (
+          <a
+            class="text-muted hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-sm p-2 inline-flex items-center"
+            aria-label="RSS Feed"
+            href={getAsset('/rss.xml')}
+          >
+            <Icon name="tabler:rss" class="w-5 h-5" />
+          </a>
+        )}
+        {actions?.length && actions.map((btnProps) => (
+          <Button {...btnProps} class="py-2 px-4 text-sm font-semibold" />
+        ))}
       </div>
     </div>
   </div>
 </header>
+
+<script>
+  (function() {
+    // === 手机端搜索 ===
+    const form = document.getElementById('search-form');
+    const input = document.getElementById('search-input');
+    const modeToggle = document.getElementById('mode-toggle');
+    const modeLabel = document.getElementById('mode-label');
+    const resultsContainer = document.getElementById('search-results-container');
+    const toggleBtn = document.getElementById('search-toggle');
+
+    // === 桌面端搜索 ===
+    const formDesktop = document.getElementById('search-form-desktop');
+    const inputDesktop = document.getElementById('search-input-desktop');
+    const modeToggleDesktop = document.getElementById('mode-toggle-desktop');
+    const modeLabelDesktop = document.getElementById('mode-label-desktop');
+    const resultsContainerDesktop = document.getElementById('search-results-container-desktop');
+    const toggleBtnDesktop = document.getElementById('search-toggle-desktop');
+
+    let mode = 'external';
+    let modeDesktop = 'external';
+    let searchData = null;
+
+    async function loadSearchData() {
+      try {
+        const resp = await fetch('/search.json');
+        if (resp.ok) {
+          searchData = await resp.json();
+        }
+      } catch (e) {}
+    }
+
+    function searchInternal(query) {
+      if (!searchData || !query.trim()) return [];
+      const q = query.toLowerCase().trim();
+      return searchData
+        .filter(page => {
+          const title = page.title.toLowerCase();
+          const desc = page.description.toLowerCase();
+          const content = page.content.toLowerCase();
+          return title.includes(q) || desc.includes(q) || content.includes(q);
+        })
+        .slice(0, 10);
+    }
+
+    function showResults(results, container) {
+      container.innerHTML = '';
+      if (results.length === 0) {
+        container.classList.add('hidden');
+        return;
+      }
+      let html = '';
+      for (const page of results) {
+        html += `
+          <a href="${page.url}">
+            <div class="title">${page.title}</div>
+            <div class="desc">${page.description || ''}</div>
+          </a>
+        `;
+      }
+      container.innerHTML = html;
+      container.classList.remove('hidden');
+    }
+
+    function clearResults(container) {
+      container.innerHTML = '';
+      container.classList.add('hidden');
+    }
+
+    function updateMode(newMode, formEl, inputEl, labelEl, containerEl) {
+      clearResults(containerEl);
+      if (newMode === 'external') {
+        formEl.action = 'https://www.bing.com/search';
+        formEl.target = '_blank';
+        let hidden = formEl.querySelector('input[name="q1"]');
+        if (!hidden) {
+          hidden = document.createElement('input');
+          hidden.type = 'hidden';
+          hidden.name = 'q1';
+          formEl.appendChild(hidden);
+        }
+        hidden.value = 'site:hsdc.dpdns.org';
+        inputEl.name = 'q';
+        inputEl.placeholder = '搜索...';
+        labelEl.textContent = '输入关键词以联网搜索';
+      } else {
+        formEl.action = '#';
+        formEl.target = '';
+        const hidden = formEl.querySelector('input[name="q1"]');
+        if (hidden) hidden.remove();
+        inputEl.name = '';
+        inputEl.placeholder = '输入关键词以检索本站';
+        labelEl.textContent = '站内搜索';
+        if (inputEl.value.trim()) {
+          const results = searchInternal(inputEl.value);
+          showResults(results, containerEl);
+        }
+      }
+    }
+
+    // 初始化手机端
+    function initMobile() {
+      if (!form || !input) return;
+      updateMode(mode, form, input, modeLabel, resultsContainer);
+
+      input.addEventListener('input', function() {
+        if (mode === 'internal') {
+          const query = this.value.trim();
+          if (!query) { clearResults(resultsContainer); return; }
+          const results = searchInternal(query);
+          showResults(results, resultsContainer);
+        } else {
+          clearResults(resultsContainer);
+        }
+      });
+
+      toggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        input.focus();
+      });
+
+      modeToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const newMode = mode === 'external' ? 'internal' : 'external';
+        mode = newMode;
+        updateMode(mode, form, input, modeLabel, resultsContainer);
+      });
+    }
+
+    // 初始化桌面端
+    function initDesktop() {
+      if (!formDesktop || !inputDesktop) return;
+      updateMode(modeDesktop, formDesktop, inputDesktop, modeLabelDesktop, resultsContainerDesktop);
+
+      inputDesktop.addEventListener('input', function() {
+        if (modeDesktop === 'internal') {
+          const query = this.value.trim();
+          if (!query) { clearResults(resultsContainerDesktop); return; }
+          const results = searchInternal(query);
+          showResults(results, resultsContainerDesktop);
+        } else {
+          clearResults(resultsContainerDesktop);
+        }
+      });
+
+      toggleBtnDesktop.addEventListener('click', function(e) {
+        e.preventDefault();
+        inputDesktop.focus();
+      });
+
+      modeToggleDesktop.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const newMode = modeDesktop === 'external' ? 'internal' : 'external';
+        modeDesktop = newMode;
+        updateMode(modeDesktop, formDesktop, inputDesktop, modeLabelDesktop, resultsContainerDesktop);
+      });
+    }
+
+    // 点击外部清除结果
+    document.addEventListener('click', function(e) {
+      const container = document.querySelector('.search-wrapper-desktop');
+      if (container && !container.contains(e.target)) {
+        clearResults(resultsContainerDesktop);
+      }
+      const mobileContainer = document.querySelector('.w-full.mt-1');
+      if (mobileContainer && !mobileContainer.contains(e.target)) {
+        clearResults(resultsContainer);
+      }
+    });
+
+    // 初始化
+    if (document.readyState === 'complete') {
+      initMobile();
+      initDesktop();
+    } else {
+      window.addEventListener('load', function() {
+        initMobile();
+        initDesktop();
+      });
+    }
+
+    loadSearchData();
+
+    // SPA 导航后重新初始化
+    document.addEventListener('astro:after-swap', function() {
+      setTimeout(function() {
+        // 重新获取元素引用
+        const newForm = document.getElementById('search-form');
+        const newInput = document.getElementById('search-input');
+        const newModeToggle = document.getElementById('mode-toggle');
+        const newModeLabel = document.getElementById('mode-label');
+        const newResults = document.getElementById('search-results-container');
+        const newToggle = document.getElementById('search-toggle');
+
+        const newFormD = document.getElementById('search-form-desktop');
+        const newInputD = document.getElementById('search-input-desktop');
+        const newModeToggleD = document.getElementById('mode-toggle-desktop');
+        const newModeLabelD = document.getElementById('mode-label-desktop');
+        const newResultsD = document.getElementById('search-results-container-desktop');
+        const newToggleD = document.getElementById('search-toggle-desktop');
+
+        if (newForm && newInput) {
+          mode = 'external';
+          updateMode(mode, newForm, newInput, newModeLabel, newResults);
+          newInput.oninput = function() {
+            if (mode === 'internal') {
+              const query = this.value.trim();
+              if (!query) { clearResults(newResults); return; }
+              const results = searchInternal(query);
+              showResults(results, newResults);
+            } else {
+              clearResults(newResults);
+            }
+          };
+          newToggle.onclick = function(e) { e.preventDefault(); newInput.focus(); };
+          newModeToggle.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const newMode = mode === 'external' ? 'internal' : 'external';
+            mode = newMode;
+            updateMode(mode, newForm, newInput, newModeLabel, newResults);
+          };
+        }
+
+        if (newFormD && newInputD) {
+          modeDesktop = 'external';
+          updateMode(modeDesktop, newFormD, newInputD, newModeLabelD, newResultsD);
+          newInputD.oninput = function() {
+            if (modeDesktop === 'internal') {
+              const query = this.value.trim();
+              if (!query) { clearResults(newResultsD); return; }
+              const results = searchInternal(query);
+              showResults(results, newResultsD);
+            } else {
+              clearResults(newResultsD);
+            }
+          };
+          newToggleD.onclick = function(e) { e.preventDefault(); newInputD.focus(); };
+          newModeToggleD.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const newMode = modeDesktop === 'external' ? 'internal' : 'external';
+            modeDesktop = newMode;
+            updateMode(modeDesktop, newFormD, newInputD, newModeLabelD, newResultsD);
+          };
+        }
+      }, 50);
+    });
+  })();
+</script>
