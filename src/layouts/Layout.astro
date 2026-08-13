@@ -12,12 +12,10 @@ import SiteVerification from '~/components/common/SiteVerification.astro';
 import Analytics from '~/components/common/Analytics.astro';
 import BasicScripts from '~/components/common/BasicScripts.astro';
 
-// Comment the line below to disable View Transitions
 import { ClientRouter } from 'astro:transitions';
 
 import type { MetaData as MetaDataType } from '~/types';
 
-// ===== 读取 JWT 所需依赖 =====
 import { parse } from 'cookie';
 import jwt from 'jsonwebtoken';
 
@@ -28,7 +26,7 @@ export interface Props {
 const { metadata = {} } = Astro.props;
 const { language, textDirection } = I18N;
 
-// ===== 判断是否为首页（首页不加顶部内边距） =====
+// ===== 判断是否为首页 =====
 const isHomePage = Astro.url.pathname === '/';
 
 // ===== 读取 JWT 获取用户名 =====
@@ -61,16 +59,13 @@ if (authToken) {
     <SiteVerification />
     <Analytics />
 
-    <!-- ===== Bing 网站验证 ===== -->
     <meta name="msvalidate.01" content="78082B8B3536A479B13C484B31119863" />
 
     <link rel="preconnect" href="https://images.unsplash.com" />
 
     <ClientRouter fallback="swap" />
 
-    <!-- ===== 全局样式：彻底消除白色残留（保留默认背景色） ===== -->
     <style is:global>
-      /* 1. 禁用滚动干扰 */
       html, body {
         overscroll-behavior: none !important;
         overflow-anchor: none !important;
@@ -83,7 +78,7 @@ if (authToken) {
         overflow-anchor: none !important;
       }
 
-      /* 2. 强制所有固定定位元素背景透明，让下方背景透出 */
+      /* 强制固定定位元素背景透明 */
       .fixed,
       header#header,
       header#header > div,
@@ -91,15 +86,6 @@ if (authToken) {
         background: transparent !important;
       }
 
-      /* 3. 移除所有可能的白色背景 */
-      .bg-white,
-      .dark\:bg-gray-900,
-      .bg-gray-100,
-      .bg-gray-50 {
-        background: transparent !important;
-      }
-
-      /* 4. View Transitions 动画 */
       ::view-transition-old(root),
       ::view-transition-new(root) {
         animation-duration: 0.3s;
@@ -122,17 +108,15 @@ if (authToken) {
   </head>
 
   <body class="antialiased text-default bg-page tracking-tight">
-    <!-- ===== 全局传递用户名（供 JS 读取） ===== -->
     <div id="global-user" data-username={username} data-avatar={userAvatar}></div>
 
-    <!-- ===== 首页不加顶部内边距，其他页面加 ===== -->
+    <!-- ===== 首页不加内边距，其他页面加 ===== -->
     <div class={isHomePage ? '' : 'pt-16 md:pt-20'}>
       <slot />
     </div>
 
     <BasicScripts />
 
-    <!-- ===== 手机端回弹终极修复 ===== -->
     <script>
       (function() {
         const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
