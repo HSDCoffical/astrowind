@@ -28,7 +28,7 @@ export interface Props {
 const { metadata = {} } = Astro.props;
 const { language, textDirection } = I18N;
 
-// ===== 判断是否为首页（首页不加内边距） =====
+// ===== 判断是否为首页（首页不加顶部内边距） =====
 const isHomePage = Astro.url.pathname === '/';
 
 // ===== 读取 JWT 获取用户名 =====
@@ -41,12 +41,10 @@ let userAvatar = '';
 
 if (authToken) {
   try {
-    // 解码 JWT
     const decoded = jwt.verify(authToken, import.meta.env.JWT_SECRET);
     username = decoded.username || '访客';
     userAvatar = decoded.avatar || '';
   } catch (error) {
-    // Token 无效或过期，保持访客
     console.log('Token 验证失败:', error.message);
   }
 }
@@ -70,38 +68,52 @@ if (authToken) {
 
     <ClientRouter fallback="swap" />
 
-    <!-- ===== 回弹修复 + View Transitions 动画 + 锚点平滑滚动 ===== -->
+    <!-- ===== 全局样式：彻底消除白色残留（保留默认背景色） ===== -->
     <style is:global>
-      /* 禁用滚动干扰 */
+      /* 1. 禁用滚动干扰 */
       html, body {
         overscroll-behavior: none !important;
         overflow-anchor: none !important;
-        scroll-behavior: smooth !important; /* ← 新增：锚点平滑滚动 */
+        scroll-behavior: smooth !important;
+        padding: 0 !important;
+        margin: 0 !important;
       }
       * {
         overscroll-behavior: none !important;
         overflow-anchor: none !important;
       }
 
-      /* ===== 恢复页面切换过渡动画 ===== */
+      /* 2. 强制所有固定定位元素背景透明，让下方背景透出 */
+      .fixed,
+      header#header,
+      header#header > div,
+      header#header div.absolute.inset-0 {
+        background: transparent !important;
+      }
+
+      /* 3. 移除所有可能的白色背景 */
+      .bg-white,
+      .dark\:bg-gray-900,
+      .bg-gray-100,
+      .bg-gray-50 {
+        background: transparent !important;
+      }
+
+      /* 4. View Transitions 动画 */
       ::view-transition-old(root),
       ::view-transition-new(root) {
         animation-duration: 0.3s;
       }
-
       ::view-transition-old(root) {
         animation-name: fade-out;
       }
-
       ::view-transition-new(root) {
         animation-name: fade-in;
       }
-
       @keyframes fade-out {
         from { opacity: 1; }
         to { opacity: 0; }
       }
-
       @keyframes fade-in {
         from { opacity: 0; }
         to { opacity: 1; }
@@ -113,7 +125,7 @@ if (authToken) {
     <!-- ===== 全局传递用户名（供 JS 读取） ===== -->
     <div id="global-user" data-username={username} data-avatar={userAvatar}></div>
 
-    <!-- ===== 首页不加内边距，其他页面加 ===== -->
+    <!-- ===== 首页不加顶部内边距，其他页面加 ===== -->
     <div class={isHomePage ? '' : 'pt-16 md:pt-20'}>
       <slot />
     </div>
