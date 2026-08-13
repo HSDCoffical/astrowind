@@ -81,6 +81,21 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
         overflow-y: auto !important;
         height: auto !important;
       }
+
+      /* 4. 强制修复 Hero 的 overflow:hidden 导致的滚轮失效 */
+      section.overflow-hidden.flex.items-center,
+      .overflow-hidden.flex.items-center,
+      section.\!overflow-hidden,
+      [class*="overflow-hidden"] {
+        overflow: visible !important;
+        min-height: auto !important;
+        max-height: none !important;
+      }
+
+      /* 5. 额外修复：确保所有滚动容器正常工作 */
+      .not-prose.overflow-hidden {
+        overflow: visible !important;
+      }
     </style>
   </head>
 
