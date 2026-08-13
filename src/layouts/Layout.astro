@@ -70,31 +70,25 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
 
     <BasicScripts />
 
-    <!-- ===== 强制重置滚动位置，消除加载时回弹 ===== -->
+    <!-- ===== 手机端回弹终极修复 ===== -->
     <script>
       (function() {
-        function resetScroll() {
-          if (window.scrollY < 10 && window.scrollY > 0) {
-            window.scrollTo(0, 0);
-          }
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (!isMobile) return;
+
+        function fixScroll() {
+          const currentScroll = window.scrollY;
+          window.scrollTo(0, 0);
+          setTimeout(function() {
+            window.scrollTo(0, currentScroll);
+          }, 50);
         }
 
-        // 页面加载完成后多次重置
         window.addEventListener('load', function() {
-          resetScroll();
-          setTimeout(resetScroll, 100);
-          setTimeout(resetScroll, 300);
-          setTimeout(resetScroll, 500);
+          setTimeout(fixScroll, 200);
+          setTimeout(fixScroll, 500);
+          setTimeout(fixScroll, 800);
         });
-
-        // Astro SPA 导航后也重置
-        document.addEventListener('astro:after-swap', function() {
-          setTimeout(resetScroll, 50);
-          setTimeout(resetScroll, 200);
-        });
-
-        // 立即执行
-        resetScroll();
       })();
     </script>
   </body>
