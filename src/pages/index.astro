@@ -41,9 +41,9 @@ const metadata = {
       bgImage={true}
       bgOpacity={30}
     >
-      <!-- ===== 动态欢迎语 ===== -->
+      <!-- ===== 动态欢迎语（由脚本填充） ===== -->
       <Fragment slot="title">
-        <span id="hero-greeting">凉宫数据欢迎您！</span>
+        <span id="hero-greeting"></span>
       </Fragment>
 
       <Fragment slot="subtitle">
@@ -610,53 +610,14 @@ const metadata = {
     })();
   </script>
 
-  <!-- ===== 动态欢迎语 + 调试按钮 ===== -->
+  <!-- ===== 接收社区登录传递的用户名 ===== -->
   <script>
     (function() {
-      const COMMUNITY_API = 'https://hono-bbs-9qj.pages.dev/user/me';
+      // 获取当前 URL 参数
+      const urlParams = new URLSearchParams(window.location.search);
+      const encodedUsername = urlParams.get('username');
 
-      // 调试按钮和结果显示容器
-      const debugContainer = document.createElement('div');
-      debugContainer.style.cssText = 'position:fixed;bottom:100px;right:10px;z-index:9999;background:rgba(0,0,0,0.8);border-radius:10px;padding:12px;max-width:220px;color:#fff;font-size:12px;font-family:sans-serif;pointer-events:auto;';
-      debugContainer.innerHTML = `
-        <button id="debugBtn" style="background:#3b82f6;border:none;color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;width:100%;">🛠️ 测试登录</button>
-        <div id="debugResult" style="margin-top:8px;word-break:break-all;font-size:11px;color:#a0aec0;"></div>
-      `;
-      document.body.appendChild(debugContainer);
-
-      const debugBtn = document.getElementById('debugBtn');
-      const debugResult = document.getElementById('debugResult');
-
-      async function fetchUsername() {
-        try {
-          const res = await fetch(COMMUNITY_API, {
-            credentials: 'include'
-          });
-          if (res.ok) {
-            const data = await res.json();
-            return { success: true, username: data.username || '访客', data };
-          } else {
-            return { success: false, error: `HTTP ${res.status}: ${res.statusText}` };
-          }
-        } catch (e) {
-          return { success: false, error: e.message };
-        }
-      }
-
-      // 自动更新欢迎语
-      async function updateGreeting() {
-        const result = await fetchUsername();
-        const el = document.getElementById('hero-greeting');
-        if (el) {
-          if (result.success) {
-            el.textContent = `${result.username}，${getGreeting()}`;
-          } else {
-            // 如果请求失败，保留默认的“凉宫数据欢迎您！”或者显示“访客”
-            // 不覆盖，避免闪动
-          }
-        }
-      }
-
+      // 获取问候语
       function getGreeting() {
         const hour = new Date().getHours();
         if (hour >= 5 && hour < 9) return '早上好';
@@ -667,32 +628,38 @@ const metadata = {
         return '晚上好';
       }
 
-      // 点击调试按钮
-      debugBtn.addEventListener('click', async function() {
-        debugResult.textContent = '⏳ 请求中...';
-        const result = await fetchUsername();
-        if (result.success) {
-          debugResult.textContent = `✅ 用户名: ${result.username}`;
-          // 同时更新欢迎语
-          const el = document.getElementById('hero-greeting');
-          if (el) {
-            el.textContent = `${result.username}，${getGreeting()}`;
-          }
-        } else {
-          debugResult.textContent = `❌ ${result.error}`;
+      // 更新欢迎语
+      function updateGreeting(username) {
+        const el = document.getElementById('hero-greeting');
+        if (el) {
+          el.textContent = `${username}，${getGreeting()}`;
         }
-      });
+      }
 
-      // 页面加载时自动尝试
-      updateGreeting();
+      // 1. 如果有 username 参数（从社区登录跳转过来）
+      if (encodedUsername) {
+        try {
+          const username = decodeURIComponent(encodedUsername);
+          if (username) {
+            // 存储到 localStorage
+            localStorage.setItem('username', username);
+            // 更新欢迎语
+            updateGreeting(username);
+            // 清除 URL 参数（不刷新页面）
+            window.history.replaceState({}, document.title, '/');
+            console.log(`✅ 欢迎语已更新: ${username}，${getGreeting()}`);
+          }
+        } catch (e) {
+          console.log('解码用户名失败:', e);
+        }
+      }
 
-      // SPA 导航后重试
-      document.addEventListener('astro:after-swap', function() {
-        setTimeout(updateGreeting, 100);
-      });
-
-      // 每 30 秒刷新一次
-      setInterval(updateGreeting, 30000);
+      // 2. 如果 localStorage 中有用户名（之前已登录）
+      const stored = localStorage.getItem('username');
+      if (stored && !encodedUsername) {
+        // 只在没有 URL 参数时使用 localStorage
+        updateGreeting(stored);
+      }
     })();
   </script>
 
