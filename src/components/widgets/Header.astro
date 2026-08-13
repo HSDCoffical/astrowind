@@ -90,14 +90,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: none !important;
       }
     }
-
-    /* 确保 Header 不干扰滚动 */
-    header#header {
-      contain: layout style;
-      will-change: transform, backdrop-filter;
-      backface-visibility: hidden;
-      overflow: visible !important;
-    }
   </style>
 
   <div class="absolute inset-0" style="background: transparent !important;"></div>
