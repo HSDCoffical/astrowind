@@ -23,6 +23,15 @@ export interface Props {
 
 const { metadata = {} } = Astro.props;
 const { language, textDirection } = I18N;
+
+// ===== 判断是否是消息中心/博客页面 =====
+const currentPath = Astro.url.pathname;
+const isBlogPage = currentPath.startsWith('/blog') || currentPath.startsWith('/消息中心');
+// 首页和关于我们页面保持覆盖效果
+const isHomePage = currentPath === '/';
+const isAboutPage = currentPath.startsWith('/about');
+// 只有博客/消息中心页面需要顶部占位
+const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
 ---
 
 <!doctype html>
@@ -46,17 +55,12 @@ const { language, textDirection } = I18N;
   </head>
 
   <body class="antialiased text-default bg-page tracking-tight">
-    <slot />
+    <!-- ===== 内容区域，根据路由决定是否添加顶部占位 ===== -->
+    <div class={needsHeaderPlaceholder ? 'pt-16 md:pt-20' : ''}>
+      <slot />
+    </div>
 
-    <!-- ===== 底部纯渐变过渡（稳定版） ===== -->
-    <!-- 亮色模式 -->
-    <div class="fixed bottom-0 left-0 w-full h-12 pointer-events-none z-50 block dark:hidden"
-         style="background: linear-gradient(to top, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0) 100%) !important;">
-    </div>
-    <!-- 暗色模式 -->
-    <div class="fixed bottom-0 left-0 w-full h-12 pointer-events-none z-50 hidden dark:block"
-         style="background: linear-gradient(to top, rgba(17,24,39,0.70) 0%, rgba(17,24,39,0) 100%) !important;">
-    </div>
+    <!-- ===== 底部渐变已删除 ===== -->
 
     <BasicScripts />
   </body>
