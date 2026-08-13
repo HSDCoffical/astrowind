@@ -27,8 +27,13 @@ if (image) {
 }
 ---
 
+<!-- 手机版：不上移；桌面版：上移 76px -->
 <section 
-  class="relative md:-mt-[76px] not-prose min-h-[100dvh] flex items-center pointer-events-none"
+  class:list={[
+    'relative not-prose min-h-[100dvh] flex items-center pointer-events-none',
+    // 桌面版上移 76px，手机版不上移
+    'md:-mt-[76px]',
+  ]}
   {...id ? { id } : {}}
 >
   <!-- ===== 背景图片层：手机版不上移，桌面版上移 76px ===== -->
