@@ -117,6 +117,34 @@ if (authToken) {
 
     <BasicScripts />
 
+    <!-- ===== 手机端回弹修复：滚动锚定重置 ===== -->
+    <script>
+      (function() {
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (!isMobile) return;
+
+        function resetScrollAnchoring() {
+          // 瞬间禁用再启用滚动，强制重置滚动锚定
+          document.body.style.overflow = 'hidden';
+          requestAnimationFrame(function() {
+            document.body.style.overflow = '';
+          });
+        }
+
+        // 页面加载完成后执行
+        window.addEventListener('load', function() {
+          setTimeout(resetScrollAnchoring, 100);
+          setTimeout(resetScrollAnchoring, 500);
+        });
+
+        // SPA 导航后执行
+        document.addEventListener('astro:after-swap', function() {
+          setTimeout(resetScrollAnchoring, 50);
+        });
+      })();
+    </script>
+
+    <!-- ===== 备用回弹修复 ===== -->
     <script>
       (function() {
         const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
