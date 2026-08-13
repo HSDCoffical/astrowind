@@ -54,6 +54,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
+    /* ===== 原有样式保留 ===== */
     header#header * {
       background: transparent !important;
     }
@@ -91,8 +92,18 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* ===== 强制内容从顶部开始，Header 覆盖在上方 ===== */
-    body {
+    /* ===== 强制覆盖所有顶部内边距 ===== */
+    body,
+    main,
+    section:first-of-type,
+    .hero,
+    [class*="Hero"] {
+      padding-top: 0 !important;
+      margin-top: 0 !important;
+    }
+
+    /* 确保 Hero 组件的容器无顶部内边距 */
+    header + div {
       padding-top: 0 !important;
       margin-top: 0 !important;
     }
