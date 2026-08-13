@@ -47,7 +47,6 @@ const {
 const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 ---
 
-<!-- ===== 状态栏固定顶部 ===== -->
 <header
   id={id}
   data-aw-sticky-header={isSticky ? true : undefined}
@@ -92,7 +91,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* 手机版禁用毛玻璃，防止白色采样 */
+    /* 手机版禁用毛玻璃 */
     @media (max-width: 768px) {
       header#header {
         backdrop-filter: none !important;
