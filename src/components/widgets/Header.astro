@@ -51,10 +51,9 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   id={id}
   data-aw-sticky-header={isSticky ? true : undefined}
   class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30"
-  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
+  style="background: rgba(255,255,255,0.85) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
-    /* ===== 原有样式保留 ===== */
     header#header * {
       background: transparent !important;
     }
@@ -92,20 +91,12 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* ===== 强制覆盖所有顶部内边距 ===== */
-    body,
-    main,
-    section:first-of-type,
-    .hero,
-    [class*="Hero"] {
-      padding-top: 0 !important;
-      margin-top: 0 !important;
-    }
-
-    /* 确保 Hero 组件的容器无顶部内边距 */
-    header + div {
-      padding-top: 0 !important;
-      margin-top: 0 !important;
+    /* 确保 Header 不干扰滚轮 */
+    header#header {
+      contain: layout style;
+      will-change: transform, backdrop-filter;
+      backface-visibility: hidden;
+      overflow: visible !important;
     }
   </style>
 
