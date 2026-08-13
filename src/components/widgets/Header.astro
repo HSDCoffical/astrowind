@@ -47,203 +47,29 @@ const {
 const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 ---
 
-<!-- ===== 整个 Header + 搜索框在同一个固定容器中 ===== -->
-<div
+<header
   id={id}
   data-aw-sticky-header={isSticky ? true : undefined}
   class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30"
   style="background: transparent !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
-    /* ===== 容器样式 ===== */
-    .header-container {
-      background: transparent !important;
-      display: flex;
-      flex-direction: column;
-      height: 100vh; /* 占满视口，让搜索框自然在底部 */
-      pointer-events: none;
-    }
-    .header-container > * {
-      pointer-events: auto;
-    }
-
-    /* ===== 顶部导航区域 ===== */
-    .header-top {
-      flex-shrink: 0;
-    }
-
-    /* ===== 底部搜索框区域 ===== */
-    .search-bottom {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      padding: 0 16px 16px 16px;
-    }
-    .search-bottom .max-w-2xl {
-      max-width: 672px;
-      margin: 0 auto;
-      width: 100%;
-      position: relative;
-    }
-    .search-bottom input[type="text"] {
-      width: 100%;
-      padding: 12px 48px 12px 48px;
-      background: rgba(255, 255, 255, 0.20);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.30);
-      border-radius: 9999px;
-      color: #1f2937;
-      font-size: 16px;
-      outline: none;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      transition: border-color 0.2s;
-      height: 54px;
-    }
-    .dark .search-bottom input[type="text"] {
-      background: rgba(31, 41, 55, 0.30);
-      color: #f3f4f6;
-      border-color: rgba(255, 255, 255, 0.10);
-    }
-    .search-bottom input[type="text"]::placeholder {
-      color: #9ca3af;
-    }
-    .dark .search-bottom input[type="text"]::placeholder {
-      color: #6b7280;
-    }
-    .search-bottom input[type="text"]:focus {
-      border-color: rgba(59, 130, 246, 0.5);
-    }
-    .search-bottom .icon-btn {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #6b7280;
-      padding: 4px;
-      transition: color 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .search-bottom .icon-btn:hover {
-      color: #1f2937;
-    }
-    .dark .search-bottom .icon-btn {
-      color: #9ca3af;
-    }
-    .dark .search-bottom .icon-btn:hover {
-      color: #f3f4f6;
-    }
-    .search-bottom .icon-btn svg {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-    }
-    .search-bottom .mode-btn {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.30);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      border: none;
-      padding: 2px 12px;
-      border-radius: 9999px;
-      font-size: 12px;
-      color: #4b5563;
-      cursor: pointer;
-      transition: background 0.2s;
-      line-height: 1.8;
-    }
-    .dark .search-bottom .mode-btn {
-      background: rgba(55, 65, 81, 0.40);
-      color: #d1d5db;
-    }
-    .search-bottom .mode-btn:hover {
-      background: rgba(255, 255, 255, 0.50);
-    }
-    .dark .search-bottom .mode-btn:hover {
-      background: rgba(75, 85, 99, 0.60);
-    }
-    .search-bottom #results {
-      margin-top: 8px;
-      background: rgba(255, 255, 255, 0.90);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.30);
-      border-radius: 12px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      max-height: 200px;
-      overflow-y: auto;
-      display: none;
-      width: 100%;
-    }
-    .dark .search-bottom #results {
-      background: rgba(31, 41, 55, 0.95);
-      border-color: rgba(255, 255, 255, 0.10);
-    }
-    .search-bottom #results a {
-      display: block;
-      padding: 10px 16px;
-      color: #1f2937;
-      text-decoration: none;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-      transition: background 0.15s;
-    }
-    .dark .search-bottom #results a {
-      color: #f3f4f6;
-    }
-    .search-bottom #results a:last-child {
-      border-bottom: none;
-    }
-    .search-bottom #results a:hover {
-      background: rgba(0, 0, 0, 0.05);
-    }
-    .dark .search-bottom #results a:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-    .search-bottom #results .title {
-      font-weight: 500;
-      font-size: 14px;
-    }
-    .search-bottom #results .desc {
-      font-size: 12px;
-      color: #6b7280;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .dark .search-bottom #results .desc {
-      color: #9ca3af;
-    }
-    .search-bottom .hidden {
-      display: none !important;
-    }
-
-    /* ===== 原有样式 ===== */
-    .header-top * {
+    header#header * {
       background: transparent !important;
     }
-    .header-top .bg-white,
-    .header-top .dark\:bg-gray-900,
-    .header-top .bg-gray-100,
-    .header-top .bg-gray-50,
-    .header-top [class*="bg-"] {
+    header#header .bg-white,
+    header#header .dark\:bg-gray-900,
+    header#header .bg-gray-100,
+    header#header .bg-gray-50,
+    header#header [class*="bg-"] {
       background: transparent !important;
     }
-    .header-top button:hover,
-    .header-top a:hover {
+    header#header button:hover,
+    header#header a:hover {
       background: rgba(255,255,255,0.1) !important;
     }
-    .dark .header-top button:hover,
-    .dark .header-top a:hover {
+    .dark header#header button:hover,
+    .dark header#header a:hover {
       background: rgba(255,255,255,0.05) !important;
     }
     .menu-theme-item {
@@ -265,329 +91,130 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* 手机端禁用毛玻璃 */
+    /* 手机版禁用毛玻璃，防止白色采样 */
     @media (max-width: 768px) {
-      #header-container {
+      header#header {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
       }
     }
   </style>
 
-  <!-- ===== 容器 ===== -->
-  <div id="header-container" class="header-container">
+  <div class="absolute inset-0" style="background: transparent !important;"></div>
+  <div
+    class:list={[
+      'relative text-default py-1.5 px-3 md:px-6 mx-auto w-full',
+      {
+        'md:flex md:justify-between': position !== 'center',
+      },
+      {
+        'md:grid md:grid-cols-3 md:items-center': position === 'center',
+      },
+      {
+        'max-w-7xl': !isFullWidth,
+      },
+    ]}
+  >
+    <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
+      <a class="flex items-center" href={getHomePermalink()}>
+        <Logo />
+      </a>
+      <div class="flex items-center md:hidden">
+        <ToggleMenu />
+      </div>
+    </div>
 
-    <!-- ===== 顶部导航区域（原有内容） ===== -->
-    <div class="header-top">
-      <div class="absolute inset-0" style="background: transparent !important;"></div>
-      <div
-        class:list={[
-          'relative text-default py-1.5 px-3 md:px-6 mx-auto w-full',
-          {
-            'md:flex md:justify-between': position !== 'center',
-          },
-          {
-            'md:grid md:grid-cols-3 md:items-center': position === 'center',
-          },
-          {
-            'max-w-7xl': !isFullWidth,
-          },
-        ]}
+    <!-- 导航菜单 -->
+    <nav
+      class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
+      aria-label="Main navigation"
+    >
+      <ul
+        class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
       >
-        <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
-          <a class="flex items-center" href={getHomePermalink()}>
-            <Logo />
-          </a>
-          <div class="flex items-center md:hidden">
-            <ToggleMenu />
-          </div>
-        </div>
-
-        <!-- 导航菜单 -->
-        <nav
-          class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
-          aria-label="Main navigation"
-        >
-          <ul
-            class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
-          >
-            {
-              links.map(({ text, href, links }) => (
-                <li class={links?.length ? 'dropdown' : ''}>
-                  {links?.length ? (
-                    <>
-                      <button
-                        type="button"
-                        class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
-                      >
-                        {text}{' '}
-                        <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
-                      </button>
-                      <ul class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl">
-                        {links.map(({ text: text2, href: href2 }) => (
-                          <li>
-                            <a
-                              class:list={[
-                                'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
-                                { 'aw-link-active': href2 === currentPath },
-                              ]}
-                              href={href2}
-                            >
-                              {text2}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  ) : (
-                    <a
-                      class:list={[
-                        'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
-                        { 'aw-link-active': href === currentPath },
-                      ]}
-                      href={href}
-                    >
-                      {text}
-                    </a>
-                  )}
-                </li>
-              ))
-            }
-            <!-- 手机端菜单底部主题切换 -->
-            <li class="menu-theme-item">
-              <ToggleTheme iconClass="w-5 h-5" />
-              <span class="text-sm">切换主题</span>
-            </li>
-          </ul>
-        </nav>
-
-        <div
-          class:list={[
-            { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
-            'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
-          ]}
-        >
-          <div class="items-center flex justify-between w-full md:w-auto">
-            <div class="flex">
-              {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
-              {
-                showRssFeed && (
-                  <a
-                    class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
-                    aria-label="RSS Feed"
-                    href={getAsset('/rss.xml')}
+        {
+          links.map(({ text, href, links }) => (
+            <li class={links?.length ? 'dropdown' : ''}>
+              {links?.length ? (
+                <>
+                  <button
+                    type="button"
+                    class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
                   >
-                    <Icon name="tabler:rss" class="w-5 h-5" />
-                  </a>
-                )
-              }
-            </div>
-            {
-              actions?.length ? (
-                <span class="ml-4 rtl:ml-0 rtl:mr-4">
-                  {actions.map((btnProps) => (
-                    <Button {...btnProps} class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto" />
-                  ))}
-                </span>
+                    {text}{' '}
+                    <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
+                  </button>
+                  <ul class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl">
+                    {links.map(({ text: text2, href: href2 }) => (
+                      <li>
+                        <a
+                          class:list={[
+                            'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
+                            { 'aw-link-active': href2 === currentPath },
+                          ]}
+                          href={href2}
+                        >
+                          {text2}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </>
               ) : (
-                ''
-              )
-            }
-          </div>
+                <a
+                  class:list={[
+                    'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
+                    { 'aw-link-active': href === currentPath },
+                  ]}
+                  href={href}
+                >
+                  {text}
+                </a>
+              )}
+            </li>
+          ))
+        }
+        <!-- 手机端菜单底部主题切换 -->
+        <li class="menu-theme-item">
+          <ToggleTheme iconClass="w-5 h-5" />
+          <span class="text-sm">切换主题</span>
+        </li>
+      </ul>
+    </nav>
+
+    <div
+      class:list={[
+        { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
+        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
+      ]}
+    >
+      <div class="items-center flex justify-between w-full md:w-auto">
+        <div class="flex">
+          {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
+          {
+            showRssFeed && (
+              <a
+                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
+                aria-label="RSS Feed"
+                href={getAsset('/rss.xml')}
+              >
+                <Icon name="tabler:rss" class="w-5 h-5" />
+              </a>
+            )
+          }
         </div>
+        {
+          actions?.length ? (
+            <span class="ml-4 rtl:ml-0 rtl:mr-4">
+              {actions.map((btnProps) => (
+                <Button {...btnProps} class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto" />
+              ))}
+            </span>
+          ) : (
+            ''
+          )
+        }
       </div>
     </div>
-
-    <!-- ===== 底部搜索框（与 Header 同一容器） ===== -->
-    <div class="search-bottom">
-      <div class="max-w-2xl">
-        <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
-          <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
-          <input
-            id="search-input"
-            type="text"
-            name="q"
-            placeholder="搜索本站内容..."
-            autocomplete="off"
-          />
-          <button type="button" class="icon-btn" id="search-toggle" aria-label="聚焦搜索框">
-            <svg viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </button>
-          <button type="button" class="mode-btn" id="mode-toggle"><span id="mode-label">站外</span></button>
-        </form>
-        <div id="results"></div>
-      </div>
-    </div>
-
   </div>
-</div>
-
-<script>
-  (function() {
-    const form = document.getElementById('search-form');
-    const input = document.getElementById('search-input');
-    const toggleBtn = document.getElementById('search-toggle');
-    const modeToggle = document.getElementById('mode-toggle');
-    const modeLabel = document.getElementById('mode-label');
-    const resultsContainer = document.getElementById('results');
-
-    if (!form || !input) return;
-
-    let mode = 'external';
-    let searchData = null;
-
-    async function loadSearchData() {
-      try {
-        const resp = await fetch('/search.json');
-        if (resp.ok) {
-          searchData = await resp.json();
-          console.log('✅ 搜索索引已加载:', searchData.length, '个页面');
-        } else {
-          console.warn('⚠️ 搜索索引加载失败，状态码:', resp.status);
-        }
-      } catch (e) {
-        console.warn('⚠️ 搜索索引加载失败:', e);
-      }
-    }
-
-    function searchInternal(query) {
-      if (!searchData || !query.trim()) return [];
-      const q = query.toLowerCase().trim();
-      if (!q) return [];
-      return searchData
-        .filter(page => {
-          const title = page.title.toLowerCase();
-          const desc = page.description.toLowerCase();
-          const content = page.content.toLowerCase();
-          return title.includes(q) || desc.includes(q) || content.includes(q);
-        })
-        .slice(0, 10);
-    }
-
-    function showResults(results) {
-      resultsContainer.innerHTML = '';
-      if (results.length === 0) {
-        resultsContainer.style.display = 'none';
-        return;
-      }
-      let html = '';
-      for (const page of results) {
-        html += `
-          <a href="${page.url}">
-            <div class="title">${page.title}</div>
-            <div class="desc">${page.description || ''}</div>
-          </a>
-        `;
-      }
-      resultsContainer.innerHTML = html;
-      resultsContainer.style.display = 'block';
-    }
-
-    function clearResults() {
-      resultsContainer.innerHTML = '';
-      resultsContainer.style.display = 'none';
-    }
-
-    function updateMode(newMode) {
-      mode = newMode;
-      clearResults();
-      if (mode === 'external') {
-        form.action = 'https://www.bing.com/search';
-        form.target = '_blank';
-        let hidden = form.querySelector('input[name="q1"]');
-        if (!hidden) {
-          hidden = document.createElement('input');
-          hidden.type = 'hidden';
-          hidden.name = 'q1';
-          form.appendChild(hidden);
-        }
-        hidden.value = 'site:hsdc.dpdns.org';
-        input.name = 'q';
-        input.placeholder = '搜索本站内容...';
-        modeLabel.textContent = '站外';
-      } else {
-        form.action = '#';
-        form.target = '';
-        const hidden = form.querySelector('input[name="q1"]');
-        if (hidden) hidden.remove();
-        input.name = '';
-        input.placeholder = '输入关键词检索本站';
-        modeLabel.textContent = '站内';
-        if (input.value.trim()) {
-          const results = searchInternal(input.value);
-          showResults(results);
-        }
-      }
-      input.focus();
-    }
-
-    input.addEventListener('input', function() {
-      if (mode === 'internal') {
-        const query = this.value.trim();
-        if (!query) { clearResults(); return; }
-        const results = searchInternal(query);
-        showResults(results);
-      } else {
-        clearResults();
-      }
-    });
-
-    document.addEventListener('click', function(e) {
-      const container = document.querySelector('.search-bottom');
-      if (container && !container.contains(e.target)) {
-        clearResults();
-      }
-    });
-
-    modeToggle.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const newMode = mode === 'external' ? 'internal' : 'external';
-      updateMode(newMode);
-    });
-
-    toggleBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      input.focus();
-    });
-
-    updateMode('external');
-    loadSearchData();
-
-    document.addEventListener('astro:after-swap', function() {
-      setTimeout(function() {
-        const newForm = document.getElementById('search-form');
-        const newInput = document.getElementById('search-input');
-        const newModeToggle = document.getElementById('mode-toggle');
-        const newModeLabel = document.getElementById('mode-label');
-        const newResults = document.getElementById('results');
-        const newToggle = document.getElementById('search-toggle');
-
-        if (newForm && newInput) {
-          mode = 'external';
-          updateMode(mode);
-          newInput.oninput = function() {
-            if (mode === 'internal') {
-              const query = this.value.trim();
-              if (!query) { clearResults(); return; }
-              const results = searchInternal(query);
-              showResults(results);
-            } else {
-              clearResults();
-            }
-          };
-          newToggle.onclick = function(e) { e.preventDefault(); newInput.focus(); };
-          newModeToggle.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const newMode = mode === 'external' ? 'internal' : 'external';
-            mode = newMode;
-            updateMode(mode);
-          };
-        }
-      }, 50);
-    });
-  })();
-</script>
+</header>
