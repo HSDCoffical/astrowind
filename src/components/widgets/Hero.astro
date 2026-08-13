@@ -27,9 +27,9 @@ if (image) {
 }
 ---
 
-<!-- ===== 关键：section 添加 pointer-events-none，让滚轮穿透 ===== -->
+<!-- ===== 关键：移除 overflow-hidden，添加 pointer-events-none ===== -->
 <section 
-  class="relative md:-mt-[76px] not-prose overflow-hidden min-h-[600px] md:min-h-[700px] flex items-center pointer-events-none"
+  class="relative md:-mt-[76px] not-prose min-h-[600px] md:min-h-[700px] flex items-center pointer-events-none"
   {...id ? { id } : {}}
 >
   <!-- ===== 背景图片层 ===== -->
@@ -50,7 +50,7 @@ if (image) {
     </slot>
   </div>
   
-  <!-- ===== 内容层：恢复 pointer-events: auto，让按钮可点 ===== -->
+  <!-- ===== 内容层：恢复交互 ===== -->
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 z-10 w-full pointer-events-auto">
     <div class="pt-0 md:pt-[76px]"></div>
     <div class="py-12 md:py-20">
