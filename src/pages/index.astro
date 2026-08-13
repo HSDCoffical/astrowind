@@ -610,7 +610,7 @@ const metadata = {
     })();
   </script>
 
-  <!-- ===== 动态更新 Hero 欢迎语（支持 Cookie / localStorage / sessionStorage） ===== -->
+  <!-- ===== 动态更新 Hero 欢迎语（从全局用户信息读取） ===== -->
   <script>
     (function() {
       function getGreeting() {
@@ -623,57 +623,9 @@ const metadata = {
         return '晚上好';
       }
 
-      function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
-        return null;
-      }
-
-      function getStorage(key) {
-        return localStorage.getItem(key) || sessionStorage.getItem(key) || null;
-      }
-
-      function getUsername() {
-        // 1. 先尝试 Cookie
-        const cookieNames = ['username', 'user', 'name', 'user_name', 'uid', 'nickname', 'display_name'];
-        for (const name of cookieNames) {
-          const val = getCookie(name);
-          if (val && val !== 'null' && val !== 'undefined' && val !== '') {
-            return decodeURIComponent(val);
-          }
-        }
-
-        // 2. 再尝试 localStorage / sessionStorage
-        const storageKeys = ['username', 'user', 'name', 'user_name', 'uid', 'nickname', 'display_name', 'userInfo'];
-        for (const key of storageKeys) {
-          const val = getStorage(key);
-          if (val && val !== 'null' && val !== 'undefined' && val !== '') {
-            // 尝试解析 JSON
-            try {
-              const parsed = JSON.parse(val);
-              if (parsed && typeof parsed === 'object') {
-                const possibleFields = ['username', 'name', 'user', 'nickname', 'displayName', 'display_name'];
-                for (const field of possibleFields) {
-                  if (parsed[field]) {
-                    return parsed[field];
-                  }
-                }
-                if (parsed.toString && parsed.toString() !== '[object Object]') {
-                  return parsed.toString();
-                }
-                return val;
-              }
-            } catch (e) {
-              return val;
-            }
-          }
-        }
-
-        return null;
-      }
-
-      let username = getUsername() || '访客';
+      // === 从 Layout 注入的全局元素读取用户名 ===
+      const userEl = document.getElementById('global-user');
+      const username = userEl ? userEl.dataset.username || '访客' : '访客';
       const greeting = getGreeting();
 
       const el = document.getElementById('hero-greeting');
@@ -682,18 +634,36 @@ const metadata = {
         console.log(`✅ 欢迎语已更新: ${username}，${greeting}`);
       }
 
-      let lastUsername = username;
-      setInterval(function() {
-        const newUsername = getUsername() || '访客';
-        if (newUsername !== lastUsername) {
-          lastUsername = newUsername;
+      // ===== 监听全局元素变化（SPA 导航后更新） =====
+      const observer = new MutationObserver(function() {
+        const newUserEl = document.getElementById('global-user');
+        if (newUserEl) {
+          const newUsername = newUserEl.dataset.username || '访客';
           const el2 = document.getElementById('hero-greeting');
-          if (el2) {
+          if (el2 && newUsername !== username) {
             el2.textContent = `${newUsername}，${getGreeting()}`;
-            console.log(`✅ 欢迎语已更新 (自动): ${newUsername}，${getGreeting()}`);
+            console.log(`✅ 欢迎语已更新 (SPA): ${newUsername}，${getGreeting()}`);
           }
         }
-      }, 2000);
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+
+      // ===== 定时检查（兜底方案） =====
+      let lastUsername = username;
+      setInterval(function() {
+        const newUserEl = document.getElementById('global-user');
+        if (newUserEl) {
+          const newUsername = newUserEl.dataset.username || '访客';
+          if (newUsername !== lastUsername) {
+            lastUsername = newUsername;
+            const el2 = document.getElementById('hero-greeting');
+            if (el2) {
+              el2.textContent = `${newUsername}，${getGreeting()}`;
+              console.log(`✅ 欢迎语已更新 (定时): ${newUsername}，${getGreeting()}`);
+            }
+          }
+        }
+      }, 3000);
     })();
   </script>
 
