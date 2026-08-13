@@ -374,46 +374,97 @@ const metadata = {
     </div>
   </section>
 
-  <!-- ===== 底部搜索框（手机端轻量毛玻璃，桌面端保留） ===== -->
-  <div 
-    class="fixed bottom-4 left-0 right-0 z-50 px-4"
-    style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y; pointer-events: none;"
-  >
-    <div class="max-w-2xl mx-auto pointer-events-auto">
-      <!-- 外层毛玻璃容器 -->
-      <div class="bg-white/10 backdrop-blur-sm md:backdrop-blur-lg rounded-2xl p-1 shadow-xl border border-white/20">
-        <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
-          <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
-          <input
-            id="search-input"
-            type="text"
-            name="q"
-            placeholder="搜索本站内容..."
-            class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
-          />
-          <button
-            id="search-toggle"
-            type="button"
-            class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
-            aria-label="聚焦搜索框"
-          >
-            <svg id="search-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </button>
-          <button
-            id="mode-toggle"
-            type="button"
-            class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full cursor-pointer hover:bg-white/50 transition-colors"
-          >
-            <span id="mode-label">站外</span>
-          </button>
-        </form>
-        <div id="search-results-container" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
-      </div>
-    </div>
-  </div>
+  <!-- ===== 原搜索框已删除，将在页面加载后动态注入 ===== -->
 
+  <!-- ===== Hero 背景修复 ===== -->
+  <script>
+    (function() {
+      function fixHeroScroll() {
+        const hero = document.querySelector('[class*="Hero"]');
+        if (!hero) return;
+        const bgLayers = hero.querySelectorAll('.absolute.inset-0, [class*="absolute"][class*="inset-0"]');
+        bgLayers.forEach(el => {
+          el.style.pointerEvents = 'none';
+        });
+        const content = hero.querySelectorAll('a, button, [role="button"]');
+        content.forEach(el => {
+          el.style.pointerEvents = 'auto';
+        });
+        console.log('✅ Hero 背景已修复');
+      }
+      if (document.readyState === 'complete') {
+        fixHeroScroll();
+      } else {
+        window.addEventListener('load', fixHeroScroll);
+      }
+      document.addEventListener('astro:after-swap', function() {
+        setTimeout(fixHeroScroll, 100);
+      });
+    })();
+  </script>
+
+  <!-- ===== 用户名接收 ===== -->
+  <script>
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const encodedUsername = urlParams.get('username');
+
+      function getGreeting() {
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 9) return '早上好';
+        if (hour >= 9 && hour < 12) return '上午好';
+        if (hour >= 12 && hour < 14) return '中午好';
+        if (hour >= 14 && hour < 18) return '下午好';
+        if (hour >= 18 && hour < 21) return '傍晚好';
+        return '晚上好';
+      }
+
+      function updateGreeting(username) {
+        const el = document.getElementById('hero-greeting');
+        if (el) {
+          el.textContent = `${username}，${getGreeting()}`;
+        }
+      }
+
+      function setUsername(username) {
+        try {
+          localStorage.setItem('username', username);
+        } catch (e) {}
+        document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=10368000`;
+      }
+
+      function getUsername() {
+        try {
+          const stored = localStorage.getItem('username');
+          if (stored) return stored;
+        } catch (e) {}
+        const cookie = document.cookie.split('; ').find(row => row.startsWith('username='));
+        if (cookie) return decodeURIComponent(cookie.split('=')[1]);
+        return null;
+      }
+
+      if (encodedUsername) {
+        try {
+          const username = decodeURIComponent(encodedUsername);
+          if (username) {
+            setUsername(username);
+            updateGreeting(username);
+            window.history.replaceState({}, document.title, '/');
+            console.log(`✅ 欢迎语已更新: ${username}，${getGreeting()}`);
+          }
+        } catch (e) {
+          console.log('解码用户名失败:', e);
+        }
+      }
+
+      const storedUsername = getUsername();
+      if (storedUsername) {
+        updateGreeting(storedUsername);
+      }
+    })();
+  </script>
+
+  <!-- ===== 动态注入搜索框（延迟加载，避免触发滚动锚定） ===== -->
   <script>
     function initSearch() {
       const form = document.getElementById('search-form');
@@ -509,7 +560,7 @@ const metadata = {
           if (hiddenInput) hiddenInput.remove();
           input.name = '';
           input.disabled = false;
-          input.placeholder = '输入关键字检索本站';
+          input.placeholder = '输入关键词检索本站';
           input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
           modeLabel.textContent = '站内检索';
           searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
@@ -548,7 +599,7 @@ const metadata = {
       };
 
       document.addEventListener('click', function(e) {
-        const searchArea = document.querySelector('.fixed.bottom-4');
+        const searchArea = document.querySelector('.search-wrapper');
         if (searchArea && !searchArea.contains(e.target)) {
           clearResults();
         }
@@ -558,97 +609,64 @@ const metadata = {
       loadSearchData();
     }
 
-    initSearch();
+    // 在页面完全加载后动态注入搜索框
+    window.addEventListener('load', function() {
+      // 构建搜索框 HTML
+      const searchHTML = `
+        <div class="search-wrapper fixed bottom-4 left-0 right-0 z-50 px-4" style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y; pointer-events: none;">
+          <div class="max-w-2xl mx-auto pointer-events-auto">
+            <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
+              <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
+              <input
+                id="search-input"
+                type="text"
+                name="q"
+                placeholder="搜索本站内容..."
+                class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
+              />
+              <button
+                id="search-toggle"
+                type="button"
+                class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                aria-label="聚焦搜索框"
+              >
+                <svg id="search-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+              <button
+                id="mode-toggle"
+                type="button"
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full cursor-pointer hover:bg-white/50 transition-colors"
+              >
+                <span id="mode-label">站外</span>
+              </button>
+            </form>
+            <div id="search-results-container" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
+          </div>
+        </div>
+      `;
+
+      // 注入到页面底部
+      document.body.insertAdjacentHTML('beforeend', searchHTML);
+
+      // 初始化搜索功能
+      initSearch();
+
+      console.log('✅ 搜索框已动态注入');
+    });
+
+    // 为 SPA 导航也重新注入（但重复注入会生成多个，所以需要清理旧的）
     document.addEventListener('astro:after-swap', function() {
-      setTimeout(initSearch, 50);
+      // 移除旧的搜索框（如果存在）
+      const oldSearch = document.querySelector('.search-wrapper');
+      if (oldSearch) oldSearch.remove();
+      // 重新注入
+      setTimeout(function() {
+        const searchHTML = `...`; // 同上
+        document.body.insertAdjacentHTML('beforeend', searchHTML);
+        initSearch();
+      }, 100);
     });
   </script>
-
-  <script>
-    (function() {
-      function fixHeroScroll() {
-        const hero = document.querySelector('[class*="Hero"]');
-        if (!hero) return;
-        const bgLayers = hero.querySelectorAll('.absolute.inset-0, [class*="absolute"][class*="inset-0"]');
-        bgLayers.forEach(el => {
-          el.style.pointerEvents = 'none';
-        });
-        const content = hero.querySelectorAll('a, button, [role="button"]');
-        content.forEach(el => {
-          el.style.pointerEvents = 'auto';
-        });
-        console.log('✅ Hero 背景已修复');
-      }
-      if (document.readyState === 'complete') {
-        fixHeroScroll();
-      } else {
-        window.addEventListener('load', fixHeroScroll);
-      }
-      document.addEventListener('astro:after-swap', function() {
-        setTimeout(fixHeroScroll, 100);
-      });
-    })();
-  </script>
-
-  <!-- ===== 用户名接收（Cookie 有效期 4 个月 = 10368000 秒） ===== -->
-  <script>
-    (function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const encodedUsername = urlParams.get('username');
-
-      function getGreeting() {
-        const hour = new Date().getHours();
-        if (hour >= 5 && hour < 9) return '早上好';
-        if (hour >= 9 && hour < 12) return '上午好';
-        if (hour >= 12 && hour < 14) return '中午好';
-        if (hour >= 14 && hour < 18) return '下午好';
-        if (hour >= 18 && hour < 21) return '傍晚好';
-        return '晚上好';
-      }
-
-      function updateGreeting(username) {
-        const el = document.getElementById('hero-greeting');
-        if (el) {
-          el.textContent = `${username}，${getGreeting()}`;
-        }
-      }
-
-      function setUsername(username) {
-        try {
-          localStorage.setItem('username', username);
-        } catch (e) {}
-        document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=10368000`;
-      }
-
-      function getUsername() {
-        try {
-          const stored = localStorage.getItem('username');
-          if (stored) return stored;
-        } catch (e) {}
-        const cookie = document.cookie.split('; ').find(row => row.startsWith('username='));
-        if (cookie) return decodeURIComponent(cookie.split('=')[1]);
-        return null;
-      }
-
-      if (encodedUsername) {
-        try {
-          const username = decodeURIComponent(encodedUsername);
-          if (username) {
-            setUsername(username);
-            updateGreeting(username);
-            window.history.replaceState({}, document.title, '/');
-            console.log(`✅ 欢迎语已更新: ${username}，${getGreeting()}`);
-          }
-        } catch (e) {
-          console.log('解码用户名失败:', e);
-        }
-      }
-
-      const storedUsername = getUsername();
-      if (storedUsername) {
-        updateGreeting(storedUsername);
-      }
-    })();
-  </script>
-
 </Layout>
