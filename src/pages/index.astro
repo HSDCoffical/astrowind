@@ -20,8 +20,6 @@ const metadata = {
 
 <Layout metadata={metadata}>
   <!-- Hero Widget ******************* -->
-  <!-- 增加顶部内边距，让状态栏和欢迎文字间距更大 -->
-
   <div class="pt-4 md:pt-8">
     <Hero
       actions={[
@@ -41,7 +39,6 @@ const metadata = {
       bgImage={true}
       bgOpacity={30}
     >
-      <!-- ===== 动态欢迎语，默认显示“凉宫数据欢迎您！” ===== -->
       <Fragment slot="title">
         <span id="hero-greeting">凉宫数据欢迎您！</span>
       </Fragment>
@@ -58,10 +55,8 @@ const metadata = {
     </Hero>
   </div>
 
-  <!-- Note Widget ******************* -->
   <Note title="我们的理念" description="创新·高新" />
 
-  <!-- Features Widget *************** -->
   <Features
     id="features"
     tagline="凉宫数据"
@@ -106,7 +101,6 @@ const metadata = {
     ]}
   />
 
-  <!-- Content Widget **************** -->
   <Content
     isReversed
     tagline="——数据板块——"
@@ -143,7 +137,6 @@ const metadata = {
     </Fragment>
   </Content>
 
-  <!-- Content Widget **************** -->
   <Content
     isAfterContent
     items={[
@@ -179,7 +172,6 @@ const metadata = {
     </Fragment>
   </Content>
 
-  <!-- Content Widget **************** -->
   <Content
     isReversed
     isAfterContent
@@ -216,7 +208,6 @@ const metadata = {
     </Fragment>
   </Content>
 
-  <!-- Steps Widget ****************** -->
   <Steps
     title="入职流程"
     items={[
@@ -249,7 +240,6 @@ const metadata = {
     }}
   />
 
-  <!-- Features2 Widget ************** -->
   <Features2
     title="加入我们"
     subtitle="成为我们的一员，并和我们一起发展进步"
@@ -312,14 +302,12 @@ const metadata = {
     </Fragment>
   </Features2>
 
-  <!-- BlogLatestPosts Widget ******* -->
   <BlogLatestPosts
     title="信息中心"
     information={`资讯/实时
                 `}
   />
 
-  <!-- FAQs Widget ******************* -->
   <FAQs
     title="更多事项"
     subtitle="凉宫数据相关问题"
@@ -359,7 +347,6 @@ const metadata = {
     ]}
   />
 
-  <!-- Stats Widget ****************** -->
   <Stats
     stats={[
       { title: '管理员', amount: '1名' },
@@ -369,12 +356,9 @@ const metadata = {
     ]}
   />
 
-  <CallToAction
-  actions={[]}
->
-</CallToAction>
+  <CallToAction actions={[]} />
 
-  <!-- ===== 直接显示邮箱地址（增加底部内边距 pb-24，为搜索框预留空间） ===== -->
+  <!-- ===== 邮箱地址 ===== -->
   <section class="px-6 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-28 mx-auto max-w-4xl text-center">
     <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
       <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">联系我们</p>
@@ -390,14 +374,13 @@ const metadata = {
     </div>
   </section>
 
-  <!-- ===== 底部固定搜索框 ===== -->
+  <!-- ===== 底部搜索框 ===== -->
   <div 
     class="fixed bottom-4 left-0 right-0 z-50 px-4"
     style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y; pointer-events: none;"
   >
     <div class="max-w-2xl mx-auto pointer-events-auto">
       <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
-        <!-- 站外搜索限定本站 -->
         <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
         <input
           id="search-input"
@@ -406,7 +389,6 @@ const metadata = {
           placeholder="搜索本站内容..."
           class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
         />
-        <!-- 放大镜图标 -->
         <button
           id="search-toggle"
           type="button"
@@ -417,7 +399,6 @@ const metadata = {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
-        <!-- 模式切换按钮 -->
         <button
           id="mode-toggle"
           type="button"
@@ -426,12 +407,10 @@ const metadata = {
           <span id="mode-label">站外</span>
         </button>
       </form>
-      <!-- 搜索结果容器 -->
       <div id="search-results-container" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
     </div>
   </div>
 
-  <!-- ===== 搜索框初始化脚本 ===== -->
   <script>
     function initSearch() {
       const form = document.getElementById('search-form');
@@ -577,45 +556,38 @@ const metadata = {
     }
 
     initSearch();
-
     document.addEventListener('astro:after-swap', function() {
       setTimeout(initSearch, 50);
     });
   </script>
 
-  <!-- ===== 修复 Hero 背景拦截滚轮 ===== -->
   <script>
     (function() {
       function fixHeroScroll() {
         const hero = document.querySelector('[class*="Hero"]');
         if (!hero) return;
-        
         const bgLayers = hero.querySelectorAll('.absolute.inset-0, [class*="absolute"][class*="inset-0"]');
         bgLayers.forEach(el => {
           el.style.pointerEvents = 'none';
         });
-        
         const content = hero.querySelectorAll('a, button, [role="button"]');
         content.forEach(el => {
           el.style.pointerEvents = 'auto';
         });
-        
-        console.log('✅ Hero 背景已修复，滚轮可穿透');
+        console.log('✅ Hero 背景已修复');
       }
-      
       if (document.readyState === 'complete') {
         fixHeroScroll();
       } else {
         window.addEventListener('load', fixHeroScroll);
       }
-      
       document.addEventListener('astro:after-swap', function() {
         setTimeout(fixHeroScroll, 100);
       });
     })();
   </script>
 
-  <!-- ===== 接收用户名（双重存储：localStorage + Cookie） ===== -->
+  <!-- ===== 用户名接收（Cookie 有效期 4 个月 = 10368000 秒） ===== -->
   <script>
     (function() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -642,7 +614,8 @@ const metadata = {
         try {
           localStorage.setItem('username', username);
         } catch (e) {}
-        document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=2592000`;
+        // 4 个月有效期（10368000 秒 ≈ 120 天）
+        document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=10368000`;
       }
 
       function getUsername() {
