@@ -35,6 +35,16 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
 <!doctype html>
 <html lang={language} dir={textDirection} class="2xl:text-[20px]">
   <head>
+    <!-- ===== 必须在最前面：禁用滚动锚定 ===== -->
+    <style is:global>
+      html, body {
+        overflow-anchor: none !important;
+      }
+      * {
+        overflow-anchor: none !important;
+      }
+    </style>
+
     <CommonMeta />
     <Favicons />
     <CustomStyles />
@@ -50,11 +60,10 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
 
     <ClientRouter fallback="swap" />
 
-    <!-- ===== 只保留回弹修复，不干预滚轮 ===== -->
+    <!-- ===== 回弹修复（备用） ===== -->
     <style is:global>
       html, body {
         overscroll-behavior: none !important;
-        overflow-anchor: none !important;
       }
       * {
         overscroll-behavior: none !important;
