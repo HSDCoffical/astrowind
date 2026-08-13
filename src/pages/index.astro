@@ -396,8 +396,11 @@ const metadata = {
   </div>
 </section>
 
-<!-- ===== 底部固定搜索框 ===== -->
-<div class="fixed bottom-4 left-0 right-0 z-50 px-4">
+<!-- ===== 底部固定搜索框（添加禁用弹性滚动样式，修复回弹） ===== -->
+<div 
+  class="fixed bottom-4 left-0 right-0 z-50 px-4"
+  style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y;"
+>
   <div class="max-w-2xl mx-auto">
     <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
       <!-- 站外搜索限定本站 -->
