@@ -610,9 +610,11 @@ const metadata = {
     })();
   </script>
 
-  <!-- ===== 动态更新 Hero 欢迎语（从全局用户信息读取） ===== -->
+  <!-- ===== 动态更新 Hero 欢迎语（从社区 API 获取） ===== -->
   <script>
     (function() {
+      const COMMUNITY_API = 'https://hono-bbs-9qj.pages.dev/user/me';
+
       function getGreeting() {
         const hour = new Date().getHours();
         if (hour >= 5 && hour < 9) return '早上好';
@@ -623,47 +625,40 @@ const metadata = {
         return '晚上好';
       }
 
-      // === 从 Layout 注入的全局元素读取用户名 ===
-      const userEl = document.getElementById('global-user');
-      const username = userEl ? userEl.dataset.username || '访客' : '访客';
-      const greeting = getGreeting();
-
-      const el = document.getElementById('hero-greeting');
-      if (el) {
-        el.textContent = `${username}，${greeting}`;
-        console.log(`✅ 欢迎语已更新: ${username}，${greeting}`);
+      async function fetchUsername() {
+        try {
+          const res = await fetch(COMMUNITY_API, {
+            credentials: 'include' // 携带 Cookie
+          });
+          if (res.ok) {
+            const data = await res.json();
+            return data.username || '访客';
+          }
+        } catch (e) {
+          console.log('获取用户信息失败:', e);
+        }
+        return '访客';
       }
 
-      // ===== 监听全局元素变化（SPA 导航后更新） =====
-      const observer = new MutationObserver(function() {
-        const newUserEl = document.getElementById('global-user');
-        if (newUserEl) {
-          const newUsername = newUserEl.dataset.username || '访客';
-          const el2 = document.getElementById('hero-greeting');
-          if (el2 && newUsername !== username) {
-            el2.textContent = `${newUsername}，${getGreeting()}`;
-            console.log(`✅ 欢迎语已更新 (SPA): ${newUsername}，${getGreeting()}`);
-          }
+      async function updateGreeting() {
+        const username = await fetchUsername();
+        const el = document.getElementById('hero-greeting');
+        if (el) {
+          el.textContent = `${username}，${getGreeting()}`;
+          console.log(`✅ 欢迎语已更新: ${username}，${getGreeting()}`);
         }
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
+      }
 
-      // ===== 定时检查（兜底方案） =====
-      let lastUsername = username;
-      setInterval(function() {
-        const newUserEl = document.getElementById('global-user');
-        if (newUserEl) {
-          const newUsername = newUserEl.dataset.username || '访客';
-          if (newUsername !== lastUsername) {
-            lastUsername = newUsername;
-            const el2 = document.getElementById('hero-greeting');
-            if (el2) {
-              el2.textContent = `${newUsername}，${getGreeting()}`;
-              console.log(`✅ 欢迎语已更新 (定时): ${newUsername}，${getGreeting()}`);
-            }
-          }
-        }
-      }, 3000);
+      // 页面加载时获取
+      updateGreeting();
+
+      // SPA 导航后重新获取
+      document.addEventListener('astro:after-swap', function() {
+        setTimeout(updateGreeting, 100);
+      });
+
+      // 每 30 秒刷新一次（用于切换登录状态）
+      setInterval(updateGreeting, 30000);
     })();
   </script>
 
