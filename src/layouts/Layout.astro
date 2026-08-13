@@ -53,14 +53,25 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
     <!-- Comment the line below to disable View Transitions -->
     <ClientRouter fallback="swap" />
 
-    <!-- ===== 全局修复回弹（不改任何 UI） ===== -->
+    <!-- ===== 全局修复回弹 + 修复滚轮 ===== -->
     <style is:global>
+      /* 禁用滚动干扰 */
       html, body {
         overscroll-behavior: none !important;
         overflow-anchor: none !important;
       }
       * {
         overscroll-behavior: none !important;
+      }
+
+      /* ===== 修复滚轮：非触摸设备上 pointer-events-none 不影响滚轮 ===== */
+      @media (hover: hover) and (pointer: fine) {
+        .pointer-events-none {
+          pointer-events: auto !important;
+        }
+        [class*="pointer-events-none"] {
+          pointer-events: auto !important;
+        }
       }
     </style>
   </head>
@@ -70,8 +81,6 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
     <div class={needsHeaderPlaceholder ? 'pt-16 md:pt-20' : ''}>
       <slot />
     </div>
-
-    <!-- ===== 底部渐变已删除 ===== -->
 
     <BasicScripts />
   </body>
