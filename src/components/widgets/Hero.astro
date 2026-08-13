@@ -27,9 +27,10 @@ if (image) {
 }
 ---
 
-<!-- 手机版不上移，桌面版通过样式上移 -->
-<section 
+<!-- 手机版完全不上移（margin-top: 0），桌面版通过 style 上移 76px -->
+<section
   class="relative not-prose min-h-[100dvh] flex items-center pointer-events-none bg-black"
+  style="margin-top: 0;"
   {...id ? { id } : {}}
 >
   {imageUrl && (
@@ -47,7 +48,7 @@ if (image) {
       {bg ? <Fragment set:html={bg} /> : null}
     </slot>
   </div>
-  
+
   <!-- ===== 内容层 ===== -->
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 z-10 w-full pointer-events-auto">
     <div class="pt-0 md:pt-[76px]"></div>
