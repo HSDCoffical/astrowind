@@ -17,7 +17,7 @@ import { ClientRouter } from 'astro:transitions';
 
 import type { MetaData as MetaDataType } from '~/types';
 
-// ===== 新增：读取 JWT 所需依赖 =====
+// ===== 读取 JWT 所需依赖 =====
 import { parse } from 'cookie';
 import jwt from 'jsonwebtoken';
 
@@ -67,12 +67,13 @@ if (authToken) {
 
     <ClientRouter fallback="swap" />
 
-    <!-- ===== 回弹修复 + View Transitions 动画 ===== -->
+    <!-- ===== 回弹修复 + View Transitions 动画 + 锚点平滑滚动 ===== -->
     <style is:global>
       /* 禁用滚动干扰 */
       html, body {
         overscroll-behavior: none !important;
         overflow-anchor: none !important;
+        scroll-behavior: smooth !important; /* ← 新增：锚点平滑滚动 */
       }
       * {
         overscroll-behavior: none !important;
