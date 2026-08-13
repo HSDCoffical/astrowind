@@ -28,13 +28,6 @@ export interface Props {
 const { metadata = {} } = Astro.props;
 const { language, textDirection } = I18N;
 
-// ===== 判断是否是消息中心/博客页面 =====
-const currentPath = Astro.url.pathname;
-const isBlogPage = currentPath.startsWith('/blog') || currentPath.startsWith('/消息中心');
-const isHomePage = currentPath === '/';
-const isAboutPage = currentPath.startsWith('/about');
-const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
-
 // ===== 读取 JWT 获取用户名 =====
 const cookieHeader = Astro.request.headers.get('cookie') || '';
 const cookies = cookieHeader ? parse(cookieHeader) : {};
@@ -74,8 +67,9 @@ if (authToken) {
 
     <ClientRouter fallback="swap" />
 
-    <!-- ===== 回弹修复 ===== -->
+    <!-- ===== 回弹修复 + View Transitions 动画 ===== -->
     <style is:global>
+      /* 禁用滚动干扰 */
       html, body {
         overscroll-behavior: none !important;
         overflow-anchor: none !important;
@@ -84,6 +78,30 @@ if (authToken) {
         overscroll-behavior: none !important;
         overflow-anchor: none !important;
       }
+
+      /* ===== 恢复页面切换过渡动画 ===== */
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 0.3s;
+      }
+
+      ::view-transition-old(root) {
+        animation-name: fade-out;
+      }
+
+      ::view-transition-new(root) {
+        animation-name: fade-in;
+      }
+
+      @keyframes fade-out {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+
+      @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
     </style>
   </head>
 
@@ -91,7 +109,8 @@ if (authToken) {
     <!-- ===== 全局传递用户名（供 JS 读取） ===== -->
     <div id="global-user" data-username={username} data-avatar={userAvatar}></div>
 
-    <div class={needsHeaderPlaceholder ? 'pt-16 md:pt-20' : ''}>
+    <!-- ===== 所有页面统一添加顶部内边距，为 fixed Header 留空间 ===== -->
+    <div class="pt-16 md:pt-20">
       <slot />
     </div>
 
