@@ -27,9 +27,16 @@ if (image) {
 }
 ---
 
-<!-- 手机版不上移，桌面版上移 76px，添加 bg-black 防止白边 -->
+<!-- 
+  手机版：margin-top: 0（不上移）
+  桌面版：margin-top: -76px（上移）
+-->
 <section 
-  class="relative not-prose min-h-[100vh] flex items-center pointer-events-none bg-black"
+  class:list={[
+    'relative not-prose min-h-[100dvh] flex items-center pointer-events-none bg-black',
+    // 桌面版上移 76px，手机版自动忽略
+    'md:-mt-[76px]',
+  ]}
   {...id ? { id } : {}}
 >
   {imageUrl && (
@@ -99,13 +106,4 @@ if (image) {
       </div>
     </div>
   </div>
-
-  <!-- ===== 桌面版专用：整个 section 上移 76px ===== -->
-  <style>
-    @media (min-width: 768px) {
-      section.relative {
-        margin-top: -76px !important;
-      }
-    }
-  </style>
 </section>
