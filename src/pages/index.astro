@@ -19,7 +19,7 @@ const metadata = {
 ---
 
 <Layout metadata={metadata}>
-  <!-- 主页所有 Widget -->
+  <!-- Hero Widget ******************* -->
   <div class="pt-4 md:pt-8">
     <Hero
       actions={[
@@ -56,6 +56,7 @@ const metadata = {
   </div>
 
   <Note title="我们的理念" description="创新·高新" />
+
   <Features
     id="features"
     tagline="凉宫数据"
@@ -99,6 +100,7 @@ const metadata = {
       },
     ]}
   />
+
   <Content
     isReversed
     tagline="——数据板块——"
@@ -372,16 +374,220 @@ const metadata = {
     </div>
   </section>
 
-  <!-- ===== 搜索框通过 iframe 隔离（独立滚动上下文） ===== -->
-  <iframe
-    src="/search-standalone"
-    class="fixed bottom-0 left-0 right-0 z-50 w-full border-none"
-    style="height: 76px; pointer-events: auto; background: transparent;"
-    scrolling="no"
-    sandbox="allow-scripts allow-same-origin"
-  ></iframe>
+  <!-- ===== 底部搜索框（手机端轻量毛玻璃，桌面端保留） ===== -->
+  <div 
+    class="fixed bottom-4 left-0 right-0 z-50 px-4"
+    style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y; pointer-events: none;"
+  >
+    <div class="max-w-2xl mx-auto pointer-events-auto">
+      <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
+        <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
+        <input
+          id="search-input"
+          type="text"
+          name="q"
+          placeholder="搜索本站内容..."
+          class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
+        />
+        <button
+          id="search-toggle"
+          type="button"
+          class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+          aria-label="聚焦搜索框"
+        >
+          <svg id="search-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+        <button
+          id="mode-toggle"
+          type="button"
+          class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full cursor-pointer hover:bg-white/50 transition-colors"
+        >
+          <span id="mode-label">站外</span>
+        </button>
+      </form>
+      <div id="search-results-container" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
+    </div>
+  </div>
 
-  <!-- ===== 用户名接收 ===== -->
+  <script>
+    function initSearch() {
+      const form = document.getElementById('search-form');
+      const input = document.getElementById('search-input');
+      const toggleBtn = document.getElementById('search-toggle');
+      const modeToggle = document.getElementById('mode-toggle');
+      const modeLabel = document.getElementById('mode-label');
+      const searchIcon = document.getElementById('search-icon');
+      const resultsContainer = document.getElementById('search-results-container');
+
+      if (!form || !input) return;
+
+      let mode = 'external';
+      let searchData = null;
+
+      async function loadSearchData() {
+        try {
+          const resp = await fetch('/search.json');
+          if (resp.ok) {
+            searchData = await resp.json();
+            console.log('✅ 搜索索引已加载:', searchData.length, '个页面');
+          } else {
+            console.warn('⚠️ 搜索索引加载失败，状态码:', resp.status);
+          }
+        } catch (e) {
+          console.warn('⚠️ 搜索索引加载失败:', e);
+        }
+      }
+
+      function searchInternal(query) {
+        if (!searchData || !query.trim()) return [];
+        const q = query.toLowerCase().trim();
+        if (!q) return [];
+        return searchData
+          .filter(page => {
+            const title = page.title.toLowerCase();
+            const desc = page.description.toLowerCase();
+            const content = page.content.toLowerCase();
+            return title.includes(q) || desc.includes(q) || content.includes(q);
+          })
+          .slice(0, 10);
+      }
+
+      function showInternalResults(results) {
+        resultsContainer.innerHTML = '';
+        if (results.length === 0) {
+          resultsContainer.classList.add('hidden');
+          return;
+        }
+        let html = '';
+        for (const page of results) {
+          html += `
+            <a href="${page.url}" class="block px-4 py-2 hover:bg-white/20 transition-colors border-b border-white/10 last:border-0">
+              <div class="font-medium text-gray-800">${page.title}</div>
+              <div class="text-sm text-gray-600 truncate">${page.description}</div>
+            </a>
+          `;
+        }
+        resultsContainer.innerHTML = html;
+        resultsContainer.classList.remove('hidden');
+      }
+
+      function clearResults() {
+        resultsContainer.innerHTML = '';
+        resultsContainer.classList.add('hidden');
+      }
+
+      function updateMode(newMode) {
+        mode = newMode;
+        clearResults();
+
+        if (mode === 'external') {
+          form.action = 'https://www.bing.com/search';
+          form.target = '_blank';
+          let hiddenInput = form.querySelector('input[name="q1"]');
+          if (!hiddenInput) {
+            hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'q1';
+            form.appendChild(hiddenInput);
+          }
+          hiddenInput.value = 'site:hsdc.dpdns.org';
+          input.name = 'q';
+          input.disabled = false;
+          input.placeholder = '输入关键字以联网检索';
+          input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
+          modeLabel.textContent = '必应搜索';
+          searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
+        } else {
+          form.action = '#';
+          form.target = '';
+          const hiddenInput = form.querySelector('input[name="q1"]');
+          if (hiddenInput) hiddenInput.remove();
+          input.name = '';
+          input.disabled = false;
+          input.placeholder = '输入关键词检索本站';
+          input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
+          modeLabel.textContent = '站内检索';
+          searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
+          if (input.value.trim()) {
+            const results = searchInternal(input.value);
+            showInternalResults(results);
+          }
+        }
+        input.focus();
+      }
+
+      input.oninput = function() {
+        if (mode === 'internal') {
+          const query = this.value.trim();
+          if (!query) {
+            clearResults();
+            return;
+          }
+          const results = searchInternal(query);
+          showInternalResults(results);
+        } else {
+          clearResults();
+        }
+      };
+
+      modeToggle.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const newMode = mode === 'external' ? 'internal' : 'external';
+        updateMode(newMode);
+      };
+
+      toggleBtn.onclick = function(e) {
+        e.preventDefault();
+        input.focus();
+      };
+
+      document.addEventListener('click', function(e) {
+        const searchArea = document.querySelector('.fixed.bottom-4');
+        if (searchArea && !searchArea.contains(e.target)) {
+          clearResults();
+        }
+      });
+
+      updateMode('external');
+      loadSearchData();
+    }
+
+    initSearch();
+    document.addEventListener('astro:after-swap', function() {
+      setTimeout(initSearch, 50);
+    });
+  </script>
+
+  <script>
+    (function() {
+      function fixHeroScroll() {
+        const hero = document.querySelector('[class*="Hero"]');
+        if (!hero) return;
+        const bgLayers = hero.querySelectorAll('.absolute.inset-0, [class*="absolute"][class*="inset-0"]');
+        bgLayers.forEach(el => {
+          el.style.pointerEvents = 'none';
+        });
+        const content = hero.querySelectorAll('a, button, [role="button"]');
+        content.forEach(el => {
+          el.style.pointerEvents = 'auto';
+        });
+        console.log('✅ Hero 背景已修复');
+      }
+      if (document.readyState === 'complete') {
+        fixHeroScroll();
+      } else {
+        window.addEventListener('load', fixHeroScroll);
+      }
+      document.addEventListener('astro:after-swap', function() {
+        setTimeout(fixHeroScroll, 100);
+      });
+    })();
+  </script>
+
+  <!-- ===== 用户名接收（Cookie 有效期 4 个月 = 10368000 秒） ===== -->
   <script>
     (function() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -428,8 +634,11 @@ const metadata = {
             setUsername(username);
             updateGreeting(username);
             window.history.replaceState({}, document.title, '/');
+            console.log(`✅ 欢迎语已更新: ${username}，${getGreeting()}`);
           }
-        } catch (e) {}
+        } catch (e) {
+          console.log('解码用户名失败:', e);
+        }
       }
 
       const storedUsername = getUsername();
@@ -438,4 +647,5 @@ const metadata = {
       }
     })();
   </script>
+
 </Layout>
