@@ -54,7 +54,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     { sticky: isSticky, relative: !isSticky, dark: isDark },
     'top-0 z-40 flex-none mx-auto w-full transition-[opacity] ease-in-out border-b border-gray-200/30 dark:border-gray-700/30',
   ]}
-  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
+  style="background: rgba(255,255,255,0.85) !important;"
   {...id ? { id } : {}}
 >
   <style>
