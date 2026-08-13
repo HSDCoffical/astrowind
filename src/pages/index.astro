@@ -41,8 +41,9 @@ const metadata = {
       bgImage={true}
       bgOpacity={30}
     >
+      <!-- ===== 动态欢迎语 ===== -->
       <Fragment slot="title">
-        凉宫数据欢迎您！
+        <span id="hero-greeting">凉宫数据欢迎您！</span>
       </Fragment>
 
       <Fragment slot="subtitle">
@@ -606,6 +607,36 @@ const metadata = {
       document.addEventListener('astro:after-swap', function() {
         setTimeout(fixHeroScroll, 100);
       });
+    })();
+  </script>
+
+  <!-- ===== 动态更新 Hero 欢迎语 ===== -->
+  <script>
+    (function() {
+      function getGreeting() {
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 9) return '早上好，';
+        if (hour >= 9 && hour < 12) return '上午好，';
+        if (hour >= 12 && hour < 14) return '中午好，';
+        if (hour >= 14 && hour < 18) return '下午好，';
+        if (hour >= 18 && hour < 21) return '傍晚好，';
+        return '晚上好，';
+      }
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+      }
+
+      const username = getCookie('username') || '访客';
+      const greeting = getGreeting();
+
+      const el = document.getElementById('hero-greeting');
+      if (el) {
+        el.textContent = `${username}，${greeting}`;
+      }
     })();
   </script>
 
