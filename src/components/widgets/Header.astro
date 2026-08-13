@@ -51,7 +51,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   id={id}
   data-aw-sticky-header={isSticky ? true : undefined}
   class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30"
-  style="background: rgba(255,255,255,0.85) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
+  style="background: rgba(255,255,255,0.25) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
     header#header * {
@@ -91,7 +91,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* 确保 Header 不干扰滚轮 */
+    /* 确保 Header 不干扰滚动 */
     header#header {
       contain: layout style;
       will-change: transform, backdrop-filter;
