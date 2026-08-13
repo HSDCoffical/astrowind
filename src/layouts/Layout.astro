@@ -117,23 +117,27 @@ if (authToken) {
 
     <BasicScripts />
 
+    <!-- ===== 修复下翻再上翻的抖动（手机端） ===== -->
     <script>
       (function() {
         const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         if (!isMobile) return;
 
-        function fixScroll() {
-          const currentScroll = window.scrollY;
-          window.scrollTo(0, 0);
-          setTimeout(function() {
-            window.scrollTo(0, currentScroll);
-          }, 50);
+        function resetScrollDirection() {
+          const y = window.scrollY;
+          // 微调 1px 后立即恢复，触发浏览器重置滚动方向状态
+          window.scrollTo(0, y + 1);
+          requestAnimationFrame(function() {
+            window.scrollTo(0, y);
+          });
         }
 
         window.addEventListener('load', function() {
-          setTimeout(fixScroll, 200);
-          setTimeout(fixScroll, 500);
-          setTimeout(fixScroll, 800);
+          setTimeout(resetScrollDirection, 300);
+        });
+
+        document.addEventListener('astro:after-swap', function() {
+          setTimeout(resetScrollDirection, 100);
         });
       })();
     </script>
