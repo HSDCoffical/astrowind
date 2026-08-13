@@ -50,52 +50,14 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
 
     <ClientRouter fallback="swap" />
 
-    <!-- ===== 全局修复：回弹 + 滚轮 ===== -->
+    <!-- ===== 只保留回弹修复，不干预滚轮 ===== -->
     <style is:global>
-      /* 1. 禁用弹性滚动和滚动锚定 */
       html, body {
         overscroll-behavior: none !important;
         overflow-anchor: none !important;
       }
       * {
         overscroll-behavior: none !important;
-      }
-
-      /* 2. 强制所有背景遮罩层不拦截鼠标事件（滚轮穿透） */
-      .absolute.inset-0,
-      [class*="absolute"][class*="inset-0"] {
-        pointer-events: none !important;
-      }
-
-      /* 3. 确保 body 可滚动 */
-      body {
-        overflow-y: auto !important;
-        height: auto !important;
-        min-height: 100vh !important;
-        min-height: 100dvh !important;
-      }
-      html {
-        overflow-y: auto !important;
-        height: auto !important;
-      }
-
-      /* 4. 强制修复所有 overflow:hidden 容器（尤其是 Hero） */
-      section.overflow-hidden,
-      .overflow-hidden,
-      .not-prose.overflow-hidden {
-        overflow: visible !important;
-        min-height: auto !important;
-        max-height: none !important;
-      }
-
-      /* 5. 确保任何固定定位元素不干扰滚动 */
-      .fixed {
-        pointer-events: auto !important;
-      }
-
-      /* 6. 恢复 Header 内的交互 */
-      header#header * {
-        pointer-events: auto !important;
       }
     </style>
   </head>
