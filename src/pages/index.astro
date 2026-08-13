@@ -19,6 +19,20 @@ const metadata = {
 ---
 
 <Layout metadata={metadata}>
+  <!-- ===== 首页局部修复：Hero 背景不拦截滚轮 ===== -->
+  <style is:global>
+    /* 只针对当前页面的 Hero 区域生效 */
+    .hero-bg-layer,
+    [class*="Hero"] [class*="absolute"][class*="inset-0"] {
+      pointer-events: none !important;
+    }
+    /* 确保 Hero 内的按钮、链接可点击 */
+    [class*="Hero"] a,
+    [class*="Hero"] button {
+      pointer-events: auto !important;
+    }
+  </style>
+
   <!-- Hero Widget ******************* -->
   <!-- 增加顶部内边距，让状态栏和欢迎文字间距更大 -->
 
