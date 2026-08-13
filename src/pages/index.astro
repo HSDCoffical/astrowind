@@ -374,10 +374,9 @@ const metadata = {
     </div>
   </section>
 
-  <!-- ===== 底部搜索框（已注释测试） ===== -->
-  <!-- 
+  <!-- ===== 底部搜索框（手机端 sticky，桌面端 fixed） ===== -->
   <div 
-    class="fixed bottom-4 left-0 right-0 z-50 px-4"
+    class="sticky bottom-0 left-0 right-0 z-50 px-4 pb-4 md:fixed md:bottom-4"
     style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y; pointer-events: none;"
   >
     <div class="max-w-2xl mx-auto pointer-events-auto">
@@ -411,97 +410,8 @@ const metadata = {
       <div id="search-results-container" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
     </div>
   </div>
-  -->
 
-  <script>
-    (function() {
-      function fixHeroScroll() {
-        const hero = document.querySelector('[class*="Hero"]');
-        if (!hero) return;
-        const bgLayers = hero.querySelectorAll('.absolute.inset-0, [class*="absolute"][class*="inset-0"]');
-        bgLayers.forEach(el => {
-          el.style.pointerEvents = 'none';
-        });
-        const content = hero.querySelectorAll('a, button, [role="button"]');
-        content.forEach(el => {
-          el.style.pointerEvents = 'auto';
-        });
-        console.log('✅ Hero 背景已修复');
-      }
-      if (document.readyState === 'complete') {
-        fixHeroScroll();
-      } else {
-        window.addEventListener('load', fixHeroScroll);
-      }
-      document.addEventListener('astro:after-swap', function() {
-        setTimeout(fixHeroScroll, 100);
-      });
-    })();
-  </script>
-
-  <!-- ===== 用户名接收（Cookie 有效期 4 个月 = 10368000 秒） ===== -->
-  <script>
-    (function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const encodedUsername = urlParams.get('username');
-
-      function getGreeting() {
-        const hour = new Date().getHours();
-        if (hour >= 5 && hour < 9) return '早上好';
-        if (hour >= 9 && hour < 12) return '上午好';
-        if (hour >= 12 && hour < 14) return '中午好';
-        if (hour >= 14 && hour < 18) return '下午好';
-        if (hour >= 18 && hour < 21) return '傍晚好';
-        return '晚上好';
-      }
-
-      function updateGreeting(username) {
-        const el = document.getElementById('hero-greeting');
-        if (el) {
-          el.textContent = `${username}，${getGreeting()}`;
-        }
-      }
-
-      function setUsername(username) {
-        try {
-          localStorage.setItem('username', username);
-        } catch (e) {}
-        document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=10368000`;
-      }
-
-      function getUsername() {
-        try {
-          const stored = localStorage.getItem('username');
-          if (stored) return stored;
-        } catch (e) {}
-        const cookie = document.cookie.split('; ').find(row => row.startsWith('username='));
-        if (cookie) return decodeURIComponent(cookie.split('=')[1]);
-        return null;
-      }
-
-      if (encodedUsername) {
-        try {
-          const username = decodeURIComponent(encodedUsername);
-          if (username) {
-            setUsername(username);
-            updateGreeting(username);
-            window.history.replaceState({}, document.title, '/');
-            console.log(`✅ 欢迎语已更新: ${username}，${getGreeting()}`);
-          }
-        } catch (e) {
-          console.log('解码用户名失败:', e);
-        }
-      }
-
-      const storedUsername = getUsername();
-      if (storedUsername) {
-        updateGreeting(storedUsername);
-      }
-    })();
-  </script>
-
-  <!-- ===== 搜索框脚本（已注释测试） ===== -->
-  <!-- 
+  <!-- ===== 搜索框脚本 ===== -->
   <script>
     function initSearch() {
       const form = document.getElementById('search-form');
@@ -636,7 +546,7 @@ const metadata = {
       };
 
       document.addEventListener('click', function(e) {
-        const searchArea = document.querySelector('.fixed.bottom-4');
+        const searchArea = document.querySelector('.sticky.bottom-0');
         if (searchArea && !searchArea.contains(e.target)) {
           clearResults();
         }
@@ -651,6 +561,93 @@ const metadata = {
       setTimeout(initSearch, 50);
     });
   </script>
-  -->
+
+  <!-- ===== Hero 背景滚轮修复 ===== -->
+  <script>
+    (function() {
+      function fixHeroScroll() {
+        const hero = document.querySelector('[class*="Hero"]');
+        if (!hero) return;
+        const bgLayers = hero.querySelectorAll('.absolute.inset-0, [class*="absolute"][class*="inset-0"]');
+        bgLayers.forEach(el => {
+          el.style.pointerEvents = 'none';
+        });
+        const content = hero.querySelectorAll('a, button, [role="button"]');
+        content.forEach(el => {
+          el.style.pointerEvents = 'auto';
+        });
+        console.log('✅ Hero 背景已修复');
+      }
+      if (document.readyState === 'complete') {
+        fixHeroScroll();
+      } else {
+        window.addEventListener('load', fixHeroScroll);
+      }
+      document.addEventListener('astro:after-swap', function() {
+        setTimeout(fixHeroScroll, 100);
+      });
+    })();
+  </script>
+
+  <!-- ===== 用户名接收（Cookie 有效期 4 个月 = 10368000 秒） ===== -->
+  <script>
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const encodedUsername = urlParams.get('username');
+
+      function getGreeting() {
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 9) return '早上好';
+        if (hour >= 9 && hour < 12) return '上午好';
+        if (hour >= 12 && hour < 14) return '中午好';
+        if (hour >= 14 && hour < 18) return '下午好';
+        if (hour >= 18 && hour < 21) return '傍晚好';
+        return '晚上好';
+      }
+
+      function updateGreeting(username) {
+        const el = document.getElementById('hero-greeting');
+        if (el) {
+          el.textContent = `${username}，${getGreeting()}`;
+        }
+      }
+
+      function setUsername(username) {
+        try {
+          localStorage.setItem('username', username);
+        } catch (e) {}
+        document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=10368000`;
+      }
+
+      function getUsername() {
+        try {
+          const stored = localStorage.getItem('username');
+          if (stored) return stored;
+        } catch (e) {}
+        const cookie = document.cookie.split('; ').find(row => row.startsWith('username='));
+        if (cookie) return decodeURIComponent(cookie.split('=')[1]);
+        return null;
+      }
+
+      if (encodedUsername) {
+        try {
+          const username = decodeURIComponent(encodedUsername);
+          if (username) {
+            setUsername(username);
+            updateGreeting(username);
+            window.history.replaceState({}, document.title, '/');
+            console.log(`✅ 欢迎语已更新: ${username}，${getGreeting()}`);
+          }
+        } catch (e) {
+          console.log('解码用户名失败:', e);
+        }
+      }
+
+      const storedUsername = getUsername();
+      if (storedUsername) {
+        updateGreeting(storedUsername);
+      }
+    })();
+  </script>
 
 </Layout>
