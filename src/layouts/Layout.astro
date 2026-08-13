@@ -55,7 +55,7 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
 
     <!-- ===== 全局修复回弹 + 修复滚轮 ===== -->
     <style is:global>
-      /* 禁用滚动干扰 */
+      /* 1. 禁用滚动干扰（回弹修复） */
       html, body {
         overscroll-behavior: none !important;
         overflow-anchor: none !important;
@@ -64,14 +64,22 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
         overscroll-behavior: none !important;
       }
 
-      /* ===== 修复滚轮：非触摸设备上 pointer-events-none 不影响滚轮 ===== */
-      @media (hover: hover) and (pointer: fine) {
-        .pointer-events-none {
-          pointer-events: auto !important;
-        }
-        [class*="pointer-events-none"] {
-          pointer-events: auto !important;
-        }
+      /* 2. 强制所有背景遮罩层不拦截鼠标事件（滚轮修复） */
+      .absolute.inset-0,
+      [class*="absolute"][class*="inset-0"] {
+        pointer-events: none !important;
+      }
+
+      /* 3. 确保 body 可滚动 */
+      body {
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+      }
+      html {
+        overflow-y: auto !important;
+        height: auto !important;
       }
     </style>
   </head>
