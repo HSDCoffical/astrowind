@@ -19,64 +19,46 @@ const metadata = {
 ---
 
 <Layout metadata={metadata}>
-  <!-- ===== 只修复首页的滚轮 ===== -->
-  <style is:global>
-    /* 只针对首页的 Hero 组件修复 */
-    section.overflow-hidden.flex.items-center {
-      overflow: visible !important;
-      min-height: auto !important;
-      max-height: none !important;
-    }
-    /* 首页的背景遮罩层不拦截鼠标事件 */
-    .absolute.inset-0.pointer-events-none {
-      pointer-events: none !important;
-    }
-    /* 确保首页 body 可滚动 */
-    body {
-      overflow-y: auto !important;
-    }
-  </style>
-
   <!-- Hero Widget ******************* -->
+  <!-- 增加顶部内边距，让状态栏和欢迎文字间距更大 -->
 
-  <Hero
-    actions={[
-      {
-        variant: 'primary',
-        text: '联系我们',
-        href: '/contact',
-        icon: 'tabler:download',
-      },
-      {
-        text: '了解更多',
-        href: '#features',
-        style: 'background-color: white !important; color: black !important; border: 1px solid #d1d5db !important; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05) !important; font-weight: 600 !important;',
-      }
-    ]}
-    image={{ src: '/new.png', alt: '凉宫数据 ' }}
-    bgImage={true}
-    bgOpacity={30}
-  >
-    <Fragment slot="title">
-      凉宫数据欢迎您！
-    </Fragment>
+  <div class="pt-4 md:pt-8">
+    <Hero
+      actions={[
+        {
+          variant: 'primary',
+          text: '联系我们',
+          href: '/contact',
+          icon: 'tabler:download',
+        },
+        {
+          text: '了解更多',
+          href: '#features',
+          style: 'background-color: white !important; color: black !important; border: 1px solid #d1d5db !important; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05) !important; font-weight: 600 !important;',
+        }
+      ]}
+      image={{ src: '/new.png', alt: '凉宫数据 ' }}
+      bgImage={true}
+      bgOpacity={30}
+    >
+      <Fragment slot="title">
+        凉宫数据欢迎您！
+      </Fragment>
 
-    <Fragment slot="subtitle">
-      <span class="hidden sm:inline">
-        凉宫数据提供
-      </span>
-      <span class="block mb-1 sm:hidden font-bold text-blue-600">
-        凉宫数据office提供
-      </span>
-      创新型互联网企业
-    </Fragment>
-  </Hero>
+      <Fragment slot="subtitle">
+        <span class="hidden sm:inline">
+          凉宫数据提供
+        </span>
+        <span class="block mb-1 sm:hidden font-bold text-blue-600">
+          凉宫数据office提供
+        </span>
+        创新型互联网企业
+      </Fragment>
+    </Hero>
+  </div>
 
-  <!-- Note Widget ******************* -->
-
+  <!-- 后续 Widget 完全保持不变 -->
   <Note title="我们的理念" description="创新·高新" />
-
-  <!-- Features Widget *************** -->
 
   <Features
     id="features"
@@ -122,8 +104,6 @@ const metadata = {
     ]}
   />
 
-  <!-- Content Widget **************** -->
-
   <Content
     isReversed
     tagline="——数据板块——"
@@ -160,8 +140,6 @@ const metadata = {
     </Fragment>
   </Content>
 
-  <!-- Content Widget **************** -->
-
   <Content
     isAfterContent
     items={[
@@ -196,8 +174,6 @@ const metadata = {
       <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
     </Fragment>
   </Content>
-
-  <!-- Content Widget **************** -->
 
   <Content
     isReversed
@@ -235,8 +211,6 @@ const metadata = {
     </Fragment>
   </Content>
 
-  <!-- Steps Widget ****************** -->
-
   <Steps
     title="入职流程"
     items={[
@@ -268,8 +242,6 @@ const metadata = {
       alt: '凉宫数据',
     }}
   />
-
-  <!-- Features2 Widget ************** -->
 
   <Features2
     title="加入我们"
@@ -333,15 +305,11 @@ const metadata = {
     </Fragment>
   </Features2>
 
-  <!-- HighlightedPosts Widget ******* -->
-
   <BlogLatestPosts
     title="信息中心"
     information={`资讯/实时
                 `}
   />
-
-  <!-- FAQs Widget ******************* -->
 
   <FAQs
     title="更多事项"
@@ -382,8 +350,6 @@ const metadata = {
     ]}
   />
 
-  <!-- Stats Widget ****************** -->
-
   <Stats
     stats={[
       { title: '管理员', amount: '1名' },
@@ -398,215 +364,215 @@ const metadata = {
 >
 </CallToAction>
 
-<!-- ===== 直接显示邮箱地址（增加底部内边距 pb-24，为搜索框预留空间） ===== -->
-<section class="px-6 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-28 mx-auto max-w-4xl text-center">
-  <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
-    <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">联系我们</p>
-    <a
-      href="电子邮件地址"
-      class="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-    >
-      电子邮箱地址
-    </a>
-    <p class="text-gray-400 dark:text-gray-500 text-xs mt-3">
-      xuexiang@lianggongoffice.dpdns.org
-    </p>
-  </div>
-</section>
-
-<!-- ===== 底部固定搜索框（添加禁用弹性滚动样式，修复回弹） ===== -->
-<div 
-  class="fixed bottom-4 left-0 right-0 z-50 px-4"
-  style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y;"
->
-  <div class="max-w-2xl mx-auto">
-    <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
-      <!-- 站外搜索限定本站 -->
-      <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
-      <input
-        id="search-input"
-        type="text"
-        name="q"
-        placeholder="搜索本站内容..."
-        class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
-      />
-      <!-- 放大镜图标 -->
-      <button
-        id="search-toggle"
-        type="button"
-        class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
-        aria-label="聚焦搜索框"
+  <!-- ===== 直接显示邮箱地址（增加底部内边距 pb-24，为搜索框预留空间） ===== -->
+  <section class="px-6 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-28 mx-auto max-w-4xl text-center">
+    <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">联系我们</p>
+      <a
+        href="电子邮件地址"
+        class="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
       >
-        <svg id="search-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </button>
-      <!-- 模式切换按钮 -->
-      <button
-        id="mode-toggle"
-        type="button"
-        class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full cursor-pointer hover:bg-white/50 transition-colors"
-      >
-        <span id="mode-label">站外</span>
-      </button>
-    </form>
-    <!-- 搜索结果容器 -->
-    <div id="search-results-container" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
+        电子邮箱地址
+      </a>
+      <p class="text-gray-400 dark:text-gray-500 text-xs mt-3">
+        xuexiang@lianggongoffice.dpdns.org
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== 底部固定搜索框 ===== -->
+  <div 
+    class="fixed bottom-4 left-0 right-0 z-50 px-4"
+    style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y; pointer-events: none;"
+  >
+    <div class="max-w-2xl mx-auto pointer-events-auto">
+      <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
+        <!-- 站外搜索限定本站 -->
+        <input type="hidden" name="q1" value="site:hsdc.dpdns.org">
+        <input
+          id="search-input"
+          type="text"
+          name="q"
+          placeholder="搜索本站内容..."
+          class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
+        />
+        <!-- 放大镜图标 -->
+        <button
+          id="search-toggle"
+          type="button"
+          class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+          aria-label="聚焦搜索框"
+        >
+          <svg id="search-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+        <!-- 模式切换按钮 -->
+        <button
+          id="mode-toggle"
+          type="button"
+          class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full cursor-pointer hover:bg-white/50 transition-colors"
+        >
+          <span id="mode-label">站外</span>
+        </button>
+      </form>
+      <!-- 搜索结果容器 -->
+      <div id="search-results-container" class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"></div>
+    </div>
   </div>
-</div>
 
-<script>
-  function initSearch() {
-    const form = document.getElementById('search-form');
-    const input = document.getElementById('search-input');
-    const toggleBtn = document.getElementById('search-toggle');
-    const modeToggle = document.getElementById('mode-toggle');
-    const modeLabel = document.getElementById('mode-label');
-    const searchIcon = document.getElementById('search-icon');
-    const resultsContainer = document.getElementById('search-results-container');
+  <script>
+    function initSearch() {
+      const form = document.getElementById('search-form');
+      const input = document.getElementById('search-input');
+      const toggleBtn = document.getElementById('search-toggle');
+      const modeToggle = document.getElementById('mode-toggle');
+      const modeLabel = document.getElementById('mode-label');
+      const searchIcon = document.getElementById('search-icon');
+      const resultsContainer = document.getElementById('search-results-container');
 
-    if (!form || !input) return;
+      if (!form || !input) return;
 
-    let mode = 'external';
-    let searchData = null;
+      let mode = 'external';
+      let searchData = null;
 
-    async function loadSearchData() {
-      try {
-        const resp = await fetch('/search.json');
-        if (resp.ok) {
-          searchData = await resp.json();
-          console.log('✅ 搜索索引已加载:', searchData.length, '个页面');
-        } else {
-          console.warn('⚠️ 搜索索引加载失败，状态码:', resp.status);
-        }
-      } catch (e) {
-        console.warn('⚠️ 搜索索引加载失败:', e);
-      }
-    }
-
-    function searchInternal(query) {
-      if (!searchData || !query.trim()) return [];
-      const q = query.toLowerCase().trim();
-      if (!q) return [];
-      return searchData
-        .filter(page => {
-          const title = page.title.toLowerCase();
-          const desc = page.description.toLowerCase();
-          const content = page.content.toLowerCase();
-          return title.includes(q) || desc.includes(q) || content.includes(q);
-        })
-        .slice(0, 10);
-    }
-
-    function showInternalResults(results) {
-      resultsContainer.innerHTML = '';
-      if (results.length === 0) {
-        resultsContainer.classList.add('hidden');
-        return;
-      }
-      let html = '';
-      for (const page of results) {
-        html += `
-          <a href="${page.url}" class="block px-4 py-2 hover:bg-white/20 transition-colors border-b border-white/10 last:border-0">
-            <div class="font-medium text-gray-800">${page.title}</div>
-            <div class="text-sm text-gray-600 truncate">${page.description}</div>
-          </a>
-        `;
-      }
-      resultsContainer.innerHTML = html;
-      resultsContainer.classList.remove('hidden');
-    }
-
-    function clearResults() {
-      resultsContainer.innerHTML = '';
-      resultsContainer.classList.add('hidden');
-    }
-
-    function updateMode(newMode) {
-      mode = newMode;
-      clearResults();
-
-      if (mode === 'external') {
-        form.action = 'https://www.bing.com/search';
-        form.target = '_blank';
-        let hiddenInput = form.querySelector('input[name="q1"]');
-        if (!hiddenInput) {
-          hiddenInput = document.createElement('input');
-          hiddenInput.type = 'hidden';
-          hiddenInput.name = 'q1';
-          form.appendChild(hiddenInput);
-        }
-        hiddenInput.value = 'site:hsdc.dpdns.org';
-        input.name = 'q';
-        input.disabled = false;
-        input.placeholder = '输入关键字以联网检索';
-        input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
-        modeLabel.textContent = '必应搜索';
-        searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
-      } else {
-        form.action = '#';
-        form.target = '';
-        const hiddenInput = form.querySelector('input[name="q1"]');
-        if (hiddenInput) hiddenInput.remove();
-        input.name = '';
-        input.disabled = false;
-        input.placeholder = '输入关键词检索本站';
-        input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
-        modeLabel.textContent = '站内检索';
-        searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
-        if (input.value.trim()) {
-          const results = searchInternal(input.value);
-          showInternalResults(results);
+      async function loadSearchData() {
+        try {
+          const resp = await fetch('/search.json');
+          if (resp.ok) {
+            searchData = await resp.json();
+            console.log('✅ 搜索索引已加载:', searchData.length, '个页面');
+          } else {
+            console.warn('⚠️ 搜索索引加载失败，状态码:', resp.status);
+          }
+        } catch (e) {
+          console.warn('⚠️ 搜索索引加载失败:', e);
         }
       }
-      input.focus();
-    }
 
-    // 使用 onclick 替代 addEventListener，避免重复绑定
-    input.oninput = function() {
-      if (mode === 'internal') {
-        const query = this.value.trim();
-        if (!query) {
-          clearResults();
+      function searchInternal(query) {
+        if (!searchData || !query.trim()) return [];
+        const q = query.toLowerCase().trim();
+        if (!q) return [];
+        return searchData
+          .filter(page => {
+            const title = page.title.toLowerCase();
+            const desc = page.description.toLowerCase();
+            const content = page.content.toLowerCase();
+            return title.includes(q) || desc.includes(q) || content.includes(q);
+          })
+          .slice(0, 10);
+      }
+
+      function showInternalResults(results) {
+        resultsContainer.innerHTML = '';
+        if (results.length === 0) {
+          resultsContainer.classList.add('hidden');
           return;
         }
-        const results = searchInternal(query);
-        showInternalResults(results);
-      } else {
-        clearResults();
+        let html = '';
+        for (const page of results) {
+          html += `
+            <a href="${page.url}" class="block px-4 py-2 hover:bg-white/20 transition-colors border-b border-white/10 last:border-0">
+              <div class="font-medium text-gray-800">${page.title}</div>
+              <div class="text-sm text-gray-600 truncate">${page.description}</div>
+            </a>
+          `;
+        }
+        resultsContainer.innerHTML = html;
+        resultsContainer.classList.remove('hidden');
       }
-    };
 
-    modeToggle.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const newMode = mode === 'external' ? 'internal' : 'external';
-      updateMode(newMode);
-    };
-
-    toggleBtn.onclick = function(e) {
-      e.preventDefault();
-      input.focus();
-    };
-
-    document.addEventListener('click', function(e) {
-      const searchArea = document.querySelector('.fixed.bottom-4');
-      if (searchArea && !searchArea.contains(e.target)) {
-        clearResults();
+      function clearResults() {
+        resultsContainer.innerHTML = '';
+        resultsContainer.classList.add('hidden');
       }
+
+      function updateMode(newMode) {
+        mode = newMode;
+        clearResults();
+
+        if (mode === 'external') {
+          form.action = 'https://www.bing.com/search';
+          form.target = '_blank';
+          let hiddenInput = form.querySelector('input[name="q1"]');
+          if (!hiddenInput) {
+            hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'q1';
+            form.appendChild(hiddenInput);
+          }
+          hiddenInput.value = 'site:hsdc.dpdns.org';
+          input.name = 'q';
+          input.disabled = false;
+          input.placeholder = '输入关键字以联网检索';
+          input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
+          modeLabel.textContent = '必应搜索';
+          searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
+        } else {
+          form.action = '#';
+          form.target = '';
+          const hiddenInput = form.querySelector('input[name="q1"]');
+          if (hiddenInput) hiddenInput.remove();
+          input.name = '';
+          input.disabled = false;
+          input.placeholder = '输入关键词检索本站';
+          input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
+          modeLabel.textContent = '站内检索';
+          searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
+          if (input.value.trim()) {
+            const results = searchInternal(input.value);
+            showInternalResults(results);
+          }
+        }
+        input.focus();
+      }
+
+      // 使用 onclick 替代 addEventListener，避免重复绑定
+      input.oninput = function() {
+        if (mode === 'internal') {
+          const query = this.value.trim();
+          if (!query) {
+            clearResults();
+            return;
+          }
+          const results = searchInternal(query);
+          showInternalResults(results);
+        } else {
+          clearResults();
+        }
+      };
+
+      modeToggle.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const newMode = mode === 'external' ? 'internal' : 'external';
+        updateMode(newMode);
+      };
+
+      toggleBtn.onclick = function(e) {
+        e.preventDefault();
+        input.focus();
+      };
+
+      document.addEventListener('click', function(e) {
+        const searchArea = document.querySelector('.fixed.bottom-4');
+        if (searchArea && !searchArea.contains(e.target)) {
+          clearResults();
+        }
+      });
+
+      updateMode('external');
+      loadSearchData();
+    }
+
+    // === 页面加载执行 ===
+    initSearch();
+
+    // === SPA 导航后重新执行 ===
+    document.addEventListener('astro:after-swap', function() {
+      setTimeout(initSearch, 50);
     });
-
-    updateMode('external');
-    loadSearchData();
-  }
-
-  // === 页面加载执行 ===
-  initSearch();
-
-  // === SPA 导航后重新执行 ===
-  document.addEventListener('astro:after-swap', function() {
-    setTimeout(initSearch, 50);
-  });
-</script>
+  </script>
 
 </Layout>
