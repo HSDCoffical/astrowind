@@ -7,10 +7,6 @@ import Layout from '~/layouts/PageLayout.astro';
 import SinglePost from '~/components/blog/SinglePost.astro';
 import ToBlogLink from '~/components/blog/ToBlogLink.astro';
 
-// ===== 修复：改为相对路径 =====
-import Header from '../../components/common/Header.astro';
-import { headerData } from '../../navigation';
-
 import { getCanonical, getPermalink } from '~/utils/permalinks';
 import { getStaticPathsBlogPost, blogPostRobots } from '~/utils/blog';
 import { findImage } from '~/utils/images';
@@ -49,10 +45,6 @@ const metadata = merge(
 ---
 
 <Layout metadata={metadata}>
-  <!-- ===== 消息中心专用：Header + 占位 ===== -->
-  <Header links={headerData.links} isSticky={true} />
-  <div class="h-16 md:h-20 w-full"></div>
-
   <SinglePost post={{ ...post, image: image }} url={url}>
     {post.Content && <post.Content />}
   </SinglePost>
