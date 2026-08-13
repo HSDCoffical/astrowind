@@ -1,0 +1,32 @@
+---
+import { parse } from 'cookie';
+import jwt from 'jsonwebtoken';
+
+const cookieHeader = Astro.request.headers.get('cookie') || '';
+const cookies = cookieHeader ? parse(cookieHeader) : {};
+const authToken = cookies.auth_token;
+
+let result = '未登录';
+let username = '未读取';
+
+if (authToken) {
+  try {
+    const decoded = jwt.verify(authToken, import.meta.env.JWT_SECRET);
+    username = decoded.username || '未读取';
+    result = '✅ 已登录，用户名：' + username;
+  } catch (error) {
+    result = '❌ Token 无效: ' + error.message;
+  }
+} else {
+  result = '⚠️ 没有 auth_token Cookie';
+}
+---
+
+<html>
+  <head><title>JWT 测试</title></head>
+  <body style="font-family: sans-serif; padding: 20px;">
+    <h1>🔐 JWT 测试结果</h1>
+    <p><strong>状态：</strong>{result}</p>
+    <p><strong>Cookie 原始值：</strong>{cookieHeader || '无'}</p>
+  </body>
+</html>
