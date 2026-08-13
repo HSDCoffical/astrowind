@@ -16,7 +16,7 @@ const {
   bg = await Astro.slots.render('bg'),
 } = Astro.props;
 
-// 提取图片 URL（支持对象或字符串）
+// 提取图片 URL
 let imageUrl = '';
 if (image) {
   if (typeof image === 'object' && image.src) {
@@ -27,7 +27,7 @@ if (image) {
 }
 ---
 
-<!-- 手机版完全不上移（margin-top: 0），桌面版通过 style 上移 76px -->
+<!-- 注意：完全没有 md: 开头的类，只用 style -->
 <section
   class="relative not-prose min-h-[100dvh] flex items-center pointer-events-none bg-black"
   style="margin-top: 0;"
@@ -49,9 +49,8 @@ if (image) {
     </slot>
   </div>
 
-  <!-- ===== 内容层 ===== -->
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 z-10 w-full pointer-events-auto">
-    <div class="pt-0 md:pt-[76px]"></div>
+    <div class="pt-0" style="padding-top: 0;"></div>
     <div class="py-12 md:py-20">
       <div class="text-center pb-10 md:pb-16 max-w-5xl mx-auto">
         {
@@ -99,13 +98,16 @@ if (image) {
       </div>
     </div>
   </div>
-
-  <!-- ===== 仅桌面版上移 76px ===== -->
-  <style>
-    @media (min-width: 768px) {
-      section.relative {
-        margin-top: -76px !important;
-      }
-    }
-  </style>
 </section>
+
+<!-- 桌面版上移 76px -->
+<style>
+  @media (min-width: 768px) {
+    section.relative {
+      margin-top: -76px !important;
+    }
+    section.relative > div.relative.max-w-7xl {
+      padding-top: 76px !important;
+    }
+  }
+</style>
