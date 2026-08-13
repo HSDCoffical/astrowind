@@ -610,10 +610,52 @@ const metadata = {
     })();
   </script>
 
-  <!-- ===== 动态更新 Hero 欢迎语（从社区 API 获取） ===== -->
+  <!-- ===== 动态欢迎语 + 调试按钮 ===== -->
   <script>
     (function() {
       const COMMUNITY_API = 'https://hono-bbs-9qj.pages.dev/user/me';
+
+      // 调试按钮和结果显示容器
+      const debugContainer = document.createElement('div');
+      debugContainer.style.cssText = 'position:fixed;bottom:100px;right:10px;z-index:9999;background:rgba(0,0,0,0.8);border-radius:10px;padding:12px;max-width:220px;color:#fff;font-size:12px;font-family:sans-serif;pointer-events:auto;';
+      debugContainer.innerHTML = `
+        <button id="debugBtn" style="background:#3b82f6;border:none;color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;width:100%;">🛠️ 测试登录</button>
+        <div id="debugResult" style="margin-top:8px;word-break:break-all;font-size:11px;color:#a0aec0;"></div>
+      `;
+      document.body.appendChild(debugContainer);
+
+      const debugBtn = document.getElementById('debugBtn');
+      const debugResult = document.getElementById('debugResult');
+
+      async function fetchUsername() {
+        try {
+          const res = await fetch(COMMUNITY_API, {
+            credentials: 'include'
+          });
+          if (res.ok) {
+            const data = await res.json();
+            return { success: true, username: data.username || '访客', data };
+          } else {
+            return { success: false, error: `HTTP ${res.status}: ${res.statusText}` };
+          }
+        } catch (e) {
+          return { success: false, error: e.message };
+        }
+      }
+
+      // 自动更新欢迎语
+      async function updateGreeting() {
+        const result = await fetchUsername();
+        const el = document.getElementById('hero-greeting');
+        if (el) {
+          if (result.success) {
+            el.textContent = `${result.username}，${getGreeting()}`;
+          } else {
+            // 如果请求失败，保留默认的“凉宫数据欢迎您！”或者显示“访客”
+            // 不覆盖，避免闪动
+          }
+        }
+      }
 
       function getGreeting() {
         const hour = new Date().getHours();
@@ -625,39 +667,31 @@ const metadata = {
         return '晚上好';
       }
 
-      async function fetchUsername() {
-        try {
-          const res = await fetch(COMMUNITY_API, {
-            credentials: 'include' // 携带 Cookie
-          });
-          if (res.ok) {
-            const data = await res.json();
-            return data.username || '访客';
+      // 点击调试按钮
+      debugBtn.addEventListener('click', async function() {
+        debugResult.textContent = '⏳ 请求中...';
+        const result = await fetchUsername();
+        if (result.success) {
+          debugResult.textContent = `✅ 用户名: ${result.username}`;
+          // 同时更新欢迎语
+          const el = document.getElementById('hero-greeting');
+          if (el) {
+            el.textContent = `${result.username}，${getGreeting()}`;
           }
-        } catch (e) {
-          console.log('获取用户信息失败:', e);
+        } else {
+          debugResult.textContent = `❌ ${result.error}`;
         }
-        return '访客';
-      }
+      });
 
-      async function updateGreeting() {
-        const username = await fetchUsername();
-        const el = document.getElementById('hero-greeting');
-        if (el) {
-          el.textContent = `${username}，${getGreeting()}`;
-          console.log(`✅ 欢迎语已更新: ${username}，${getGreeting()}`);
-        }
-      }
-
-      // 页面加载时获取
+      // 页面加载时自动尝试
       updateGreeting();
 
-      // SPA 导航后重新获取
+      // SPA 导航后重试
       document.addEventListener('astro:after-swap', function() {
         setTimeout(updateGreeting, 100);
       });
 
-      // 每 30 秒刷新一次（用于切换登录状态）
+      // 每 30 秒刷新一次
       setInterval(updateGreeting, 30000);
     })();
   </script>
