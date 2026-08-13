@@ -224,4 +224,38 @@ const metadata = {
       },
     ]}
   />
+
+  <!-- ===== 修复 Hero 背景拦截滚轮 ===== -->
+  <script>
+    (function() {
+      function fixHeroScroll() {
+        const hero = document.querySelector('[class*="Hero"]');
+        if (!hero) return;
+        
+        // 让所有背景层不拦截鼠标事件
+        const bgLayers = hero.querySelectorAll('.absolute.inset-0, [class*="absolute"][class*="inset-0"]');
+        bgLayers.forEach(el => {
+          el.style.pointerEvents = 'none';
+        });
+        
+        // 确保按钮和链接可点击
+        const content = hero.querySelectorAll('a, button, [role="button"]');
+        content.forEach(el => {
+          el.style.pointerEvents = 'auto';
+        });
+        
+        console.log('✅ 关于我们 Hero 背景已修复，滚轮可穿透');
+      }
+      
+      if (document.readyState === 'complete') {
+        fixHeroScroll();
+      } else {
+        window.addEventListener('load', fixHeroScroll);
+      }
+      
+      document.addEventListener('astro:after-swap', function() {
+        setTimeout(fixHeroScroll, 100);
+      });
+    })();
+  </script>
 </Layout>
