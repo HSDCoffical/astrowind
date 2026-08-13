@@ -17,6 +17,10 @@ import { ClientRouter } from 'astro:transitions';
 
 import type { MetaData as MetaDataType } from '~/types';
 
+// ===== 新增：读取 JWT 所需依赖 =====
+import { parse } from 'cookie';
+import jwt from 'jsonwebtoken';
+
 export interface Props {
   metadata?: MetaDataType;
 }
@@ -30,6 +34,26 @@ const isBlogPage = currentPath.startsWith('/blog') || currentPath.startsWith('/�
 const isHomePage = currentPath === '/';
 const isAboutPage = currentPath.startsWith('/about');
 const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
+
+// ===== 读取 JWT 获取用户名 =====
+const cookieHeader = Astro.request.headers.get('cookie') || '';
+const cookies = cookieHeader ? parse(cookieHeader) : {};
+const authToken = cookies.auth_token;
+
+let username = '访客';
+let userAvatar = '';
+
+if (authToken) {
+  try {
+    // 解码 JWT
+    const decoded = jwt.verify(authToken, import.meta.env.JWT_SECRET);
+    username = decoded.username || '访客';
+    userAvatar = decoded.avatar || '';
+  } catch (error) {
+    // Token 无效或过期，保持访客
+    console.log('Token 验证失败:', error.message);
+  }
+}
 ---
 
 <!doctype html>
@@ -64,6 +88,9 @@ const needsHeaderPlaceholder = isBlogPage && !isHomePage && !isAboutPage;
   </head>
 
   <body class="antialiased text-default bg-page tracking-tight">
+    <!-- ===== 全局传递用户名（供 JS 读取） ===== -->
+    <div id="global-user" data-username={username} data-avatar={userAvatar}></div>
+
     <div class={needsHeaderPlaceholder ? 'pt-16 md:pt-20' : ''}>
       <slot />
     </div>
