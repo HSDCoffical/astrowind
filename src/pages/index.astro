@@ -374,7 +374,7 @@ const metadata = {
     </div>
   </section>
 
-  <!-- ===== 底部搜索框 ===== -->
+  <!-- ===== 底部搜索框（手机端无毛玻璃，桌面端保留） ===== -->
   <div 
     class="fixed bottom-4 left-0 right-0 z-50 px-4"
     style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y; pointer-events: none;"
@@ -387,7 +387,7 @@ const metadata = {
           type="text"
           name="q"
           placeholder="搜索本站内容..."
-          class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
+          class="w-full py-3 px-6 pl-12 bg-white/20 md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
         />
         <button
           id="search-toggle"
@@ -496,7 +496,7 @@ const metadata = {
           input.name = 'q';
           input.disabled = false;
           input.placeholder = '输入关键字以联网检索';
-          input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
+          input.className = 'w-full py-3 px-6 pl-12 bg-white/20 md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
           modeLabel.textContent = '必应搜索';
           searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
         } else {
@@ -507,7 +507,7 @@ const metadata = {
           input.name = '';
           input.disabled = false;
           input.placeholder = '输入关键词检索本站';
-          input.className = 'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
+          input.className = 'w-full py-3 px-6 pl-12 bg-white/20 md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
           modeLabel.textContent = '站内检索';
           searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
           if (input.value.trim()) {
