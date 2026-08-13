@@ -26,10 +26,8 @@ export interface Props {
 const { metadata = {} } = Astro.props;
 const { language, textDirection } = I18N;
 
-// ===== 判断是否为首页 =====
 const isHomePage = Astro.url.pathname === '/';
 
-// ===== 读取 JWT 获取用户名 =====
 const cookieHeader = Astro.request.headers.get('cookie') || '';
 const cookies = cookieHeader ? parse(cookieHeader) : {};
 const authToken = cookies.auth_token;
@@ -78,7 +76,6 @@ if (authToken) {
         overflow-anchor: none !important;
       }
 
-      /* 强制固定定位元素背景透明 */
       .fixed,
       header#header,
       header#header > div,
@@ -110,34 +107,32 @@ if (authToken) {
   <body class="antialiased text-default bg-page tracking-tight">
     <div id="global-user" data-username={username} data-avatar={userAvatar}></div>
 
-    <!-- ===== 首页不加内边距，其他页面加 ===== -->
     <div class={isHomePage ? '' : 'pt-16 md:pt-20'}>
       <slot />
     </div>
 
     <BasicScripts />
 
-    <!-- ===== 修复下翻再上翻的抖动（手机端） ===== -->
+    <!-- ===== 重置滚动锚定（保留搜索框） ===== -->
     <script>
       (function() {
         const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         if (!isMobile) return;
 
-        function resetScrollDirection() {
-          const y = window.scrollY;
-          // 微调 1px 后立即恢复，触发浏览器重置滚动方向状态
-          window.scrollTo(0, y + 1);
-          requestAnimationFrame(function() {
-            window.scrollTo(0, y);
+        function resetScrollAnchoring() {
+          document.body.classList.toggle('overflow-hidden');
+          requestAnimationFrame(() => {
+            document.body.classList.toggle('overflow-hidden');
           });
         }
 
         window.addEventListener('load', function() {
-          setTimeout(resetScrollDirection, 300);
+          setTimeout(resetScrollAnchoring, 300);
+          setTimeout(resetScrollAnchoring, 500);
         });
 
         document.addEventListener('astro:after-swap', function() {
-          setTimeout(resetScrollDirection, 100);
+          setTimeout(resetScrollAnchoring, 100);
         });
       })();
     </script>
