@@ -28,16 +28,16 @@ if (image) {
 ---
 
 <section class="relative md:-mt-[76px] not-prose overflow-hidden min-h-[600px] md:min-h-[700px] flex items-center" {...id ? { id } : {}}>
-  <!-- ===== 背景图片层（绝对定位，铺满全屏） ===== -->
+  <!-- ===== 背景图片层（添加 pointer-events-none 让滚轮穿透） ===== -->
   {imageUrl && (
     <div
-      class="absolute inset-0 w-full h-full bg-cover bg-center"
+      class="absolute inset-0 w-full h-full bg-cover bg-center pointer-events-none"
       style={`background-image: url('${imageUrl}');`}
     ></div>
   )}
-  <!-- ===== 半透明遮罩（让文字更清晰，可调整透明度） ===== -->
+  <!-- ===== 半透明遮罩（添加 pointer-events-none 让滚轮穿透） ===== -->
   {imageUrl && (
-    <div class="absolute inset-0 w-full h-full bg-black/40"></div>
+    <div class="absolute inset-0 w-full h-full bg-black/40 pointer-events-none"></div>
   )}
 
   <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
