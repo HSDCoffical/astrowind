@@ -7,9 +7,9 @@ import Layout from '~/layouts/PageLayout.astro';
 import SinglePost from '~/components/blog/SinglePost.astro';
 import ToBlogLink from '~/components/blog/ToBlogLink.astro';
 
-// ===== 新增：导入 Header =====
-import Header from '~/components/common/Header.astro';
-import { headerData } from '~/navigation';
+// ===== 修复：改为相对路径 =====
+import Header from '../../components/common/Header.astro';
+import { headerData } from '../../navigation';
 
 import { getCanonical, getPermalink } from '~/utils/permalinks';
 import { getStaticPathsBlogPost, blogPostRobots } from '~/utils/blog';
