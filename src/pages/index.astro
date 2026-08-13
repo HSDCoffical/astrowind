@@ -610,7 +610,7 @@ const metadata = {
     })();
   </script>
 
-  <!-- ===== 动态更新 Hero 欢迎语（支持多种 Cookie 字段名） ===== -->
+  <!-- ===== 动态更新 Hero 欢迎语（支持 Cookie / localStorage / sessionStorage） ===== -->
   <script>
     (function() {
       function getGreeting() {
@@ -630,19 +630,50 @@ const metadata = {
         return null;
       }
 
-      // ===== 尝试多个可能的 Cookie 字段名 =====
-      const possibleNames = ['username', 'user', 'name', 'user_name', 'uid', 'nickname', 'display_name'];
-      let username = null;
-      for (const name of possibleNames) {
-        const val = getCookie(name);
-        if (val && val !== 'null' && val !== 'undefined' && val !== '') {
-          username = decodeURIComponent(val);
-          break;
-        }
+      function getStorage(key) {
+        return localStorage.getItem(key) || sessionStorage.getItem(key) || null;
       }
-      // 如果都没找到，默认访客
-      username = username || '访客';
 
+      function getUsername() {
+        // 1. 先尝试 Cookie
+        const cookieNames = ['username', 'user', 'name', 'user_name', 'uid', 'nickname', 'display_name'];
+        for (const name of cookieNames) {
+          const val = getCookie(name);
+          if (val && val !== 'null' && val !== 'undefined' && val !== '') {
+            return decodeURIComponent(val);
+          }
+        }
+
+        // 2. 再尝试 localStorage / sessionStorage
+        const storageKeys = ['username', 'user', 'name', 'user_name', 'uid', 'nickname', 'display_name', 'userInfo'];
+        for (const key of storageKeys) {
+          const val = getStorage(key);
+          if (val && val !== 'null' && val !== 'undefined' && val !== '') {
+            // 尝试解析 JSON
+            try {
+              const parsed = JSON.parse(val);
+              if (parsed && typeof parsed === 'object') {
+                const possibleFields = ['username', 'name', 'user', 'nickname', 'displayName', 'display_name'];
+                for (const field of possibleFields) {
+                  if (parsed[field]) {
+                    return parsed[field];
+                  }
+                }
+                if (parsed.toString && parsed.toString() !== '[object Object]') {
+                  return parsed.toString();
+                }
+                return val;
+              }
+            } catch (e) {
+              return val;
+            }
+          }
+        }
+
+        return null;
+      }
+
+      let username = getUsername() || '访客';
       const greeting = getGreeting();
 
       const el = document.getElementById('hero-greeting');
@@ -651,18 +682,9 @@ const metadata = {
         console.log(`✅ 欢迎语已更新: ${username}，${greeting}`);
       }
 
-      // ===== 监听 Cookie 变化（每2秒检查一次，无需刷新页面） =====
       let lastUsername = username;
       setInterval(function() {
-        let newUsername = null;
-        for (const name of possibleNames) {
-          const val = getCookie(name);
-          if (val && val !== 'null' && val !== 'undefined' && val !== '') {
-            newUsername = decodeURIComponent(val);
-            break;
-          }
-        }
-        newUsername = newUsername || '访客';
+        const newUsername = getUsername() || '访客';
         if (newUsername !== lastUsername) {
           lastUsername = newUsername;
           const el2 = document.getElementById('hero-greeting');
