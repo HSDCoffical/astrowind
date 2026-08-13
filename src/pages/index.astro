@@ -610,7 +610,7 @@ const metadata = {
     })();
   </script>
 
-  <!-- ===== 动态更新 Hero 欢迎语 ===== -->
+  <!-- ===== 动态更新 Hero 欢迎语（支持多种 Cookie 字段名） ===== -->
   <script>
     (function() {
       function getGreeting() {
@@ -630,13 +630,48 @@ const metadata = {
         return null;
       }
 
-      const username = getCookie('username') || '访客';
+      // ===== 尝试多个可能的 Cookie 字段名 =====
+      const possibleNames = ['username', 'user', 'name', 'user_name', 'uid', 'nickname', 'display_name'];
+      let username = null;
+      for (const name of possibleNames) {
+        const val = getCookie(name);
+        if (val && val !== 'null' && val !== 'undefined' && val !== '') {
+          username = decodeURIComponent(val);
+          break;
+        }
+      }
+      // 如果都没找到，默认访客
+      username = username || '访客';
+
       const greeting = getGreeting();
 
       const el = document.getElementById('hero-greeting');
       if (el) {
         el.textContent = `${username}，${greeting}`;
+        console.log(`✅ 欢迎语已更新: ${username}，${greeting}`);
       }
+
+      // ===== 监听 Cookie 变化（每2秒检查一次，无需刷新页面） =====
+      let lastUsername = username;
+      setInterval(function() {
+        let newUsername = null;
+        for (const name of possibleNames) {
+          const val = getCookie(name);
+          if (val && val !== 'null' && val !== 'undefined' && val !== '') {
+            newUsername = decodeURIComponent(val);
+            break;
+          }
+        }
+        newUsername = newUsername || '访客';
+        if (newUsername !== lastUsername) {
+          lastUsername = newUsername;
+          const el2 = document.getElementById('hero-greeting');
+          if (el2) {
+            el2.textContent = `${newUsername}，${getGreeting()}`;
+            console.log(`✅ 欢迎语已更新 (自动): ${newUsername}，${getGreeting()}`);
+          }
+        }
+      }, 2000);
     })();
   </script>
 
