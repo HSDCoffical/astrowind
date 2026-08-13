@@ -30,7 +30,6 @@ export interface Props {
   showToggleTheme?: boolean;
   showRssFeed?: boolean;
   position?: string;
-  username?: string;
 }
 
 const {
@@ -43,7 +42,6 @@ const {
   showToggleTheme = false,
   showRssFeed = false,
   position = 'center',
-  username = '访客', // 默认用户名改为“访客”
 } = Astro.props;
 
 const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
@@ -176,12 +174,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       </ul>
     </nav>
 
-    <!-- ===== 动态欢迎语（时间问候 + 用户名） ===== -->
-    <div class="flex items-center justify-center md:justify-end text-white/80 text-sm font-medium mt-2 md:mt-0">
-      <span id="greeting-text">加载中...</span>
-      <span class="text-white font-semibold ml-1" id="username-display">{username}</span>
-    </div>
-
     <div
       class:list={[
         { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
@@ -218,30 +210,3 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     </div>
   </div>
 </header>
-
-<!-- ===== 动态问候语脚本 ===== -->
-<script>
-  (function() {
-    function getGreeting() {
-      const hour = new Date().getHours();
-      if (hour >= 5 && hour < 9) {
-        return '🌅 早上好';
-      } else if (hour >= 9 && hour < 12) {
-        return '☀️ 上午好';
-      } else if (hour >= 12 && hour < 14) {
-        return '🌤️ 中午好';
-      } else if (hour >= 14 && hour < 18) {
-        return '🌤️ 下午好';
-      } else if (hour >= 18 && hour < 21) {
-        return '🌅 傍晚好';
-      } else {
-        return '🌙 晚上好';
-      }
-    }
-
-    const greetingEl = document.getElementById('greeting-text');
-    if (greetingEl) {
-      greetingEl.textContent = getGreeting();
-    }
-  })();
-</script>
