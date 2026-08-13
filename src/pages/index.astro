@@ -55,9 +55,308 @@ const metadata = {
     </Hero>
   </div>
 
-  <!-- 中间 Widget 保持不变（省略，实际完整） -->
   <Note title="我们的理念" description="创新·高新" />
-  <!-- ... 所有中间内容 ... -->
+
+  <Features
+    id="features"
+    tagline="凉宫数据"
+    title="新方向·新发展"
+    items={[
+      {
+        title: '我们的理念',
+        description:
+          '创新，当代互联网高新技术产业已处于饱和状态，作为创新型企业，则必然需要开拓新型市场以及高新产业',
+        icon: 'tabler:brand-tailwind',
+      },
+      {
+        title: '我们的发展',
+        description:
+          '我们于2026/4/17成立，届时，我们一共发布了三个中心，其中，凉宫数据中央行政中心为最高管理中心',
+        icon: 'tabler:components',
+      },
+      {
+        title: '我们的目标',
+        description:
+          '我们正在不断的发展，拓展各个互联网方向，在发展的同时也在不断提升自我，以达到看一步，走一步，稳一步的效果',
+        icon: 'tabler:list-check',
+      },
+      {
+        title: '我们的数据',
+        description:
+          '凉宫数据现采用Cloudflare作为防火墙，后续将逐步改善，提高用户的浏览效率',
+        icon: 'tabler:rocket',
+      },
+      {
+        title: '我们的Ai',
+        description:
+          "凉宫数据现已完成移动端Ai项目部署，完成了主流平台的聊天/分析等功能，现逐步完善到网页端",
+        icon: 'tabler:arrows-right-left',
+      },
+      {
+        title: '我们的人员',
+        description:
+          '凉宫数据现有一名中央行政员，同时也欢迎各位加入我们，我们将会不断开放更多福利',
+        icon: 'tabler:bulb',
+      },
+    ]}
+  />
+
+  <Content
+    isReversed
+    tagline="——数据板块——"
+    title="凉宫数据数字安全化"
+    items={[
+      {
+        title: '安全性',
+        description:
+          '数据采用端到端加密的方式，任何人不能获取到私人信息，并且定期有安全管理员进行安全核查',
+      },
+      {
+        title: '时效性',
+        description:
+          '除验证码等具有时效性的数据，其他数据均有长期时效性，给用户提供更长时效性的数字化服务',
+      },
+      {
+        title: '链接性',
+        description:
+          '所有的数据直接发送到云端数据库，避免二次转发，达到更高销量的数据高效化',
+      },
+    ]}
+    image={{
+      src: '/01.png',
+      alt: '凉宫数据',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">新数据化</h3>
+      多效化 
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    isAfterContent
+    items={[
+      {
+        title: '中国',
+        description:'国内主要服务端，大部分云端服务由国内提供技术服务',
+      },
+      {
+        title: '美国',
+        description:
+          '防火墙提供商Cloudflare主干服务器位于美国，其安全性由该企业提供技术支持',
+      },
+      {
+        title: '新加坡',
+        description:
+          "Ai服务端联网信息获取资源网站，由其提供的联网Api获取实时资讯",
+      },
+      {
+        title: '未知',
+        description:
+          '待后续开放',
+      },
+    ]}
+    image={{
+      src: '/02.png',
+      alt: '凉宫数据',
+    }}
+  >
+    <Fragment slot="content">全球数据分布</Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Content
+    isReversed
+    isAfterContent
+    items={[
+      {
+        title: '子企总行政管理员',
+        description:
+          '凉宫数据中央行政中心作为主导中心，旗下还有“凉宫数据数字发行中心”及“凉宫数据硬件发行中心”，两个子企业也需要领导人，带领企业逐步发展',
+      },
+      {
+        title: '项目管理员',
+        description:
+          '负责中心下发的项目开发，完善等，带领团队高效的完成发布的项目，获取你的荣誉称号',
+      },
+      {
+        title: '新媒体运营',
+        description:
+          '即管理公司对外媒体运营账号，包含短视频账号，资讯类平台等，同时也及时了解用户反馈及建议',
+      },
+      {
+        title: '职员',
+        description: `作为职员，只需要完成中心下发的信息即可，入职时，会发放你的专属邮箱地址，并在辞职时回收`,
+      },
+    ]}
+    image={{
+      src: '/03.png',
+      alt: '凉宫数据',
+    }}
+  >
+    <Fragment slot="content">加入我们</Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <Steps
+    title="入职流程"
+    items={[
+      {
+        title: '[1]: <span class="font-medium">发送申请</span>',
+        description:
+          "向中心发送入职申请，中心会在一周内通过原邮件地址返回报告",
+        icon: 'tabler:package',
+      },
+      {
+        title: '[2]: <span class="font-medium">返回报告</span>',
+        description:
+          "审核通过后会附赠一个联系人，添加联系人，并咨询",
+        icon: 'tabler:letter-case',
+      },
+      {
+        title: '[3]: <span class="font-medium">专属编号</span>',
+        description:
+          '中心下发专属邮件地址，并下发独立的编号',
+        icon: 'tabler:paint',
+      },
+      {
+        title: '成功，欢迎您加入凉宫数据！',
+        icon: 'tabler:check',
+      },
+    ]}
+    image={{
+      src: '/04.png',
+      alt: '凉宫数据',
+    }}
+  />
+
+  <Features2
+    title="加入我们"
+    subtitle="成为我们的一员，并和我们一起发展进步"
+    tagline="——团队协作——"
+    items={[
+      {
+        title: '团队协作',
+        description: "多团队协作需要每个成员之间相互理解包容，在每一次协作时不断磨合，最终达成高效的协作能力",
+        icon: 'flat-color-icons:template',
+      },
+      {
+        title: '团队建设',
+        description:
+          "在一个大集体中，不存在高低之分，所有人都是一份子，从凉宫数据诞生之日起[公平]便是刻进企业骨子里的原则",
+        icon: 'flat-color-icons:gallery',
+      },
+      {
+        title: '团队意识',
+        description:
+          '抛弃传统的硬磨合，每一位成员都应该有自己的主见，无论是谁，都应该需要了解每一位员工的意见',
+        icon: 'flat-color-icons:approval',
+      },
+      {
+        title: '团队整体',
+        description:
+          "在大型表决会议中，每一位员工都应该表达自己的主见，不以职位高低评价一个人，不以富贵贫穷区分等级",
+        icon: 'flat-color-icons:document',
+      },
+      {
+        title: '团队专业',
+        description:
+          '作为一个合作性大集体，新员工都会由老员工带领，加入我们这个团体不会视而不见，每一位员工都值得被尊敬',
+        icon: 'flat-color-icons:advertising',
+      },
+      {
+        title: '团队意识',
+        description: '团队意识秉持着创立时的初衷[以民为本]，只有团队之间相互理解包容，才能在这条路上越走越远',
+        icon: 'flat-color-icons:currency-exchange',
+      },
+      {
+        title: '团队精神',
+        description: '走好每一步，让每一位成员都走好每一步，不需要急促的发展，需要每一位员工的参与，团队在此刻才会彰显出意义',
+        icon: 'flat-color-icons:voice-presentation',
+      },
+      {
+        title: '团队协调',
+        description:
+          '团队中的每一位都是不可缺少的一份子，只有每一位参与，协调才会更加强大',
+        icon: 'flat-color-icons:business-contact',
+      },
+      {
+        title: '团队衷心',
+        description: "有付出那么也会有收获",
+        icon: 'flat-color-icons:database',
+      },
+    ]}
+  >
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Features2>
+
+  <BlogLatestPosts
+    title="信息中心"
+    information={`资讯/实时
+                `}
+  />
+
+  <FAQs
+    title="更多事项"
+    subtitle="凉宫数据相关问题"
+    tagline="凉宫架构"
+    classes={{ container: 'max-w-6xl' }}
+    items={[
+      {
+        title: '我该如何辨认是不是企业发布?',
+        description:
+          "首先，发送申请后回执报告由xuexiang@lianggong.dpdns.org转发，如果源邮箱不对，请联系该邮箱获取帮助或视为冒充邮件",
+      },
+      {
+        title: '没有经验可以加入吗?',
+        description:
+          '先说答案，可以，因为我们本身就是刚起步的小行业，只要愿意，欢迎您加入我们',
+      },
+      {
+        title: '为什么有时网页加载很慢或报错?',
+        description:
+          "网页由Cloudflare托管，加载时间要按服务器响应时间来看，如果一直不行，请科学上网",
+      },
+      {
+        title: "凉宫数据是干什么的?",
+        description:
+          "凉宫数据是一家创新型互联网企业，我们会在Ai，数字数据等高新技术方面进行发展",
+      },
+      {
+        title: '为什么市面上没有凉宫数据?',
+        description:
+          "凉宫数据作为刚起步的小型企业，我们选择保守性，即等规模宏大了便注册实体资质",
+      },
+      {
+        title: '它能带来什么?',
+        description:
+          "对于新手来说，它能让你了解到互联网行业，对于老手来说，温故而知新，对于管理来说，是一次自我锻炼的机会",
+      },
+    ]}
+  />
+
+  <Stats
+    stats={[
+      { title: '管理员', amount: '1名' },
+      { title: '建设者', amount: '1名' },
+      { title: '贡献者', amount: '1名' },
+      { title: '企业人数', amount: '1名' },
+    ]}
+  />
+
+  <CallToAction actions={[]} />
 
   <!-- ===== 邮箱地址 ===== -->
   <section class="px-6 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-28 mx-auto max-w-4xl text-center">
@@ -75,10 +374,10 @@ const metadata = {
     </div>
   </section>
 
-  <!-- ===== 底部固定搜索框（手机端纯色背景，桌面端毛玻璃） ===== -->
+  <!-- ===== 底部搜索框（手机端无毛玻璃，桌面端保留） ===== -->
   <div 
     class="fixed bottom-4 left-0 right-0 z-50 px-4"
-    style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y; pointer-events: none; will-change: transform; transform: translateZ(0);"
+    style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y; pointer-events: none;"
   >
     <div class="max-w-2xl mx-auto pointer-events-auto">
       <form id="search-form" class="relative" action="https://www.bing.com/search" method="GET" target="_blank">
@@ -88,7 +387,7 @@ const metadata = {
           type="text"
           name="q"
           placeholder="搜索本站内容..."
-          class="w-full py-3 px-6 pl-12 bg-white/90 md:bg-white/20 border border-gray-300 md:border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg md:backdrop-blur-lg"
+          class="w-full py-3 px-6 pl-12 bg-white/20 md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
         />
         <button
           id="search-toggle"
@@ -112,7 +411,6 @@ const metadata = {
     </div>
   </div>
 
-  <!-- ===== 搜索框脚本 ===== -->
   <script>
     function initSearch() {
       const form = document.getElementById('search-form');
@@ -198,7 +496,7 @@ const metadata = {
           input.name = 'q';
           input.disabled = false;
           input.placeholder = '输入关键字以联网检索';
-          input.className = 'w-full py-3 px-6 pl-12 bg-white/90 md:bg-white/20 border border-gray-300 md:border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg md:backdrop-blur-lg';
+          input.className = 'w-full py-3 px-6 pl-12 bg-white/20 md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
           modeLabel.textContent = '必应搜索';
           searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
         } else {
@@ -209,7 +507,7 @@ const metadata = {
           input.name = '';
           input.disabled = false;
           input.placeholder = '输入关键词检索本站';
-          input.className = 'w-full py-3 px-6 pl-12 bg-white/90 md:bg-white/20 border border-gray-300 md:border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg md:backdrop-blur-lg';
+          input.className = 'w-full py-3 px-6 pl-12 bg-white/20 md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
           modeLabel.textContent = '站内检索';
           searchIcon.setAttribute('d', 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z');
           if (input.value.trim()) {
@@ -263,7 +561,6 @@ const metadata = {
     });
   </script>
 
-  <!-- ===== Hero 背景滚轮修复 ===== -->
   <script>
     (function() {
       function fixHeroScroll() {
@@ -317,6 +614,7 @@ const metadata = {
         try {
           localStorage.setItem('username', username);
         } catch (e) {}
+        // 4 个月有效期（10368000 秒 ≈ 120 天）
         document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=10368000`;
       }
 
