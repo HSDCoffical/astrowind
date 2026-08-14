@@ -12,7 +12,7 @@ const {
   class: className = 'flex flex-col h-12 w-12 rounded justify-center items-center cursor-pointer group relative z-[60]',
 } = Astro.props;
 
-// ✅ 直接写死菜单链接
+// 菜单链接
 const menuLinks = [
   { text: '首页', href: '/' },
   { text: '信息中心', href: '/blog' },
@@ -119,6 +119,20 @@ const menuLinks = [
     const closeBtn = document.getElementById('menu-close-btn');
     let isOpen = false;
 
+    // ✅ 重置按钮到三横线状态
+    function resetButton() {
+      line1.style.transform = 'rotate(0deg) translateY(0px)';
+      line2.style.opacity = '0.8';
+      line3.style.transform = 'rotate(0deg) translateY(0px)';
+      // 确保面板关闭
+      panel.classList.add('translate-x-full');
+      panel.classList.remove('translate-x-0');
+      overlay.classList.add('opacity-0', 'pointer-events-none');
+      overlay.classList.remove('opacity-100', 'pointer-events-auto');
+      document.body.style.overflow = '';
+      isOpen = false;
+    }
+
     function openMenu() {
       isOpen = true;
       // 三横线 → X
@@ -163,8 +177,31 @@ const menuLinks = [
       }
     });
 
+    // ✅ 点击菜单项后先关闭菜单，再跳转
     panel.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', closeMenu);
+      link.addEventListener('click', function(e) {
+        // 如果是外部链接，新窗口打开，不关闭菜单
+        if (this.href.startsWith('http')) {
+          // 外部链接新窗口打开，不需要关闭
+          return;
+        }
+        // 内部链接：关闭菜单后再跳转
+        e.preventDefault();
+        const href = this.href;
+        closeMenu();
+        // 等待动画完成后再跳转
+        setTimeout(() => {
+          window.location.href = href;
+        }, 300);
+      });
+    });
+
+    // ✅ 页面加载后重置按钮状态（解决返回后状态不对的问题）
+    resetButton();
+
+    // ✅ Astro SPA 导航切换后也重置
+    document.addEventListener('astro:after-swap', function() {
+      resetButton();
     });
   })();
 </script>
