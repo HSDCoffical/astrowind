@@ -32,61 +32,31 @@ const menuLinks = [
 >
   <span class="sr-only">{label}</span>
   <slot>
-    <span
-      id="menu-line-1"
-      aria-hidden="true"
-      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition duration-200 opacity-80"
-      style="transform-origin: center center;"
-    ></span>
-    <span
-      id="menu-line-2"
-      aria-hidden="true"
-      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition duration-200 opacity-80"
-    ></span>
-    <span
-      id="menu-line-3"
-      aria-hidden="true"
-      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition duration-200 opacity-80"
-      style="transform-origin: center center;"
-    ></span>
+    <!-- 三条线各自独立控制 -->
+    <span id="menu-line-1" class="menu-line"></span>
+    <span id="menu-line-2" class="menu-line"></span>
+    <span id="menu-line-3" class="menu-line"></span>
   </slot>
 </button>
 
-<!-- ========== 遮罩层 ========== -->
-<div
-  id="menu-overlay"
-  class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none"
-  aria-hidden="true"
-></div>
+<!-- 遮罩 -->
+<div id="menu-overlay" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none"></div>
 
-<!-- ========== 侧边菜单面板 ========== -->
-<div
-  id="menu-panel"
-  class="fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 shadow-2xl transition-transform duration-300 ease-out translate-x-full"
-  role="dialog"
-  aria-modal="true"
-  aria-label="导航菜单"
->
-  <!-- 顶部只保留分割线 -->
+<!-- 侧边菜单 -->
+<div id="menu-panel" class="fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 shadow-2xl transition-transform duration-300 ease-out translate-x-full">
   <div class="h-16 border-b border-gray-100 dark:border-gray-800"></div>
-
   <nav class="py-2 px-3 overflow-y-auto h-[calc(100%-4rem)]">
     <ul class="space-y-1">
       {menuLinks.map(({ text, href }) => (
         <li>
-          <a
-            href={href || '#'}
-            target={href?.startsWith('http') ? '_blank' : '_self'}
-            rel={href?.startsWith('http') ? 'noopener noreferrer' : ''}
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
-          >
-            {text}
-          </a>
+          <a href={href || '#'}
+             target={href?.startsWith('http') ? '_blank' : '_self'}
+             rel={href?.startsWith('http') ? 'noopener noreferrer' : ''}
+             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
+          >{text}</a>
         </li>
       ))}
     </ul>
-
-    <!-- 底部主题切换 -->
     <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
       <div class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-500 dark:text-gray-400">
         <ToggleTheme iconClass="w-5 h-5" />
@@ -96,7 +66,40 @@ const menuLinks = [
   </nav>
 </div>
 
-<!-- ========== 交互脚本 ========== -->
+<style>
+  /* 三条线的公共样式 */
+  .menu-line {
+    display: block;
+    width: 1.5rem;   /* w-6 */
+    height: 2px;      /* h-0.5 */
+    margin: 4px 0;    /* my-1 */
+    border-radius: 9999px;
+    background-color: black;
+    transition: all 0.2s ease;
+    transform-origin: center center;
+  }
+  .dark .menu-line {
+    background-color: white;
+  }
+  /* 打开时的样式，通过 JS 添加类来控制 */
+  .menu-line.open-1 {
+    transform: rotate(45deg) translateY(0px);
+  }
+  .menu-line.open-2 {
+    opacity: 0;
+  }
+  .menu-line.open-3 {
+    transform: rotate(-45deg) translateY(0px);
+  }
+  /* 确保遮罩和面板层级正确 */
+  #menu-overlay {
+    will-change: opacity;
+  }
+  #menu-panel {
+    will-change: transform;
+  }
+</style>
+
 <script>
   (function() {
     const btn = document.getElementById('menu-toggle-btn');
@@ -105,35 +108,28 @@ const menuLinks = [
     const line3 = document.getElementById('menu-line-3');
     const panel = document.getElementById('menu-panel');
     const overlay = document.getElementById('menu-overlay');
-    let isOpen = false;
 
-    // 重置按钮到三横线状态
-    function resetButton() {
-      line1.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-      line1.style.transform = 'rotate(0deg) translateY(0px)';
-      line2.style.transition = 'opacity 0.2s ease';
-      line2.style.opacity = '0.8';
-      line3.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-      line3.style.transform = 'rotate(0deg) translateY(0px)';
-      // 确保面板关闭
+    // 重置到三横线状态（移除所有 open 类）
+    function resetMenu() {
+      line1.classList.remove('open-1');
+      line2.classList.remove('open-2');
+      line3.classList.remove('open-3');
       panel.classList.add('translate-x-full');
       panel.classList.remove('translate-x-0');
       overlay.classList.add('opacity-0', 'pointer-events-none');
       overlay.classList.remove('opacity-100', 'pointer-events-auto');
       document.body.style.overflow = '';
-      isOpen = false;
     }
 
+    // 打开菜单（添加 open 类）
     function openMenu() {
-      // 先重置，再打开
-      resetButton();
+      // 先重置，再打开，避免状态错乱
+      resetMenu();
+      // 使用 requestAnimationFrame 确保重置完成后再打开
       requestAnimationFrame(() => {
-        isOpen = true;
-        // 三横线 → X
-        line1.style.transform = 'rotate(45deg) translateY(-2.5px)';
-        line2.style.opacity = '0';
-        line3.style.transform = 'rotate(-45deg) translateY(2.5px)';
-        // 菜单滑出
+        line1.classList.add('open-1');
+        line2.classList.add('open-2');
+        line3.classList.add('open-3');
         panel.classList.remove('translate-x-full');
         panel.classList.add('translate-x-0');
         overlay.classList.remove('opacity-0', 'pointer-events-none');
@@ -142,32 +138,26 @@ const menuLinks = [
       });
     }
 
+    // 关闭菜单
     function closeMenu() {
-      isOpen = false;
-      // X → 三横线
-      line1.style.transform = 'rotate(0deg) translateY(0px)';
-      line2.style.opacity = '0.8';
-      line3.style.transform = 'rotate(0deg) translateY(0px)';
-      panel.classList.remove('translate-x-0');
-      panel.classList.add('translate-x-full');
-      overlay.classList.remove('opacity-100', 'pointer-events-auto');
-      overlay.classList.add('opacity-0', 'pointer-events-none');
-      document.body.style.overflow = '';
+      resetMenu();
     }
 
+    // 切换
     function toggleMenu() {
-      isOpen ? closeMenu() : openMenu();
+      // 判断是否打开：看 panel 是否含有 translate-x-0
+      if (panel.classList.contains('translate-x-0')) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
     }
 
-    // 点击汉堡按钮
+    // 事件绑定
     btn.addEventListener('click', toggleMenu);
-
-    // 点击遮罩关闭
     overlay.addEventListener('click', closeMenu);
-
-    // ESC 关闭
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && isOpen) {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && panel.classList.contains('translate-x-0')) {
         closeMenu();
       }
     });
@@ -175,9 +165,9 @@ const menuLinks = [
     // 菜单内链接点击
     panel.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', function(e) {
-        if (this.href.startsWith('http')) {
-          return; // 外部链接新窗口
-        }
+        // 外部链接（http）新窗口打开，不阻止默认
+        if (this.href.startsWith('http')) return;
+        // 内部链接：先关闭菜单再跳转
         e.preventDefault();
         const href = this.href;
         closeMenu();
@@ -187,21 +177,17 @@ const menuLinks = [
       });
     });
 
-    // 页面加载重置
-    resetButton();
+    // 页面加载时重置（解决返回后状态不对）
+    resetMenu();
 
-    // Astro SPA 导航后重置
-    document.addEventListener('astro:after-swap', function() {
-      resetButton();
+    // Astro SPA 导航切换后重置
+    document.addEventListener('astro:after-swap', () => {
+      resetMenu();
+    });
+
+    // 页面卸载前确保菜单关闭（可选）
+    window.addEventListener('beforeunload', () => {
+      resetMenu();
     });
   })();
 </script>
-
-<style is:global>
-  #menu-panel {
-    will-change: transform;
-  }
-  #menu-overlay {
-    will-change: opacity;
-  }
-</style>
