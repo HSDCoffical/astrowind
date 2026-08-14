@@ -44,10 +44,17 @@ const metadata = {
       </Fragment>
 
       <Fragment slot="subtitle">
-        <!-- 轮播文案（在问候语和蓝色文案之间） -->
-        <div class="text-sm sm:text-base text-blue-500/80 font-medium mb-0.5" id="carousel-text">
-          今天过的怎么样？
+        <!-- 问候语（由用户名脚本控制） -->
+        <span id="hero-greeting">凉宫数据欢迎您！</span>
+
+        <!-- 轮播文案（带毛玻璃背景，独立一行） -->
+        <div class="mt-0.5">
+          <span class="inline-block px-4 py-1 text-sm sm:text-base text-blue-600/90 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full shadow-sm">
+            <span id="carousel-text">今天过的怎么样？</span>
+          </span>
         </div>
+
+        <!-- 蓝色文案（恢复原样） -->
         <span class="hidden sm:inline">凉宫数据提供</span>
         <span class="block mb-1 sm:hidden font-bold text-blue-600">凉宫office提供</span>
         创新型互联网企业
