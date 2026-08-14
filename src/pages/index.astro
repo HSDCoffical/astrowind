@@ -44,12 +44,19 @@ const metadata = {
       </Fragment>
 
       <Fragment slot="subtitle">
-        <span class="hidden sm:inline">
-          凉宫数据提供
-        </span>
-        <span class="block mb-1 sm:hidden font-bold text-blue-600">
-          凉宫office提供
-        </span>
+        <!-- 问候语 -->
+        <span id="hero-greeting">凉宫数据欢迎您！</span>
+
+        <!-- ===== 轮播文案 ===== -->
+        <div id="slogan-carousel" class="text-sm text-blue-500/80 font-medium mt-0.5 h-5 overflow-hidden">
+          <span id="carousel-text" class="inline-block transition-opacity duration-500 opacity-100">
+            今天过的怎么样？
+          </span>
+        </div>
+
+        <!-- 蓝色文案 -->
+        <span class="block mb-1 sm:hidden font-bold text-blue-600">凉宫office提供</span>
+        <span class="hidden sm:inline">凉宫数据提供</span>
         创新型互联网企业
       </Fragment>
     </Hero>
@@ -462,9 +469,53 @@ const metadata = {
     })();
   </script>
 
+  <!-- ===== 轮播文案脚本 ===== -->
+  <script>
+    (function() {
+      const SLOGANS = [
+        "今天过的怎么样？",
+        "今天心情如何？",
+        "今天也要加油哦",
+        "你来了呀，欢迎哦",
+        "今天也要好好爱自己哦",
+        "保持热爱，奔赴山河",
+        "今天有什么有趣的事吗？",
+        "辛苦了，休息一下吧",
+        "今天也要元气满满哦",
+        "在这里，遇见更好的自己",
+      ];
+
+      let currentIndex = 0;
+      const textEl = document.getElementById('carousel-text');
+
+      function showNext() {
+        if (!textEl) return;
+        textEl.style.opacity = '0';
+        setTimeout(() => {
+          currentIndex = (currentIndex + 1) % SLOGANS.length;
+          textEl.textContent = SLOGANS[currentIndex];
+          textEl.style.opacity = '1';
+        }, 500);
+      }
+
+      if (textEl) {
+        textEl.textContent = SLOGANS[0];
+        textEl.style.opacity = '1';
+        setInterval(showNext, 4000);
+      }
+
+      document.addEventListener('astro:after-swap', function() {
+        const newTextEl = document.getElementById('carousel-text');
+        if (newTextEl) {
+          newTextEl.textContent = SLOGANS[0];
+          newTextEl.style.opacity = '1';
+        }
+      });
+    })();
+  </script>
+
   <!-- ===== 动态注入搜索框（修复 SPA 导航后消失问题） ===== -->
   <script>
-    // 搜索框 HTML 模板（完整定义，避免丢失）
     const SEARCH_HTML = `
       <div class="search-wrapper fixed bottom-4 left-0 right-0 z-50 px-4" style="overscroll-behavior: none; overflow-anchor: none; touch-action: pan-y; pointer-events: none;">
         <div class="max-w-2xl mx-auto pointer-events-auto">
@@ -630,16 +681,13 @@ const metadata = {
       loadSearchData();
     }
 
-    // 注入搜索框的函数
     function injectSearch() {
       const oldSearch = document.querySelector('.search-wrapper');
       if (oldSearch) oldSearch.remove();
       document.body.insertAdjacentHTML('beforeend', SEARCH_HTML);
-      // 延迟一点确保 DOM 渲染完成
       setTimeout(initSearch, 50);
     }
 
-    // 页面加载完成后注入
     if (document.readyState === 'complete') {
       setTimeout(injectSearch, 300);
     } else {
@@ -648,7 +696,6 @@ const metadata = {
       });
     }
 
-    // SPA 导航后重新注入（切换页面后返回时重新创建）
     document.addEventListener('astro:after-swap', function() {
       setTimeout(injectSearch, 100);
     });
