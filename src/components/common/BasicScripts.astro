@@ -52,6 +52,9 @@ import { UI } from 'astrowind:config';
       document.getElementById('header')?.classList.remove('expanded');
       document.getElementById('header')?.classList.remove('bg-page');
       document.getElementById('header')?.classList.remove('menu-open');
+      // 移除旧版类确保兼容
+      document.querySelector('#header nav')?.classList.add('hidden');
+      document.querySelector('#header > div > div:last-child')?.classList.add('hidden');
     });
 
     // 点击菜单按钮切换
@@ -63,6 +66,24 @@ import { UI } from 'astrowind:config';
       document.getElementById('header')?.classList.toggle('bg-page');
       // 关键：切换 menu-open 类触发滑动动画
       document.getElementById('header')?.classList.toggle('menu-open');
+      // 旧版兼容
+      document.querySelector('#header nav')?.classList.toggle('hidden');
+      document.querySelector('#header > div > div:last-child')?.classList.toggle('hidden');
+    });
+
+    // 点击遮罩关闭菜单（在点击其他地方时关闭）
+    document.addEventListener('click', function(e) {
+      const menu = document.querySelector('#header nav:not(.md\\:flex)');
+      const btn = document.querySelector('[data-aw-toggle-menu]');
+      const header = document.getElementById('header');
+      if (menu && !menu.contains(e.target) && btn && !btn.contains(e.target) && header?.classList.contains('menu-open')) {
+        header.classList.remove('menu-open');
+        document.body.classList.remove('overflow-hidden');
+        document.querySelector('[data-aw-toggle-menu]')?.classList.remove('expanded');
+        document.getElementById('header')?.classList.remove('h-screen');
+        document.getElementById('header')?.classList.remove('expanded');
+        document.getElementById('header')?.classList.remove('bg-page');
+      }
     });
 
     attachEvent('[data-aw-toggle-color-scheme]', 'click', function () {
@@ -117,6 +138,8 @@ import { UI } from 'astrowind:config';
       document.getElementById('header')?.classList.remove('expanded');
       document.getElementById('header')?.classList.remove('bg-page');
       document.getElementById('header')?.classList.remove('menu-open');
+      document.querySelector('#header nav')?.classList.add('hidden');
+      document.querySelector('#header > div > div:last-child')?.classList.add('hidden');
     });
 
     // 已注释冲突的滚动逻辑
@@ -155,6 +178,7 @@ import { UI } from 'astrowind:config';
     document.getElementById('header')?.classList.remove('h-screen');
     document.getElementById('header')?.classList.remove('expanded');
     document.getElementById('header')?.classList.remove('menu-open');
+    document.querySelector('#header nav')?.classList.add('hidden');
   };
 
   window.onload = onLoad;
