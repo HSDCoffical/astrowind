@@ -11,7 +11,7 @@ export interface Props {
 
 const {
   label = 'Toggle Menu',
-  class: className = 'flex flex-col h-12 w-12 rounded justify-center items-center cursor-pointer group relative z-50',
+  class: className = 'flex flex-col h-12 w-12 rounded justify-center items-center cursor-pointer group relative z-[60]',
 } = Astro.props;
 
 const menuLinks = headerData.links || [];
@@ -108,42 +108,25 @@ const menuLinks = headerData.links || [];
     const panel = document.getElementById('menu-panel');
     const overlay = document.getElementById('menu-overlay');
     const closeBtn = document.getElementById('menu-close-btn');
-    const header = document.querySelector('header');  // 获取状态栏
     let isOpen = false;
 
     function openMenu() {
       isOpen = true;
-      // 按钮变 X
       btn.classList.add('expanded');
-      // 菜单滑出
       panel.classList.remove('translate-x-full');
       panel.classList.add('translate-x-0');
-      // 遮罩显示
       overlay.classList.remove('opacity-0', 'pointer-events-none');
       overlay.classList.add('opacity-100', 'pointer-events-auto');
-      // ✅ 关键：让状态栏消失（防止重叠冲突）
-      if (header) {
-        header.style.opacity = '0';
-        header.style.pointerEvents = 'none';
-      }
       document.body.style.overflow = 'hidden';
     }
 
     function closeMenu() {
       isOpen = false;
-      // 按钮变回三横线
       btn.classList.remove('expanded');
-      // 菜单滑回
       panel.classList.remove('translate-x-0');
       panel.classList.add('translate-x-full');
-      // 遮罩隐藏
       overlay.classList.remove('opacity-100', 'pointer-events-auto');
       overlay.classList.add('opacity-0', 'pointer-events-none');
-      // ✅ 关键：恢复状态栏
-      if (header) {
-        header.style.opacity = '1';
-        header.style.pointerEvents = 'auto';
-      }
       document.body.style.overflow = '';
     }
 
@@ -151,23 +134,16 @@ const menuLinks = headerData.links || [];
       isOpen ? closeMenu() : openMenu();
     }
 
-    // 点击汉堡按钮
     btn.addEventListener('click', toggleMenu);
-
-    // 点击关闭按钮
     closeBtn.addEventListener('click', closeMenu);
-
-    // 点击遮罩层
     overlay.addEventListener('click', closeMenu);
 
-    // 按 ESC 键
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && isOpen) {
         closeMenu();
       }
     });
 
-    // 点击菜单项自动关闭
     panel.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', closeMenu);
     });
@@ -180,9 +156,5 @@ const menuLinks = headerData.links || [];
   }
   #menu-overlay {
     will-change: opacity;
-  }
-  /* ✅ 状态栏过渡动画 */
-  header {
-    transition: opacity 0.3s ease;
   }
 </style>
