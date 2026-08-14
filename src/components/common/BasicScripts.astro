@@ -44,24 +44,25 @@ import { UI } from 'astrowind:config';
     let lastKnownScrollPosition = window.scrollY;
     let ticking = true;
 
+    // 点击导航链接关闭菜单
     attachEvent('#header nav', 'click', function () {
       document.querySelector('[data-aw-toggle-menu]')?.classList.remove('expanded');
       document.body.classList.remove('overflow-hidden');
       document.getElementById('header')?.classList.remove('h-screen');
       document.getElementById('header')?.classList.remove('expanded');
       document.getElementById('header')?.classList.remove('bg-page');
-      document.querySelector('#header nav')?.classList.add('hidden');
-      document.querySelector('#header > div > div:last-child')?.classList.add('hidden');
+      document.getElementById('header')?.classList.remove('menu-open');
     });
 
+    // 点击菜单按钮切换
     attachEvent('[data-aw-toggle-menu]', 'click', function (_, elem) {
       elem.classList.toggle('expanded');
       document.body.classList.toggle('overflow-hidden');
       document.getElementById('header')?.classList.toggle('h-screen');
       document.getElementById('header')?.classList.toggle('expanded');
       document.getElementById('header')?.classList.toggle('bg-page');
-      document.querySelector('#header nav')?.classList.toggle('hidden');
-      document.querySelector('#header > div > div:last-child')?.classList.toggle('hidden');
+      // 关键：切换 menu-open 类触发滑动动画
+      document.getElementById('header')?.classList.toggle('menu-open');
     });
 
     attachEvent('[data-aw-toggle-color-scheme]', 'click', function () {
@@ -115,11 +116,10 @@ import { UI } from 'astrowind:config';
       document.getElementById('header')?.classList.remove('h-screen');
       document.getElementById('header')?.classList.remove('expanded');
       document.getElementById('header')?.classList.remove('bg-page');
-      document.querySelector('#header nav')?.classList.add('hidden');
-      document.querySelector('#header > div > div:last-child')?.classList.add('hidden');
+      document.getElementById('header')?.classList.remove('menu-open');
     });
 
-    // ===== 已注释冲突的滚动逻辑 =====
+    // 已注释冲突的滚动逻辑
     /*
     function applyHeaderStylesOnScroll() {
       const header = document.querySelector('#header[data-aw-sticky-header]');
@@ -146,7 +146,6 @@ import { UI } from 'astrowind:config';
   };
 
   const onPageShow = function () {
-    // ===== 注释掉可能导致回弹的平滑滚动 =====
     // document.documentElement.classList.add('motion-safe:scroll-smooth');
     const elem = document.querySelector('[data-aw-toggle-menu]');
     if (elem) {
@@ -155,7 +154,7 @@ import { UI } from 'astrowind:config';
     document.body.classList.remove('overflow-hidden');
     document.getElementById('header')?.classList.remove('h-screen');
     document.getElementById('header')?.classList.remove('expanded');
-    document.querySelector('#header nav')?.classList.add('hidden');
+    document.getElementById('header')?.classList.remove('menu-open');
   };
 
   window.onload = onLoad;
@@ -169,7 +168,7 @@ import { UI } from 'astrowind:config';
 </script>
 
 <script is:inline>
-  /* Inspired by: https://github.com/heidkaemper/tailwindcss-intersect */
+  // Observer 代码保持不变
   const Observer = {
     observer: null,
     delayBetweenAnimations: 100,
@@ -276,12 +275,6 @@ import { UI } from 'astrowind:config';
       });
     },
 
-    /*
-      REF: #643;
-      We need to remove the delay to fix flickering/delay
-      when toggling the theme. Observer only removes them
-      after data-animated is gone (out of view).
-    */
     removeAnimationDelay() {
       this.elements.forEach((el) => {
         if (el.getAttribute('data-animated') === 'true') {
