@@ -44,20 +44,11 @@ const metadata = {
       </Fragment>
 
       <Fragment slot="subtitle">
-        <!-- 问候语（保持不变） -->
-        <span id="hero-greeting">凉宫数据欢迎您！</span>
-
-        <!-- 每日随机文案（独立一行） -->
-        <div class="text-xs sm:text-sm text-blue-500/80 font-medium mt-0.5" id="daily-slogan">
-          今天有什么有趣的事吗？
-        </div>
-
-        <!-- 蓝色字体恢复为原来的"凉宫office提供" -->
-        <span class="block mb-1 sm:hidden font-bold text-blue-600">
-          凉宫office提供
-        </span>
         <span class="hidden sm:inline">
           凉宫数据提供
+        </span>
+        <span class="block mb-1 sm:hidden font-bold text-blue-600">
+          凉宫office提供
         </span>
         创新型互联网企业
       </Fragment>
@@ -468,48 +459,6 @@ const metadata = {
       if (storedUsername) {
         updateGreeting(storedUsername);
       }
-    })();
-  </script>
-
-  <!-- ===== 每日随机文案 ===== -->
-  <script>
-    (function() {
-      const SLOGANS = [
-        "今天过的怎么样？",
-        "今天心情如何？",
-        "今天也要加油哦",
-        "你来了呀，欢迎哦",
-        "今天也要好好爱自己哦",
-        "保持热爱，奔赴山河",
-        "今天有什么有趣的事吗？",
-        "辛苦了，休息一下吧",
-        "今天也要元气满满哦",
-        "在这里，遇见更好的自己",
-      ];
-
-      function getDailySlogan() {
-        const now = new Date();
-        const start = new Date(now.getFullYear(), 0, 0);
-        const diff = now - start;
-        const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
-        return SLOGANS[dayOfYear % SLOGANS.length] || SLOGANS[0];
-      }
-
-      function updateSlogans() {
-        const slogan = getDailySlogan();
-        const el = document.getElementById('daily-slogan');
-        if (el) el.textContent = slogan;
-      }
-
-      if (document.readyState === 'complete') {
-        updateSlogans();
-      } else {
-        window.addEventListener('load', updateSlogans);
-      }
-
-      document.addEventListener('astro:after-swap', function() {
-        setTimeout(updateSlogans, 50);
-      });
     })();
   </script>
 
