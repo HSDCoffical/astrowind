@@ -45,8 +45,8 @@ const metadata = merge(
 ---
 
 <Layout metadata={metadata}>
-  <!-- ===== 顶部内边距与列表页对齐 ===== -->
-  <div class="pt-4 md:pt-8">
+  <!-- ===== 手机端加内边距，桌面端不加 ===== -->
+  <div class="pt-4 md:pt-0">
     <SinglePost post={{ ...post, image: image }} url={url}>
       {post.Content && <post.Content />}
     </SinglePost>
