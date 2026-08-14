@@ -9,7 +9,7 @@ export interface Props {
 
 const {
   label = 'Toggle Menu',
-  class: className = 'flex flex-col h-12 w-12 rounded justify-center items-center cursor-pointer relative z-[60]',
+  class: className = 'flex flex-col h-12 w-12 rounded justify-center items-center cursor-pointer group relative z-[60]',
 } = Astro.props;
 
 const menuLinks = [
@@ -22,40 +22,59 @@ const menuLinks = [
 ];
 ---
 
-<!-- ========== 汉堡按钮 ========== -->
 <button
-  id="menu-toggle-btn"
   type="button"
   class={className}
   aria-label={label}
+  id="menu-toggle-btn"
 >
   <span class="sr-only">{label}</span>
-  <!-- 三条线的容器 -->
-  <div id="menu-lines" class="relative w-6 h-5">
-    <span id="line-1" class="absolute top-0 left-0 w-full h-0.5 bg-black dark:bg-white rounded-full transition-all duration-200"></span>
-    <span id="line-2" class="absolute top-1/2 left-0 w-full h-0.5 bg-black dark:bg-white rounded-full transition-all duration-200 -translate-y-1/2"></span>
-    <span id="line-3" class="absolute bottom-0 left-0 w-full h-0.5 bg-black dark:bg-white rounded-full transition-all duration-200"></span>
-  </div>
+  <slot>
+    <span
+      aria-hidden="true"
+      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition ease transform duration-200 opacity-80 group-[.expanded]:rotate-45 group-[.expanded]:translate-y-2.5"
+    ></span>
+    <span
+      aria-hidden="true"
+      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition ease transform duration-200 opacity-80 group-[.expanded]:opacity-0"
+    ></span>
+    <span
+      aria-hidden="true"
+      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition ease transform duration-200 opacity-80 group-[.expanded]:-rotate-45 group-[.expanded]:translate-y-2.5"
+    ></span>
+  </slot>
 </button>
 
-<!-- 遮罩 -->
-<div id="menu-overlay" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+<!-- 遮罩层 -->
+<div
+  id="menu-overlay"
+  class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none"
+></div>
 
-<!-- 侧边菜单 -->
-<div id="menu-panel" class="fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 shadow-2xl transition-transform duration-300 ease-out translate-x-full">
+<!-- 侧边菜单面板 -->
+<div
+  id="menu-panel"
+  class="fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 shadow-2xl transition-transform duration-300 ease-out translate-x-full"
+>
+  <!-- 占位高度，与状态栏对齐 -->
   <div class="h-16 border-b border-gray-100 dark:border-gray-800"></div>
+
   <nav class="py-2 px-3 overflow-y-auto h-[calc(100%-4rem)]">
     <ul class="space-y-1">
       {menuLinks.map(({ text, href }) => (
         <li>
-          <a href={href || '#'}
-             target={href?.startsWith('http') ? '_blank' : '_self'}
-             rel={href?.startsWith('http') ? 'noopener noreferrer' : ''}
-             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
-          >{text}</a>
+          <a
+            href={href || '#'}
+            target={href?.startsWith('http') ? '_blank' : '_self'}
+            rel={href?.startsWith('http') ? 'noopener noreferrer' : ''}
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
+          >
+            {text}
+          </a>
         </li>
       ))}
     </ul>
+
     <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
       <div class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-500 dark:text-gray-400">
         <ToggleTheme iconClass="w-5 h-5" />
@@ -68,68 +87,48 @@ const menuLinks = [
 <script>
   (function() {
     const btn = document.getElementById('menu-toggle-btn');
-    const line1 = document.getElementById('line-1');
-    const line2 = document.getElementById('line-2');
-    const line3 = document.getElementById('line-3');
     const panel = document.getElementById('menu-panel');
     const overlay = document.getElementById('menu-overlay');
-
     let isOpen = false;
 
+    // 打开菜单
     function openMenu() {
       isOpen = true;
-      // 第一条线：旋转45度，移到中间
-      line1.style.transform = 'rotate(45deg)';
-      line1.style.top = '50%';
-      line1.style.transformOrigin = 'center center';
-      // 第二条线：消失
-      line2.style.opacity = '0';
-      // 第三条线：旋转-45度，移到中间
-      line3.style.transform = 'rotate(-45deg)';
-      line3.style.bottom = '50%';
-      line3.style.transformOrigin = 'center center';
-      // 面板滑出
-      panel.style.transform = 'translateX(0)';
-      // 遮罩显示
-      overlay.style.opacity = '1';
-      overlay.style.pointerEvents = 'auto';
+      btn.classList.add('expanded');
+      panel.classList.remove('translate-x-full');
+      panel.classList.add('translate-x-0');
+      overlay.classList.remove('opacity-0', 'pointer-events-none');
+      overlay.classList.add('opacity-100', 'pointer-events-auto');
       document.body.style.overflow = 'hidden';
     }
 
+    // 关闭菜单
     function closeMenu() {
       isOpen = false;
-      // 恢复三条线
-      line1.style.transform = 'rotate(0deg)';
-      line1.style.top = '0';
-      line2.style.opacity = '1';
-      line3.style.transform = 'rotate(0deg)';
-      line3.style.bottom = '0';
-      // 面板滑回
-      panel.style.transform = 'translateX(100%)';
-      // 遮罩隐藏
-      overlay.style.opacity = '0';
-      overlay.style.pointerEvents = 'none';
+      btn.classList.remove('expanded');
+      panel.classList.remove('translate-x-0');
+      panel.classList.add('translate-x-full');
+      overlay.classList.remove('opacity-100', 'pointer-events-auto');
+      overlay.classList.add('opacity-0', 'pointer-events-none');
       document.body.style.overflow = '';
     }
 
+    // 切换
     function toggleMenu() {
       isOpen ? closeMenu() : openMenu();
     }
 
-    // 点击按钮
+    // 事件绑定
     btn.addEventListener('click', toggleMenu);
-
-    // 点击遮罩关闭
     overlay.addEventListener('click', closeMenu);
 
-    // ESC 关闭
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isOpen) closeMenu();
     });
 
-    // 菜单内链接点击
-    panel.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', function(e) {
+    // 点击菜单项关闭
+    panel.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', function (e) {
         if (this.href.startsWith('http')) return;
         e.preventDefault();
         const href = this.href;
@@ -140,22 +139,17 @@ const menuLinks = [
       });
     });
 
-    // 重置函数（页面加载和 SPA 导航后调用）
-    function resetMenu() {
-      closeMenu();
-    }
-
     // 页面加载重置
-    resetMenu();
+    closeMenu();
 
     // Astro SPA 导航后重置
     document.addEventListener('astro:after-swap', () => {
-      resetMenu();
+      closeMenu();
     });
 
-    // 切回页面时重置
+    // 页面可见性变化重置
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') resetMenu();
+      if (document.visibilityState === 'visible') closeMenu();
     });
   })();
 </script>
