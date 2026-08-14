@@ -54,7 +54,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   style="background: transparent !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
-    /* 所有原有样式保留 */
+    /* ===== 所有原有样式保留 ===== */
     header#header * {
       background: transparent !important;
     }
@@ -92,7 +92,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* 手机版禁用毛玻璃 */
     @media (max-width: 768px) {
       header#header {
         backdrop-filter: none !important;
@@ -100,47 +99,38 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* ===== 移动端菜单滑动动画（仅作用于手机菜单面板） ===== */
+    /* ===== 移动端菜单滑动动画（最小改动版） ===== */
     @media (max-width: 767px) {
-      /* 移动端菜单面板 - 仅针对手机版显示的导航 */
-      #header nav.md\\:hidden,
-      #header > div > div:last-child {
+      /* 菜单面板 - 仅针对手机菜单 */
+      #header nav:not(.md\\:flex) {
         position: fixed;
         top: 0;
         right: 0;
         bottom: 0;
-        width: 80%;
-        max-width: 320px;
-        background: rgba(255, 255, 255, 0.95);
+        width: 280px;
+        background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
-        padding: 20px 24px;
+        padding: 60px 24px 24px;
         overflow-y: auto;
-        z-index: 50;
-        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+        z-index: 60;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         transform: translateX(100%);
-        opacity: 0;
-        pointer-events: none;
-        display: flex !important; /* 覆盖 hidden 类，由 transform 控制显隐 */
-        flex-direction: column;
+        display: block !important;
       }
 
-      .dark #header nav.md\\:hidden,
-      .dark #header > div > div:last-child {
-        background: rgba(17, 24, 39, 0.95);
+      .dark #header nav:not(.md\\:flex) {
+        background: rgba(17, 24, 39, 0.98);
       }
 
-      /* 菜单打开状态 */
-      #header.menu-open nav.md\\:hidden,
-      #header.menu-open > div > div:last-child {
+      /* 菜单打开 */
+      #header.menu-open nav:not(.md\\:flex) {
         transform: translateX(0);
-        opacity: 1;
-        pointer-events: auto;
       }
 
-      /* 背景遮罩 */
-      #header.menu-open::before {
+      /* 遮罩层（点击关闭） */
+      #header.menu-open::after {
         content: '';
         position: fixed;
         top: 0;
@@ -148,44 +138,50 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         right: 0;
         bottom: 0;
         background: rgba(0, 0, 0, 0.3);
-        z-index: 45;
-        animation: fadeIn 0.25s ease;
+        z-index: 55;
+        cursor: pointer;
       }
 
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-
-      /* 确保菜单内部内容正常显示 */
-      #header nav.md\\:hidden ul,
-      #header > div > div:last-child ul {
+      /* 菜单内部样式 */
+      #header nav:not(.md\\:flex) ul {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        width: 100%;
       }
 
-      #header nav.md\\:hidden li,
-      #header > div > div:last-child li {
+      #header nav:not(.md\\:flex) li {
         width: 100%;
+        list-style: none;
       }
 
-      /* 桌面导航保持原有布局不受影响 */
-      #header nav:not(.md\\:hidden) {
-        display: flex !important;
-        position: static;
-        transform: none;
-        opacity: 1;
-        pointer-events: auto;
+      #header nav:not(.md\\:flex) a,
+      #header nav:not(.md\\:flex) button {
+        display: block;
+        padding: 10px 16px;
+        font-size: 16px;
+        color: #1f2937;
+        text-decoration: none;
+        border-radius: 8px;
+        width: 100%;
+        text-align: left;
         background: transparent;
-        box-shadow: none;
-        backdrop-filter: none;
-        padding: 0;
-        overflow: visible;
-        z-index: auto;
-        width: auto;
-        flex-direction: row;
+        border: none;
+        cursor: pointer;
+      }
+
+      .dark #header nav:not(.md\\:flex) a,
+      .dark #header nav:not(.md\\:flex) button {
+        color: #f3f4f6;
+      }
+
+      #header nav:not(.md\\:flex) a:hover,
+      #header nav:not(.md\\:flex) button:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
+
+      .dark #header nav:not(.md\\:flex) a:hover,
+      .dark #header nav:not(.md\\:flex) button:hover {
+        background: rgba(255, 255, 255, 0.05);
       }
     }
   </style>
