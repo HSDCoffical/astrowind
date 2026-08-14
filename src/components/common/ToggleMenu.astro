@@ -2,7 +2,7 @@
 // src/components/common/ToggleMenu.astro
 import { Icon } from 'astro-icon/components';
 import ToggleTheme from './ToggleTheme.astro';
-import { headerData } from '~/config/navigation';
+import { headerData } from '../../config/navigation';   // ✅ 修正为相对路径
 
 export interface Props {
   label?: string;
@@ -17,7 +17,7 @@ const {
 const menuLinks = headerData.links || [];
 ---
 
-<!-- ========== 三横线按钮（保留原有样式，由CSS控制动画） ========== -->
+<!-- ========== 三横线按钮（保留原有动画） ========== -->
 <button
   id="menu-toggle-btn"
   type="button"
@@ -57,7 +57,7 @@ const menuLinks = headerData.links || [];
   aria-modal="true"
   aria-label="导航菜单"
 >
-  <!-- 顶部：品牌标识 + 关闭按钮 -->
+  <!-- 顶部 -->
   <div class="flex items-center justify-between px-5 h-16 border-b border-gray-100 dark:border-gray-800">
     <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">
       凉宫数据
@@ -112,7 +112,7 @@ const menuLinks = headerData.links || [];
 
     function openMenu() {
       isOpen = true;
-      btn.classList.add('expanded');        // 触发三横线 → X 动画
+      btn.classList.add('expanded');
       panel.classList.remove('translate-x-full');
       panel.classList.add('translate-x-0');
       overlay.classList.remove('opacity-0', 'pointer-events-none');
@@ -122,7 +122,7 @@ const menuLinks = headerData.links || [];
 
     function closeMenu() {
       isOpen = false;
-      btn.classList.remove('expanded');     // 触发 X → 三横线 动画
+      btn.classList.remove('expanded');
       panel.classList.remove('translate-x-0');
       panel.classList.add('translate-x-full');
       overlay.classList.remove('opacity-100', 'pointer-events-auto');
