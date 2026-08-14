@@ -2,7 +2,7 @@
 // src/components/common/ToggleMenu.astro
 import { Icon } from 'astro-icon/components';
 import ToggleTheme from './ToggleTheme.astro';
-import { headerData } from '../../navigation';   // ✅ 修正路径
+import { headerData } from '../../navigation';
 
 export interface Props {
   label?: string;
@@ -17,7 +17,7 @@ const {
 const menuLinks = headerData.links || [];
 ---
 
-<!-- ========== 三横线按钮（保留原有动画） ========== -->
+<!-- ========== 三横线按钮 ========== -->
 <button
   id="menu-toggle-btn"
   type="button"
@@ -29,7 +29,7 @@ const menuLinks = headerData.links || [];
   <slot>
     <span
       aria-hidden="true"
-      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition ease transform duration-200 opacity-80 group-[.expanded]:rotate-45 group-[.expanded]:translate-y-2.5"
+      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition ease transform duration-200 opacity-80 group-[.expanded]:rotate-45 group-[.expanded]:-translate-y-2.5"
     ></span>
     <span
       aria-hidden="true"
@@ -57,7 +57,7 @@ const menuLinks = headerData.links || [];
   aria-modal="true"
   aria-label="导航菜单"
 >
-  <!-- 顶部：品牌标识 + 关闭按钮 -->
+  <!-- 顶部 -->
   <div class="flex items-center justify-between px-5 h-16 border-b border-gray-100 dark:border-gray-800">
     <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">
       凉宫数据
@@ -108,25 +108,42 @@ const menuLinks = headerData.links || [];
     const panel = document.getElementById('menu-panel');
     const overlay = document.getElementById('menu-overlay');
     const closeBtn = document.getElementById('menu-close-btn');
+    const header = document.querySelector('header');  // 获取状态栏
     let isOpen = false;
 
     function openMenu() {
       isOpen = true;
+      // 按钮变 X
       btn.classList.add('expanded');
+      // 菜单滑出
       panel.classList.remove('translate-x-full');
       panel.classList.add('translate-x-0');
+      // 遮罩显示
       overlay.classList.remove('opacity-0', 'pointer-events-none');
       overlay.classList.add('opacity-100', 'pointer-events-auto');
+      // ✅ 关键：让状态栏消失（防止重叠冲突）
+      if (header) {
+        header.style.opacity = '0';
+        header.style.pointerEvents = 'none';
+      }
       document.body.style.overflow = 'hidden';
     }
 
     function closeMenu() {
       isOpen = false;
+      // 按钮变回三横线
       btn.classList.remove('expanded');
+      // 菜单滑回
       panel.classList.remove('translate-x-0');
       panel.classList.add('translate-x-full');
+      // 遮罩隐藏
       overlay.classList.remove('opacity-100', 'pointer-events-auto');
       overlay.classList.add('opacity-0', 'pointer-events-none');
+      // ✅ 关键：恢复状态栏
+      if (header) {
+        header.style.opacity = '1';
+        header.style.pointerEvents = 'auto';
+      }
       document.body.style.overflow = '';
     }
 
@@ -134,16 +151,23 @@ const menuLinks = headerData.links || [];
       isOpen ? closeMenu() : openMenu();
     }
 
+    // 点击汉堡按钮
     btn.addEventListener('click', toggleMenu);
+
+    // 点击关闭按钮
     closeBtn.addEventListener('click', closeMenu);
+
+    // 点击遮罩层
     overlay.addEventListener('click', closeMenu);
 
+    // 按 ESC 键
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && isOpen) {
         closeMenu();
       }
     });
 
+    // 点击菜单项自动关闭
     panel.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', closeMenu);
     });
@@ -156,5 +180,9 @@ const menuLinks = headerData.links || [];
   }
   #menu-overlay {
     will-change: opacity;
+  }
+  /* ✅ 状态栏过渡动画 */
+  header {
+    transition: opacity 0.3s ease;
   }
 </style>
