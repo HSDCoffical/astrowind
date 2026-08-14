@@ -31,15 +31,15 @@ const menuLinks = [
   data-aw-toggle-menu
 >
   <span class="sr-only">{label}</span>
-  <slot>
-    <span id="menu-line-1" class="menu-line"></span>
-    <span id="menu-line-2" class="menu-line"></span>
-    <span id="menu-line-3" class="menu-line"></span>
-  </slot>
+  <div class="relative flex flex-col items-center justify-center w-6 h-6">
+    <span class="menu-line line-1"></span>
+    <span class="menu-line line-2"></span>
+    <span class="menu-line line-3"></span>
+  </div>
 </button>
 
 <!-- 遮罩 -->
-<div id="menu-overlay" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+<div id="menu-overlay" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
 <!-- 侧边菜单 -->
 <div id="menu-panel" class="fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 shadow-2xl transition-transform duration-300 ease-out translate-x-full">
@@ -67,82 +67,72 @@ const menuLinks = [
 
 <style>
   .menu-line {
-    display: block;
-    width: 1.5rem;
+    position: absolute;
+    width: 100%;
     height: 2px;
-    margin: 4px 0;
-    border-radius: 9999px;
     background-color: black;
+    border-radius: 9999px;
     transition: transform 0.25s ease, opacity 0.25s ease;
     transform-origin: center center;
   }
   .dark .menu-line {
     background-color: white;
   }
+  .line-1 { top: 0; }
+  .line-2 { top: 50%; transform: translateY(-50%); }
+  .line-3 { bottom: 0; }
+
+  /* 打开状态 */
+  .open .line-1 {
+    transform: rotate(45deg) translate(4px, 4px);
+  }
+  .open .line-2 {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  .open .line-3 {
+    transform: rotate(-45deg) translate(4px, -4px);
+  }
+
+  /* 面板和遮罩的打开状态 */
+  .menu-open #menu-panel {
+    transform: translateX(0%);
+  }
+  .menu-open #menu-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
 </style>
 
 <script>
   (function() {
     const btn = document.getElementById('menu-toggle-btn');
-    const line1 = document.getElementById('menu-line-1');
-    const line2 = document.getElementById('menu-line-2');
-    const line3 = document.getElementById('menu-line-3');
     const panel = document.getElementById('menu-panel');
     const overlay = document.getElementById('menu-overlay');
 
-    // 重置到三横线
-    function resetMenu() {
-      // 三条线恢复
-      line1.style.transform = 'rotate(0deg)';
-      line1.style.opacity = '1';
-      line2.style.transform = 'rotate(0deg)';
-      line2.style.opacity = '0.8';
-      line3.style.transform = 'rotate(0deg)';
-      line3.style.opacity = '1';
-      // 面板关闭
-      panel.style.transform = 'translateX(100%)';
-      // 遮罩隐藏
-      overlay.style.opacity = '0';
-      overlay.style.pointerEvents = 'none';
-      document.body.style.overflow = '';
-    }
-
-    // 打开菜单（三横线 → X）
-    function openMenu() {
-      line1.style.transform = 'rotate(45deg)';
-      line1.style.opacity = '1';
-      line2.style.transform = 'rotate(0deg)';
-      line2.style.opacity = '0';
-      line3.style.transform = 'rotate(-45deg)';
-      line3.style.opacity = '1';
-      panel.style.transform = 'translateX(0%)';
-      overlay.style.opacity = '1';
-      overlay.style.pointerEvents = 'auto';
-      document.body.style.overflow = 'hidden';
-    }
-
-    // 关闭菜单（X → 三横线）
-    function closeMenu() {
-      resetMenu();
-    }
-
-    // 切换
+    // 切换打开状态
     function toggleMenu() {
-      // 判断：如果面板在显示（transform 不是 translateX(100%)）
-      if (panel.style.transform === 'translateX(0%)' || panel.classList.contains('translate-x-0')) {
-        closeMenu();
+      document.documentElement.classList.toggle('menu-open');
+      btn.classList.toggle('open');
+      if (document.documentElement.classList.contains('menu-open')) {
+        document.body.style.overflow = 'hidden';
       } else {
-        openMenu();
+        document.body.style.overflow = '';
       }
+    }
+
+    // 关闭菜单
+    function closeMenu() {
+      document.documentElement.classList.remove('menu-open');
+      btn.classList.remove('open');
+      document.body.style.overflow = '';
     }
 
     // 事件绑定
     btn.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', closeMenu);
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeMenu();
-      }
+      if (e.key === 'Escape') closeMenu();
     });
 
     // 菜单内链接点击
@@ -158,19 +148,14 @@ const menuLinks = [
       });
     });
 
-    // 页面加载时重置
+    // 页面加载和 SPA 导航后重置
+    function resetMenu() {
+      closeMenu();
+    }
     resetMenu();
-
-    // Astro SPA 导航后重置
-    document.addEventListener('astro:after-swap', () => {
-      resetMenu();
-    });
-
-    // 切回页面时重置
+    document.addEventListener('astro:after-swap', resetMenu);
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        resetMenu();
-      }
+      if (document.visibilityState === 'visible') resetMenu();
     });
   })();
 </script>
