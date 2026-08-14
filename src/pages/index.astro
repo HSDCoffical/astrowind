@@ -44,10 +44,10 @@ const metadata = {
       </Fragment>
 
       <Fragment slot="subtitle">
-        <span class="hidden sm:inline">
+        <span class="hidden sm:inline" id="slogan-pc">
           凉宫数据提供
         </span>
-        <span class="block mb-1 sm:hidden font-bold text-blue-600">
+        <span class="block mb-1 sm:hidden font-bold text-blue-600" id="slogan-mobile">
           凉宫数据office提供
         </span>
         创新型互联网企业
@@ -179,7 +179,7 @@ const metadata = {
       {
         title: '子企总行政管理员',
         description:
-          '凉宫数据中央行政中心作为主导中心，旗下还有“凉宫数据数字发行中心”及“凉宫数据硬件发行中心”，两个子企业也需要领导人，带领企业逐步发展',
+          '凉宫数据中央行政中心作为主导中心，旗下还有"凉宫数据数字发行中心"及"凉宫数据硬件发行中心"，两个子企业也需要领导人，带领企业逐步发展',
       },
       {
         title: '项目管理员',
@@ -459,6 +459,56 @@ const metadata = {
       if (storedUsername) {
         updateGreeting(storedUsername);
       }
+    })();
+  </script>
+
+  <!-- ===== 每日随机文案（替换"凉宫数据office提供"） ===== -->
+  <script>
+    (function() {
+      // ============================================================
+      //  👇 在这里填写你的每日文案，每行一条，用英文逗号隔开
+      // ============================================================
+      const SLOGANS = [
+        "今天过的怎么样？",
+        "今天心情如何？",
+        "今天也要加油哦",
+        "你来了呀，欢迎哦",
+        "今天也要好好爱自己哦",
+        "保持热爱，奔赴山河",
+        "今天有什么有趣的事吗？",
+        "辛苦了，休息一下吧",
+        "今天也要元气满满哦",
+        "在这里，遇见更好的自己",
+      ];
+      // ============================================================
+
+      function getDailySlogan() {
+        const now = new Date();
+        // 计算今年第几天（1月1日 = 第1天）
+        const start = new Date(now.getFullYear(), 0, 0);
+        const diff = now - start;
+        const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+        // 用天数取模，同一天同一条，第二天自动换
+        return SLOGANS[dayOfYear % SLOGANS.length] || SLOGANS[0];
+      }
+
+      function updateSlogans() {
+        const slogan = getDailySlogan();
+        const pcEl = document.getElementById('slogan-pc');
+        const mobileEl = document.getElementById('slogan-mobile');
+        if (pcEl) pcEl.textContent = slogan;
+        if (mobileEl) mobileEl.textContent = slogan;
+      }
+
+      if (document.readyState === 'complete') {
+        updateSlogans();
+      } else {
+        window.addEventListener('load', updateSlogans);
+      }
+
+      document.addEventListener('astro:after-swap', function() {
+        setTimeout(updateSlogans, 50);
+      });
     })();
   </script>
 
