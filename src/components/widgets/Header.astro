@@ -54,6 +54,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   style="background: transparent !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
+    /* 所有原有样式保留 */
     header#header * {
       background: transparent !important;
     }
@@ -91,7 +92,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* 手机版禁用毛玻璃，防止白色采样 */
+    /* 手机版禁用毛玻璃 */
     @media (max-width: 768px) {
       header#header {
         backdrop-filter: none !important;
@@ -99,10 +100,10 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
     }
 
-    /* ===== 移动端菜单滑动动画 ===== */
+    /* ===== 移动端菜单滑动动画（仅作用于手机菜单面板） ===== */
     @media (max-width: 767px) {
-      /* 菜单面板 */
-      #header nav,
+      /* 移动端菜单面板 - 仅针对手机版显示的导航 */
+      #header nav.md\\:hidden,
       #header > div > div:last-child {
         position: fixed;
         top: 0;
@@ -121,15 +122,17 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         transform: translateX(100%);
         opacity: 0;
         pointer-events: none;
+        display: flex !important; /* 覆盖 hidden 类，由 transform 控制显隐 */
+        flex-direction: column;
       }
 
-      .dark #header nav,
+      .dark #header nav.md\\:hidden,
       .dark #header > div > div:last-child {
         background: rgba(17, 24, 39, 0.95);
       }
 
       /* 菜单打开状态 */
-      #header.menu-open nav,
+      #header.menu-open nav.md\\:hidden,
       #header.menu-open > div > div:last-child {
         transform: translateX(0);
         opacity: 1;
@@ -154,9 +157,35 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         to { opacity: 1; }
       }
 
-      /* 移除原有的 .hidden 控制 */
-      #header nav.hidden {
+      /* 确保菜单内部内容正常显示 */
+      #header nav.md\\:hidden ul,
+      #header > div > div:last-child ul {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+      }
+
+      #header nav.md\\:hidden li,
+      #header > div > div:last-child li {
+        width: 100%;
+      }
+
+      /* 桌面导航保持原有布局不受影响 */
+      #header nav:not(.md\\:hidden) {
         display: flex !important;
+        position: static;
+        transform: none;
+        opacity: 1;
+        pointer-events: auto;
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
+        padding: 0;
+        overflow: visible;
+        z-index: auto;
+        width: auto;
+        flex-direction: row;
       }
     }
   </style>
