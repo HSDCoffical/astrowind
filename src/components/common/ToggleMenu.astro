@@ -1,8 +1,6 @@
 ---
 // src/components/common/ToggleMenu.astro
-import { Icon } from 'astro-icon/components';
 import ToggleTheme from './ToggleTheme.astro';
-import { headerData } from '../../navigation';
 
 export interface Props {
   label?: string;
@@ -14,7 +12,15 @@ const {
   class: className = 'flex flex-col h-12 w-12 rounded justify-center items-center cursor-pointer group relative z-[60]',
 } = Astro.props;
 
-const menuLinks = headerData.links || [];
+// ✅ 直接写死菜单链接
+const menuLinks = [
+  { text: '首页', href: '/' },
+  { text: '信息中心', href: '/blog' },
+  { text: '社区中心', href: 'https://hono-bbs-9qj.pages.dev' },
+  { text: '工具中心', href: 'https://it-toolbox-19l.pages.dev/' },
+  { text: '个人中心', href: 'https://users-manage-react.pages.dev/account?sessionId=' },
+  { text: '关于我们', href: '/about' },
+];
 ---
 
 <!-- ========== 三横线按钮 ========== -->
@@ -28,16 +34,19 @@ const menuLinks = headerData.links || [];
   <span class="sr-only">{label}</span>
   <slot>
     <span
+      id="menu-line-1"
       aria-hidden="true"
-      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition ease transform duration-200 opacity-80 group-[.expanded]:rotate-45 group-[.expanded]:-translate-y-2.5"
+      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition ease transform duration-200 opacity-80"
     ></span>
     <span
+      id="menu-line-2"
       aria-hidden="true"
-      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition ease transform duration-200 opacity-80 group-[.expanded]:opacity-0"
+      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition ease transform duration-200 opacity-80"
     ></span>
     <span
+      id="menu-line-3"
       aria-hidden="true"
-      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition ease transform duration-200 opacity-80 group-[.expanded]:-rotate-45 group-[.expanded]:translate-y-2.5"
+      class="h-0.5 w-6 my-1 rounded-full bg-black dark:bg-white transition ease transform duration-200 opacity-80"
     ></span>
   </slot>
 </button>
@@ -49,7 +58,7 @@ const menuLinks = headerData.links || [];
   aria-hidden="true"
 ></div>
 
-<!-- ========== 侧边菜单面板（去掉顶部品牌标识） ========== -->
+<!-- ========== 侧边菜单面板 ========== -->
 <div
   id="menu-panel"
   class="fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 shadow-2xl transition-transform duration-300 ease-out translate-x-full"
@@ -57,7 +66,7 @@ const menuLinks = headerData.links || [];
   aria-modal="true"
   aria-label="导航菜单"
 >
-  <!-- ✅ 顶部只保留关闭按钮，去掉"凉宫数据"文字 -->
+  <!-- 顶部：只保留关闭按钮 -->
   <div class="flex items-center justify-end px-5 h-16 border-b border-gray-100 dark:border-gray-800">
     <button
       id="menu-close-btn"
@@ -102,6 +111,9 @@ const menuLinks = headerData.links || [];
 <script>
   (function() {
     const btn = document.getElementById('menu-toggle-btn');
+    const line1 = document.getElementById('menu-line-1');
+    const line2 = document.getElementById('menu-line-2');
+    const line3 = document.getElementById('menu-line-3');
     const panel = document.getElementById('menu-panel');
     const overlay = document.getElementById('menu-overlay');
     const closeBtn = document.getElementById('menu-close-btn');
@@ -109,9 +121,14 @@ const menuLinks = headerData.links || [];
 
     function openMenu() {
       isOpen = true;
-      btn.classList.add('expanded');
+      // 三横线 → X
+      line1.style.transform = 'rotate(45deg) translateY(-2.5px)';
+      line2.style.opacity = '0';
+      line3.style.transform = 'rotate(-45deg) translateY(2.5px)';
+      // 菜单滑出
       panel.classList.remove('translate-x-full');
       panel.classList.add('translate-x-0');
+      // 遮罩显示
       overlay.classList.remove('opacity-0', 'pointer-events-none');
       overlay.classList.add('opacity-100', 'pointer-events-auto');
       document.body.style.overflow = 'hidden';
@@ -119,9 +136,14 @@ const menuLinks = headerData.links || [];
 
     function closeMenu() {
       isOpen = false;
-      btn.classList.remove('expanded');
+      // X → 三横线
+      line1.style.transform = 'rotate(0deg) translateY(0px)';
+      line2.style.opacity = '0.8';
+      line3.style.transform = 'rotate(0deg) translateY(0px)';
+      // 菜单滑回
       panel.classList.remove('translate-x-0');
       panel.classList.add('translate-x-full');
+      // 遮罩隐藏
       overlay.classList.remove('opacity-100', 'pointer-events-auto');
       overlay.classList.add('opacity-0', 'pointer-events-none');
       document.body.style.overflow = '';
@@ -144,11 +166,6 @@ const menuLinks = headerData.links || [];
     panel.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', closeMenu);
     });
-
-    // ✅ 修复：确保页面加载后按钮状态正确
-    if (btn.classList.contains('expanded')) {
-      btn.classList.remove('expanded');
-    }
   })();
 </script>
 
