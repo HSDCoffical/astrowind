@@ -107,13 +107,13 @@ if (authToken) {
   <body class="antialiased text-default bg-page tracking-tight">
     <div id="global-user" data-username={username} data-avatar={userAvatar}></div>
 
-    <div class={isHomePage ? '' : 'pt-16 md:pt-20'}>
+    <!-- ===== 移除所有顶部内边距 ===== -->
+    <div>
       <slot />
     </div>
 
     <BasicScripts />
 
-    <!-- ===== 重置滚动锚定（保留搜索框） ===== -->
     <script>
       (function() {
         const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
