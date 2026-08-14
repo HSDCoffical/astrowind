@@ -2,7 +2,7 @@
 // src/components/common/ToggleMenu.astro
 import { Icon } from 'astro-icon/components';
 import ToggleTheme from './ToggleTheme.astro';
-import { headerData } from '../../config/navigation';   // ✅ 修正为相对路径
+import { headerData } from '../../navigation';   // ✅ 修正路径
 
 export interface Props {
   label?: string;
@@ -57,7 +57,7 @@ const menuLinks = headerData.links || [];
   aria-modal="true"
   aria-label="导航菜单"
 >
-  <!-- 顶部 -->
+  <!-- 顶部：品牌标识 + 关闭按钮 -->
   <div class="flex items-center justify-between px-5 h-16 border-b border-gray-100 dark:border-gray-800">
     <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">
       凉宫数据
