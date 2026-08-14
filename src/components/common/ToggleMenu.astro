@@ -73,28 +73,11 @@ const menuLinks = [
     margin: 4px 0;
     border-radius: 9999px;
     background-color: black;
-    transition: all 0.25s ease;
+    transition: transform 0.25s ease, opacity 0.25s ease;
     transform-origin: center center;
   }
   .dark .menu-line {
     background-color: white;
-  }
-  /* ✅ 修正旋转方向：第一条线顺时针45度，第三条线逆时针45度 */
-  .menu-line.open-1 {
-    transform: rotate(45deg);
-  }
-  .menu-line.open-2 {
-    opacity: 0;
-    transform: scaleX(0);
-  }
-  .menu-line.open-3 {
-    transform: rotate(-45deg);
-  }
-  #menu-overlay {
-    will-change: opacity;
-  }
-  #menu-panel {
-    will-change: transform;
   }
 </style>
 
@@ -107,52 +90,46 @@ const menuLinks = [
     const panel = document.getElementById('menu-panel');
     const overlay = document.getElementById('menu-overlay');
 
-    // ✅ 硬重置：直接操作 style，绕过 class 缓存
-    function hardReset() {
+    // 重置到三横线
+    function resetMenu() {
+      // 三条线恢复
       line1.style.transform = 'rotate(0deg)';
       line1.style.opacity = '1';
-      line2.style.transform = 'rotate(0deg) scaleX(1)';
+      line2.style.transform = 'rotate(0deg)';
       line2.style.opacity = '0.8';
       line3.style.transform = 'rotate(0deg)';
       line3.style.opacity = '1';
+      // 面板关闭
       panel.style.transform = 'translateX(100%)';
+      // 遮罩隐藏
       overlay.style.opacity = '0';
       overlay.style.pointerEvents = 'none';
       document.body.style.overflow = '';
-      // 同时移除 class
-      line1.classList.remove('open-1');
-      line2.classList.remove('open-2');
-      line3.classList.remove('open-3');
-      panel.classList.remove('translate-x-0');
-      panel.classList.add('translate-x-full');
-      overlay.classList.remove('opacity-100', 'pointer-events-auto');
-      overlay.classList.add('opacity-0', 'pointer-events-none');
     }
 
+    // 打开菜单（三横线 → X）
     function openMenu() {
-      // 先硬重置
-      hardReset();
-      // 用 requestAnimationFrame 确保重置生效
-      requestAnimationFrame(() => {
-        // 用 class 控制动画
-        line1.classList.add('open-1');
-        line2.classList.add('open-2');
-        line3.classList.add('open-3');
-        panel.classList.remove('translate-x-full');
-        panel.classList.add('translate-x-0');
-        overlay.classList.remove('opacity-0', 'pointer-events-none');
-        overlay.classList.add('opacity-100', 'pointer-events-auto');
-        document.body.style.overflow = 'hidden';
-      });
+      line1.style.transform = 'rotate(45deg)';
+      line1.style.opacity = '1';
+      line2.style.transform = 'rotate(0deg)';
+      line2.style.opacity = '0';
+      line3.style.transform = 'rotate(-45deg)';
+      line3.style.opacity = '1';
+      panel.style.transform = 'translateX(0%)';
+      overlay.style.opacity = '1';
+      overlay.style.pointerEvents = 'auto';
+      document.body.style.overflow = 'hidden';
     }
 
+    // 关闭菜单（X → 三横线）
     function closeMenu() {
-      hardReset();
+      resetMenu();
     }
 
+    // 切换
     function toggleMenu() {
-      // 判断是否打开：检查 panel 是否有 translate-x-0 class
-      if (panel.classList.contains('translate-x-0')) {
+      // 判断：如果面板在显示（transform 不是 translateX(100%)）
+      if (panel.style.transform === 'translateX(0%)' || panel.classList.contains('translate-x-0')) {
         closeMenu();
       } else {
         openMenu();
@@ -163,7 +140,7 @@ const menuLinks = [
     btn.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', closeMenu);
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && panel.classList.contains('translate-x-0')) {
+      if (e.key === 'Escape') {
         closeMenu();
       }
     });
@@ -181,18 +158,18 @@ const menuLinks = [
       });
     });
 
-    // ✅ 页面加载时硬重置
-    hardReset();
+    // 页面加载时重置
+    resetMenu();
 
-    // ✅ Astro SPA 导航后硬重置
+    // Astro SPA 导航后重置
     document.addEventListener('astro:after-swap', () => {
-      hardReset();
+      resetMenu();
     });
 
-    // ✅ 页面可见性变化时重置（用户切回页面时）
+    // 切回页面时重置
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        hardReset();
+        resetMenu();
       }
     });
   })();
