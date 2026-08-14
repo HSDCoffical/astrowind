@@ -58,7 +58,7 @@ const menuLinks = [
   aria-hidden="true"
 ></div>
 
-<!-- ========== 侧边菜单面板 ========== -->
+<!-- ========== 侧边菜单面板（去掉X关闭按钮） ========== -->
 <div
   id="menu-panel"
   class="fixed top-0 right-0 z-50 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 shadow-2xl transition-transform duration-300 ease-out translate-x-full"
@@ -66,19 +66,8 @@ const menuLinks = [
   aria-modal="true"
   aria-label="导航菜单"
 >
-  <!-- 顶部：只保留关闭按钮 -->
-  <div class="flex items-center justify-end px-5 h-16 border-b border-gray-100 dark:border-gray-800">
-    <button
-      id="menu-close-btn"
-      class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-      aria-label="关闭菜单"
-      type="button"
-    >
-      <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  </div>
+  <!-- ✅ 顶部只保留一条细线分割，不要关闭按钮 -->
+  <div class="h-16 border-b border-gray-100 dark:border-gray-800"></div>
 
   <!-- 菜单列表 -->
   <nav class="py-2 px-3 overflow-y-auto h-[calc(100%-4rem)]">
@@ -116,15 +105,15 @@ const menuLinks = [
     const line3 = document.getElementById('menu-line-3');
     const panel = document.getElementById('menu-panel');
     const overlay = document.getElementById('menu-overlay');
-    const closeBtn = document.getElementById('menu-close-btn');
     let isOpen = false;
 
     // ✅ 重置按钮到三横线状态
     function resetButton() {
       line1.style.transform = 'rotate(0deg) translateY(0px)';
+      line1.style.transition = 'transform 0.2s ease';
       line2.style.opacity = '0.8';
       line3.style.transform = 'rotate(0deg) translateY(0px)';
-      // 确保面板关闭
+      line3.style.transition = 'transform 0.2s ease';
       panel.classList.add('translate-x-full');
       panel.classList.remove('translate-x-0');
       overlay.classList.add('opacity-0', 'pointer-events-none');
@@ -167,39 +156,41 @@ const menuLinks = [
       isOpen ? closeMenu() : openMenu();
     }
 
+    // ✅ 只有点击汉堡按钮才触发切换
     btn.addEventListener('click', toggleMenu);
-    closeBtn.addEventListener('click', closeMenu);
+
+    // ✅ 点击遮罩层关闭
     overlay.addEventListener('click', closeMenu);
 
+    // ✅ ESC 键关闭
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && isOpen) {
         closeMenu();
       }
     });
 
-    // ✅ 点击菜单项后先关闭菜单，再跳转
+    // ✅ 点击内部链接：关闭菜单后再跳转
     panel.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', function(e) {
-        // 如果是外部链接，新窗口打开，不关闭菜单
+        // 外部链接：新窗口打开，不影响当前页面
         if (this.href.startsWith('http')) {
-          // 外部链接新窗口打开，不需要关闭
+          // 不阻止默认行为，直接新窗口打开
           return;
         }
         // 内部链接：关闭菜单后再跳转
         e.preventDefault();
         const href = this.href;
         closeMenu();
-        // 等待动画完成后再跳转
         setTimeout(() => {
           window.location.href = href;
         }, 300);
       });
     });
 
-    // ✅ 页面加载后重置按钮状态（解决返回后状态不对的问题）
+    // ✅ 页面加载后重置（解决返回后状态不对）
     resetButton();
 
-    // ✅ Astro SPA 导航切换后也重置
+    // ✅ Astro SPA 导航后重置
     document.addEventListener('astro:after-swap', function() {
       resetButton();
     });
