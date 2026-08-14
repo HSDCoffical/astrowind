@@ -27,7 +27,6 @@ if (image) {
 }
 ---
 
-<!-- 注意：完全没有 md: 开头的类，只用 style -->
 <section
   class="relative not-prose min-h-[100dvh] flex items-center pointer-events-none bg-black"
   style="margin-top: 0;"
@@ -100,8 +99,17 @@ if (image) {
   </div>
 </section>
 
-<!-- 桌面版上移 76px -->
+<!-- ===== 精确控制偏移 ===== -->
 <style>
+  /* 手机版：整体上移 2px 盖住白条，同时增加高度避免底部镂空 */
+  @media (max-width: 768px) {
+    section.relative {
+      margin-top: -2px !important;
+      min-height: calc(100dvh + 2px) !important;
+    }
+  }
+
+  /* 桌面版：保持原有 76px 上移 */
   @media (min-width: 768px) {
     section.relative {
       margin-top: -76px !important;
