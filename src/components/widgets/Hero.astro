@@ -18,6 +18,7 @@ const {
 
 // 提取图片 URL
 let imageUrl = '';
+
 if (image) {
   if (typeof image === 'object' && image.src) {
     imageUrl = image.src;
@@ -33,16 +34,28 @@ if (image) {
   style="margin-top: 0;"
   {...id ? { id } : {}}
 >
+  <!-- =====================================================
+       Hero 背景
+  ====================================================== -->
+
   {imageUrl && (
     <div
-      class="absolute inset-0 w-full h-full bg-cover bg-center"
+      class="absolute inset-0 w-full h-full bg-cover bg-center hsdc-hero-background"
       style={`background-image: url('${imageUrl}');`}
     ></div>
   )}
 
+  <!-- =====================================================
+       黑色遮罩
+  ====================================================== -->
+
   {imageUrl && (
-    <div class="absolute inset-0 w-full h-full bg-black/40"></div>
+    <div class="absolute inset-0 w-full h-full bg-black/40 hsdc-hero-overlay"></div>
   )}
+
+  <!-- =====================================================
+       背景插槽
+  ====================================================== -->
 
   <div
     class="absolute inset-0 pointer-events-none"
@@ -53,8 +66,12 @@ if (image) {
     </slot>
   </div>
 
+  <!-- =====================================================
+       Hero 内容
+  ====================================================== -->
+
   <div
-    class="relative max-w-7xl mx-auto px-4 sm:px-6 z-10 w-full pointer-events-auto"
+    class="relative max-w-7xl mx-auto px-4 sm:px-6 z-10 w-full pointer-events-auto hsdc-hero-content"
   >
     <div
       class="pt-0"
@@ -62,83 +79,221 @@ if (image) {
     ></div>
 
     <div class="pt-12 pb-28 md:py-20">
+
       <div class="text-center pb-10 md:pb-16 max-w-5xl mx-auto">
+
+        <!-- =================================================
+             Tagline
+        ================================================== -->
 
         {
           tagline && (
             <p
-              class="text-base text-secondary dark:text-blue-200 font-bold tracking-wide uppercase intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
+              class="text-base text-secondary dark:text-blue-200 font-bold tracking-wide uppercase intersect-once intersect-quarter motion-safe:opacity-0 motion-safe:intersect:animate-fade hsdc-hero-item hsdc-hero-item-1"
               set:html={tagline}
             />
           )
         }
 
+
+        <!-- =================================================
+             标题
+        ================================================== -->
+
         {
           title && (
             <h1
-              class="text-5xl md:text-6xl font-bold leading-tighter tracking-tighter md:tracking-normal mb-4 font-heading text-white drop-shadow-lg intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
+              class="text-5xl md:text-6xl font-bold leading-tighter tracking-tighter md:tracking-normal mb-4 font-heading text-white drop-shadow-lg intersect-once intersect-quarter motion-safe:opacity-0 motion-safe:intersect:animate-fade hsdc-hero-item hsdc-hero-item-2"
               set:html={title}
             />
           )
         }
 
+
         <div class="max-w-3xl mx-auto">
+
+          <!-- ===============================================
+               Subtitle
+          ================================================ -->
 
           {
             subtitle && (
               <p
-                class="text-xl text-white/90 mb-6 dark:text-slate-200 intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
+                class="text-xl text-white/90 mb-6 dark:text-slate-200 intersect-once intersect-quarter motion-safe:opacity-0 motion-safe:intersect:animate-fade hsdc-hero-item hsdc-hero-item-3"
                 set:html={subtitle}
               />
             )
           }
 
+
+          <!-- ===============================================
+               Actions
+          ================================================ -->
+
           {
             actions && (
-              <div class="max-w-xs sm:max-w-md m-auto flex flex-nowrap flex-col sm:flex-row sm:justify-center gap-4 intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade">
-                {Array.isArray(actions) ? (
-                  actions.map((action) => (
-                    <div class="flex w-full sm:w-auto">
-                      <Button
-                        {...(action || {})}
-                        class="w-full sm:mb-0"
-                      />
-                    </div>
-                  ))
-                ) : (
-                  <Fragment set:html={actions} />
-                )}
+              <div
+                class="max-w-xs sm:max-w-md m-auto flex flex-nowrap flex-col sm:flex-row sm:justify-center gap-4 intersect-once intersect-quarter motion-safe:opacity-0 motion-safe:intersect:animate-fade hsdc-hero-item hsdc-hero-item-4"
+              >
+                {
+                  Array.isArray(actions) ? (
+                    actions.map((action) => (
+                      <div class="flex w-full sm:w-auto">
+                        <Button
+                          {...(action || {})}
+                          class="w-full sm:mb-0 hsdc-hero-button"
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <Fragment set:html={actions} />
+                  )
+                }
               </div>
             )
           }
 
         </div>
 
-        {content && <Fragment set:html={content} />}
+
+        <!-- =================================================
+             Content
+        ================================================== -->
+
+        {content && (
+          <div class="hsdc-hero-extra">
+            <Fragment set:html={content} />
+          </div>
+        )}
 
       </div>
+
     </div>
   </div>
 </section>
 
+
 <style>
+  /* =========================================================
+     Hero 背景
+     ========================================================= */
+
+  .hsdc-hero-background {
+    transform: scale(1.02);
+    transform-origin: center center;
+    will-change: transform;
+    animation: hsdcHeroZoom 18s ease-in-out infinite alternate;
+  }
+
+
+  .hsdc-hero-overlay {
+    transition: opacity 500ms ease;
+  }
+
+
+  /* =========================================================
+     Hero 内容
+     ========================================================= */
+
+  .hsdc-hero-item {
+    will-change: opacity, transform;
+  }
+
+
   /*
-   * 手机端：
-   * 不再使用 -16px 和 calc(100dvh + 16px)
-   *
-   * svh 的高度更加稳定，不会因为浏览器地址栏
-   * 展开/收起而不断改变 Hero 高度。
+   * 不直接给 Hero 内容做持续动画。
+   * 只在进入视口时使用已有 Intersection 动画。
    */
+
+  .hsdc-hero-item-1 {
+    animation-delay: 0ms;
+  }
+
+  .hsdc-hero-item-2 {
+    animation-delay: 90ms;
+  }
+
+  .hsdc-hero-item-3 {
+    animation-delay: 170ms;
+  }
+
+  .hsdc-hero-item-4 {
+    animation-delay: 260ms;
+  }
+
+
+  /* =========================================================
+     Hero 按钮
+     ========================================================= */
+
+  .hsdc-hero-button {
+    transition:
+      transform 220ms ease,
+      box-shadow 220ms ease,
+      filter 220ms ease;
+  }
+
+
+  @media (hover: hover) and (pointer: fine) {
+    .hsdc-hero-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgb(0 0 0 / 20%);
+      filter: brightness(1.03);
+    }
+  }
+
+
+  /* =========================================================
+     Hero 背景动画
+     ========================================================= */
+
+  @keyframes hsdcHeroZoom {
+    0% {
+      transform: scale(1.02);
+    }
+
+    100% {
+      transform: scale(1.055);
+    }
+  }
+
+
+  /* =========================================================
+     手机端
+     ========================================================= */
+
   @media (max-width: 767px) {
     section[data-home-hero] {
       margin-top: 0 !important;
       min-height: 100svh !important;
     }
+
+
+    /*
+     * 手机端背景不做明显持续缩放。
+     * 保留非常轻微的视觉变化。
+     */
+
+    .hsdc-hero-background {
+      animation-duration: 28s;
+      transform: scale(1.015);
+    }
+
+
+    /*
+     * 手机按钮按下反馈
+     */
+
+    .hsdc-hero-button:active {
+      transform: scale(0.975);
+    }
   }
 
-  /*
-   * 桌面端保持你原来的顶部布局。
-   */
+
+  /* =========================================================
+     桌面端
+     ========================================================= */
+
   @media (min-width: 768px) {
     section[data-home-hero] {
       margin-top: -76px !important;
@@ -146,6 +301,22 @@ if (image) {
 
     section[data-home-hero] > div.relative.max-w-7xl {
       padding-top: 76px !important;
+    }
+  }
+
+
+  /* =========================================================
+     减少动态效果
+     ========================================================= */
+
+  @media (prefers-reduced-motion: reduce) {
+    .hsdc-hero-background {
+      animation: none !important;
+      transform: none !important;
+    }
+
+    .hsdc-hero-button {
+      transition: none !important;
     }
   }
 </style>
