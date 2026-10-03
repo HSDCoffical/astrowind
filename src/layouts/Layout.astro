@@ -37,7 +37,11 @@ let userAvatar = '';
 
 if (authToken) {
   try {
-    const decoded = jwt.verify(authToken, import.meta.env.JWT_SECRET);
+    const decoded = jwt.verify(
+      authToken,
+      import.meta.env.JWT_SECRET
+    );
+
     username = decoded.username || '访客';
     userAvatar = decoded.avatar || '';
   } catch (error) {
@@ -47,35 +51,68 @@ if (authToken) {
 ---
 
 <!doctype html>
-<html lang={language} dir={textDirection} class="2xl:text-[20px]">
+<html
+  lang={language}
+  dir={textDirection}
+  class="2xl:text-[20px]"
+>
   <head>
+
     <CommonMeta />
+
     <Favicons />
+
     <CustomStyles />
+
     <ApplyColorMode />
+
     <Metadata {...metadata} />
+
     <SiteVerification />
+
     <Analytics />
 
-    <meta name="msvalidate.01" content="78082B8B3536A479B13C484B31119863" />
+    <meta
+      name="msvalidate.01"
+      content="78082B8B3536A479B13C484B31119863"
+    />
 
-    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link
+      rel="preconnect"
+      href="https://images.unsplash.com"
+    />
 
     <ClientRouter fallback="swap" />
 
     <style is:global>
-      html, body {
-        overscroll-behavior: none !important;
-        overflow-anchor: none !important;
-        scroll-behavior: smooth !important;
+
+      /*
+       * 页面基础布局
+       *
+       * 这里不再全局禁止 overscroll，
+       * 也不再修改 overflow-anchor。
+       *
+       * 避免移动浏览器滚动时出现回弹/跳动。
+       */
+      html,
+      body {
         padding: 0 !important;
         margin: 0 !important;
       }
-      * {
-        overscroll-behavior: none !important;
-        overflow-anchor: none !important;
+
+      /*
+       * 平滑滚动保留。
+       *
+       * 它只影响主动滚动行为，
+       * 不再配合 overflow-hidden 做强制滚动修复。
+       */
+      html {
+        scroll-behavior: smooth;
       }
 
+      /*
+       * Header 保持透明。
+       */
       .fixed,
       header#header,
       header#header > div,
@@ -83,58 +120,61 @@ if (authToken) {
         background: transparent !important;
       }
 
+      /*
+       * 页面切换动画。
+       */
       ::view-transition-old(root),
       ::view-transition-new(root) {
         animation-duration: 0.3s;
       }
+
       ::view-transition-old(root) {
         animation-name: fade-out;
       }
+
       ::view-transition-new(root) {
         animation-name: fade-in;
       }
+
       @keyframes fade-out {
-        from { opacity: 1; }
-        to { opacity: 0; }
+        from {
+          opacity: 1;
+        }
+
+        to {
+          opacity: 0;
+        }
       }
+
       @keyframes fade-in {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
       }
+
     </style>
+
   </head>
 
-  <body class="antialiased text-default bg-page tracking-tight">
-    <div id="global-user" data-username={username} data-avatar={userAvatar}></div>
+  <body
+    class="antialiased text-default bg-page tracking-tight"
+  >
 
-    <!-- ===== 移除所有顶部内边距 ===== -->
+    <div
+      id="global-user"
+      data-username={username}
+      data-avatar={userAvatar}
+    ></div>
+
     <div>
       <slot />
     </div>
 
     <BasicScripts />
 
-    <script>
-      (function() {
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        if (!isMobile) return;
-
-        function resetScrollAnchoring() {
-          document.body.classList.toggle('overflow-hidden');
-          requestAnimationFrame(() => {
-            document.body.classList.toggle('overflow-hidden');
-          });
-        }
-
-        window.addEventListener('load', function() {
-          setTimeout(resetScrollAnchoring, 300);
-          setTimeout(resetScrollAnchoring, 500);
-        });
-
-        document.addEventListener('astro:after-swap', function() {
-          setTimeout(resetScrollAnchoring, 100);
-        });
-      })();
-    </script>
   </body>
 </html>
