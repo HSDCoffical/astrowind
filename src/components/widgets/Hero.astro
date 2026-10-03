@@ -28,7 +28,8 @@ if (image) {
 ---
 
 <section
-  class="relative not-prose min-h-[100dvh] flex items-center pointer-events-none bg-black"
+  data-home-hero
+  class="relative not-prose min-h-screen md:min-h-[100dvh] flex items-center pointer-events-none bg-black"
   style="margin-top: 0;"
   {...id ? { id } : {}}
 >
@@ -38,20 +39,31 @@ if (image) {
       style={`background-image: url('${imageUrl}');`}
     ></div>
   )}
+
   {imageUrl && (
     <div class="absolute inset-0 w-full h-full bg-black/40"></div>
   )}
 
-  <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+  <div
+    class="absolute inset-0 pointer-events-none"
+    aria-hidden="true"
+  >
     <slot name="bg">
       {bg ? <Fragment set:html={bg} /> : null}
     </slot>
   </div>
 
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 z-10 w-full pointer-events-auto">
-    <div class="pt-0" style="padding-top: 0;"></div>
-    <div class="py-12 md:py-20">
+  <div
+    class="relative max-w-7xl mx-auto px-4 sm:px-6 z-10 w-full pointer-events-auto"
+  >
+    <div
+      class="pt-0"
+      style="padding-top: 0;"
+    ></div>
+
+    <div class="pt-12 pb-28 md:py-20">
       <div class="text-center pb-10 md:pb-16 max-w-5xl mx-auto">
+
         {
           tagline && (
             <p
@@ -60,6 +72,7 @@ if (image) {
             />
           )
         }
+
         {
           title && (
             <h1
@@ -68,7 +81,9 @@ if (image) {
             />
           )
         }
+
         <div class="max-w-3xl mx-auto">
+
           {
             subtitle && (
               <p
@@ -77,13 +92,17 @@ if (image) {
               />
             )
           }
+
           {
             actions && (
               <div class="max-w-xs sm:max-w-md m-auto flex flex-nowrap flex-col sm:flex-row sm:justify-center gap-4 intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade">
                 {Array.isArray(actions) ? (
                   actions.map((action) => (
                     <div class="flex w-full sm:w-auto">
-                      <Button {...(action || {})} class="w-full sm:mb-0" />
+                      <Button
+                        {...(action || {})}
+                        class="w-full sm:mb-0"
+                      />
                     </div>
                   ))
                 ) : (
@@ -92,29 +111,40 @@ if (image) {
               </div>
             )
           }
+
         </div>
+
         {content && <Fragment set:html={content} />}
+
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== 精确控制偏移 ===== -->
 <style>
-  /* 手机版：整体上移 2px 盖住白条，同时增加高度避免底部镂空 */
-  @media (max-width: 768px) {
-    section.relative {
-      margin-top: -16px !important;
-      min-height: calc(100dvh + 16px) !important;
+  /*
+   * 手机端：
+   * 不再使用 -16px 和 calc(100dvh + 16px)
+   *
+   * svh 的高度更加稳定，不会因为浏览器地址栏
+   * 展开/收起而不断改变 Hero 高度。
+   */
+  @media (max-width: 767px) {
+    section[data-home-hero] {
+      margin-top: 0 !important;
+      min-height: 100svh !important;
     }
   }
 
-  /* 桌面版：保持原有 76px 上移 */
+  /*
+   * 桌面端保持你原来的顶部布局。
+   */
   @media (min-width: 768px) {
-    section.relative {
+    section[data-home-hero] {
       margin-top: -76px !important;
     }
-    section.relative > div.relative.max-w-7xl {
+
+    section[data-home-hero] > div.relative.max-w-7xl {
       padding-top: 76px !important;
     }
   }
