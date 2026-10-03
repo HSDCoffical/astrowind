@@ -54,9 +54,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   style="background: transparent !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
+    /* =========================================================
+       Header 原有样式
+    ========================================================= */
+
     header#header * {
       background: transparent !important;
     }
+
     header#header .bg-white,
     header#header .dark\:bg-gray-900,
     header#header .bg-gray-100,
@@ -64,43 +69,258 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     header#header [class*="bg-"] {
       background: transparent !important;
     }
+
     header#header button:hover,
     header#header a:hover {
-      background: rgba(255,255,255,0.1) !important;
+      background: rgba(255, 255, 255, 0.1) !important;
     }
+
     .dark header#header button:hover,
     .dark header#header a:hover {
-      background: rgba(255,255,255,0.05) !important;
+      background: rgba(255, 255, 255, 0.05) !important;
     }
+
     .menu-theme-item {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       padding: 0.75rem 1rem;
       margin-top: 0.5rem;
-      border-top: 1px solid rgba(0,0,0,0.06);
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
       color: #666;
     }
+
     .dark .menu-theme-item {
-      border-top-color: rgba(255,255,255,0.06);
+      border-top-color: rgba(255, 255, 255, 0.06);
       color: #aaa;
     }
+
     @media (min-width: 768px) {
       .menu-theme-item {
         display: none !important;
       }
     }
 
-    /* 手机版禁用毛玻璃，防止白色采样 */
+    /* =========================================================
+       手机端禁用毛玻璃
+    ========================================================= */
+
     @media (max-width: 768px) {
       header#header {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
       }
     }
+
+
+    /* =========================================================
+       手机端菜单动画
+       
+       注意：
+       不修改 ToggleMenu 按钮
+       不修改 body / html 滚动
+       不使用 JS
+    ========================================================= */
+
+    @media (max-width: 767px) {
+
+      header#header nav {
+        display: block !important;
+
+        width: 100%;
+
+        max-height: 0;
+
+        opacity: 0;
+
+        overflow: hidden;
+
+        transform: translateY(-8px);
+
+        visibility: hidden;
+
+        pointer-events: none;
+
+        transition:
+          max-height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.22s ease,
+          transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s linear 0.38s;
+      }
+
+
+      /*
+       * ToggleMenu 展开后，
+       * AstroWind 会给菜单区域/父级产生 expanded 状态。
+       *
+       * 这里兼容常见的 expanded 写法。
+       */
+
+      header#header nav.expanded,
+      header#header nav[data-expanded="true"],
+      header#header:has(.expanded) nav {
+        max-height: calc(100vh - 72px);
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+        visibility: visible;
+
+        pointer-events: auto;
+
+        overflow-y: auto;
+
+        transition:
+          max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.25s ease,
+          transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s linear 0s;
+      }
+
+
+      /* =====================================================
+         菜单列表
+      ===================================================== */
+
+      header#header nav > ul {
+        padding-top: 8px;
+
+        padding-bottom: 12px;
+      }
+
+
+      /* =====================================================
+         菜单项目初始状态
+      ===================================================== */
+
+      header#header nav > ul > li {
+        opacity: 0;
+
+        transform: translateY(-8px);
+
+        transition:
+          opacity 0.24s ease,
+          transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+
+      /* =====================================================
+         菜单打开
+      ===================================================== */
+
+      header#header:has(nav.expanded) nav > ul > li,
+      header#header:has(.expanded) nav > ul > li {
+        opacity: 1;
+
+        transform: translateY(0);
+      }
+
+
+      /* =====================================================
+         菜单项依次出现
+      ===================================================== */
+
+      header#header:has(.expanded) nav > ul > li:nth-child(1) {
+        transition-delay: 0.04s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(2) {
+        transition-delay: 0.08s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(3) {
+        transition-delay: 0.12s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(4) {
+        transition-delay: 0.16s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(5) {
+        transition-delay: 0.20s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(6) {
+        transition-delay: 0.24s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(7) {
+        transition-delay: 0.28s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(8) {
+        transition-delay: 0.32s;
+      }
+
+
+      /* =====================================================
+         菜单关闭时立即开始收回
+      ===================================================== */
+
+      header#header nav:not(.expanded) > ul > li {
+        transition-delay: 0s;
+      }
+
+
+      /* =====================================================
+         手机菜单文字点击区域
+      ===================================================== */
+
+      header#header nav > ul > li > a,
+      header#header nav > ul > li > button {
+        width: 100%;
+
+        box-sizing: border-box;
+
+        padding-top: 13px;
+
+        padding-bottom: 13px;
+      }
+
+
+      /* =====================================================
+         手机菜单滚动条
+      ===================================================== */
+
+      header#header nav::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      header#header nav::-webkit-scrollbar-track {
+        background: transparent !important;
+      }
+
+      header#header nav::-webkit-scrollbar-thumb {
+        background: rgba(100, 116, 139, 0.25);
+        border-radius: 999px;
+      }
+
+    }
+
+
+    /* =========================================================
+       减少动态效果
+    ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      header#header nav,
+      header#header nav > ul > li {
+        transition: none !important;
+      }
+
+    }
+
   </style>
 
-  <div class="absolute inset-0" style="background: transparent !important;"></div>
+
+  <div
+    class="absolute inset-0"
+    style="background: transparent !important;"
+  ></div>
+
+
   <div
     class:list={[
       'relative text-default py-1.5 px-3 md:px-6 mx-auto w-full',
@@ -115,106 +335,239 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       },
     ]}
   >
-    <div class:list={[{ 'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right' }, 'flex justify-between']}>
-      <a class="flex items-center" href={getHomePermalink()}>
+
+
+    <!-- =====================================================
+         Logo + 菜单按钮
+    ====================================================== -->
+
+    <div
+      class:list={[
+        {
+          'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right',
+        },
+        'flex justify-between',
+      ]}
+    >
+
+      <a
+        class="flex items-center"
+        href={getHomePermalink()}
+      >
         <Logo />
       </a>
+
+
+      <!--
+        三按钮保持完全不动
+      -->
+
       <div class="flex items-center md:hidden">
         <ToggleMenu />
       </div>
+
     </div>
 
-    <!-- 导航菜单 -->
+
+    <!-- =====================================================
+         导航菜单
+    ====================================================== -->
+
     <nav
       class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
       aria-label="Main navigation"
     >
+
       <ul
         class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
       >
+
         {
           links.map(({ text, href, links }) => (
-            <li class={links?.length ? 'dropdown' : ''}>
-              {links?.length ? (
-                <>
-                  <button
-                    type="button"
-                    class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
+
+            <li
+              class={links?.length ? 'dropdown' : ''}
+            >
+
+              {
+                links?.length ? (
+
+                  <>
+
+                    <button
+                      type="button"
+                      class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
+                    >
+                      {text}
+
+                      {' '}
+
+                      <Icon
+                        name="tabler:chevron-down"
+                        class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline"
+                      />
+                    </button>
+
+
+                    <ul
+                      class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl"
+                    >
+
+                      {
+                        links.map(
+                          ({
+                            text: text2,
+                            href: href2,
+                          }) => (
+
+                            <li>
+
+                              <a
+                                class:list={[
+                                  'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
+                                  {
+                                    'aw-link-active':
+                                      href2 === currentPath,
+                                  },
+                                ]}
+                                href={href2}
+                              >
+                                {text2}
+                              </a>
+
+                            </li>
+
+                          )
+                        )
+                      }
+
+                    </ul>
+
+                  </>
+
+                ) : (
+
+                  <a
+                    class:list={[
+                      'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
+                      {
+                        'aw-link-active':
+                          href === currentPath,
+                      },
+                    ]}
+                    href={href}
                   >
-                    {text}{' '}
-                    <Icon name="tabler:chevron-down" class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline" />
-                  </button>
-                  <ul class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl">
-                    {links.map(({ text: text2, href: href2 }) => (
-                      <li>
-                        <a
-                          class:list={[
-                            'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
-                            { 'aw-link-active': href2 === currentPath },
-                          ]}
-                          href={href2}
-                        >
-                          {text2}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              ) : (
-                <a
-                  class:list={[
-                    'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
-                    { 'aw-link-active': href === currentPath },
-                  ]}
-                  href={href}
-                >
-                  {text}
-                </a>
-              )}
+                    {text}
+                  </a>
+
+                )
+              }
+
             </li>
+
           ))
         }
-        <!-- 手机端菜单底部主题切换 -->
+
+
+        <!-- ===================================================
+             手机端主题切换
+        ==================================================== -->
+
         <li class="menu-theme-item">
+
           <ToggleTheme iconClass="w-5 h-5" />
-          <span class="text-sm">切换主题</span>
+
+          <span class="text-sm">
+            切换主题
+          </span>
+
         </li>
+
       </ul>
+
     </nav>
+
+
+    <!-- =====================================================
+         桌面端右侧功能
+    ====================================================== -->
 
     <div
       class:list={[
-        { 'ml-auto rtl:ml-0 rtl:mr-auto': position === 'left' },
+        {
+          'ml-auto rtl:ml-0 rtl:mr-auto':
+            position === 'left',
+        },
         'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
       ]}
     >
-      <div class="items-center flex justify-between w-full md:w-auto">
+
+      <div
+        class="items-center flex justify-between w-full md:w-auto"
+      >
+
         <div class="flex">
-          {showToggleTheme && <ToggleTheme iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block" />}
+
+          {
+            showToggleTheme && (
+              <ToggleTheme
+                iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block"
+              />
+            )
+          }
+
+
           {
             showRssFeed && (
+
               <a
                 class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
                 aria-label="RSS Feed"
                 href={getAsset('/rss.xml')}
               >
-                <Icon name="tabler:rss" class="w-5 h-5" />
+
+                <Icon
+                  name="tabler:rss"
+                  class="w-5 h-5"
+                />
+
               </a>
+
             )
           }
+
         </div>
+
+
         {
           actions?.length ? (
+
             <span class="ml-4 rtl:ml-0 rtl:mr-4">
-              {actions.map((btnProps) => (
-                <Button {...btnProps} class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto" />
-              ))}
+
+              {
+                actions.map((btnProps) => (
+
+                  <Button
+                    {...btnProps}
+                    class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto"
+                  />
+
+                ))
+              }
+
             </span>
+
           ) : (
+
             ''
+
           )
         }
+
       </div>
+
     </div>
+
   </div>
+
 </header>
