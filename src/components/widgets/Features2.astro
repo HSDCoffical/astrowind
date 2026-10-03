@@ -29,25 +29,202 @@ const columnsClass =
         : '';
 ---
 
-<WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-7xl mx-auto ${classes?.container ?? ''}`} bg={bg}>
-  <Headline title={title} subtitle={subtitle} tagline={tagline} classes={classes?.headline as Record<string, string>} />
+<WidgetWrapper
+  id={id}
+  isDark={isDark}
+  containerClass={`max-w-7xl mx-auto ${classes?.container ?? ''}`}
+  bg={bg}
+>
+  <Headline
+    title={title}
+    subtitle={subtitle}
+    tagline={tagline}
+    classes={classes?.headline as Record<string, string>}
+  />
 
   {
     items.length > 0 && (
       <div class:list={['grid gap-4 md:gap-6 gap-x-12', columnsClass]}>
-        {items.map(({ title: itemTitle, description, icon, callToAction }) => (
-          <div class="relative flex flex-col rounded-lg shadow-[0_4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.1)] backdrop-blur border border-[#ffffff29] bg-white dark:bg-slate-900 p-6 intersect-once intersect-quarter intersect-no-queue motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade">
-            {(icon || defaultIcon) && <Icon name={icon || defaultIcon} class="mb-6 w-12 h-12 text-primary" />}
-            <div class="text-xl font-bold">{itemTitle}</div>
-            {description && <p class="text-muted mt-2" set:html={description} />}
-            {callToAction && (
-              <div class="mt-2">
-                <Button {...callToAction} />
-              </div>
-            )}
+        {items.map(({ title: itemTitle, description, icon, callToAction }, index) => (
+          <div
+            class:list={[
+              'relative flex flex-col rounded-lg shadow-[0_4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.1)] backdrop-blur border border-[#ffffff29] bg-white dark:bg-slate-900 p-6',
+              'intersect-once intersect-quarter intersect-no-queue',
+              'motion-safe:opacity-0 motion-safe:intersect:animate-fade',
+              'hsdc-feature-card',
+              `hsdc-feature-card-${index + 1}`,
+            ]}
+          >
+            {
+              (icon || defaultIcon) && (
+                <div class="hsdc-feature-icon-wrap">
+                  <Icon
+                    name={icon || defaultIcon}
+                    class="mb-6 w-12 h-12 text-primary hsdc-feature-icon"
+                  />
+                </div>
+              )
+            }
+
+            <div class="text-xl font-bold">
+              {itemTitle}
+            </div>
+
+            {
+              description && (
+                <p
+                  class="text-muted mt-2"
+                  set:html={description}
+                />
+              )
+            }
+
+            {
+              callToAction && (
+                <div class="mt-2">
+                  <Button
+                    {...callToAction}
+                    class="hsdc-feature-button"
+                  />
+                </div>
+              )
+            }
           </div>
         ))}
       </div>
     )
   }
 </WidgetWrapper>
+
+
+<style>
+  /* =========================================================
+     卡片基础
+     ========================================================= */
+
+  .hsdc-feature-card {
+    transform: translate3d(0, 0, 0);
+    transition:
+      transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 280ms ease,
+      border-color 280ms ease;
+    will-change: transform;
+  }
+
+
+  /* =========================================================
+     PC Hover
+     ========================================================= */
+
+  @media (hover: hover) and (pointer: fine) {
+    .hsdc-feature-card:hover {
+      transform: translate3d(0, -6px, 0);
+      box-shadow: 0 20px 45px rgb(15 23 42 / 13%);
+      border-color: rgb(1 97 239 / 25%);
+    }
+
+    .hsdc-feature-card:hover .hsdc-feature-icon {
+      transform: translateY(-3px) scale(1.06) rotate(-3deg);
+    }
+  }
+
+
+  /* =========================================================
+     Icon
+     ========================================================= */
+
+  .hsdc-feature-icon {
+    transition:
+      transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      filter 300ms ease;
+  }
+
+
+  /* =========================================================
+     手机端
+     ========================================================= */
+
+  @media (max-width: 767px) {
+    .hsdc-feature-card {
+      transition:
+        transform 180ms ease,
+        box-shadow 180ms ease;
+    }
+
+    /*
+     * 手机按下
+     */
+
+    .hsdc-feature-card:active {
+      transform: scale(0.985);
+      box-shadow: 0 8px 25px rgb(15 23 42 / 10%);
+    }
+
+    /*
+     * 手机不做持续 hover 式图标动画
+     */
+
+    .hsdc-feature-icon {
+      transition: transform 180ms ease;
+    }
+
+    .hsdc-feature-card:active .hsdc-feature-icon {
+      transform: scale(0.96);
+    }
+  }
+
+
+  /* =========================================================
+     卡片依次出现
+     ========================================================= */
+
+  .hsdc-feature-card-1 {
+    animation-delay: 0ms;
+  }
+
+  .hsdc-feature-card-2 {
+    animation-delay: 70ms;
+  }
+
+  .hsdc-feature-card-3 {
+    animation-delay: 140ms;
+  }
+
+  .hsdc-feature-card-4 {
+    animation-delay: 210ms;
+  }
+
+  .hsdc-feature-card-5 {
+    animation-delay: 280ms;
+  }
+
+  .hsdc-feature-card-6 {
+    animation-delay: 350ms;
+  }
+
+  .hsdc-feature-card-7 {
+    animation-delay: 420ms;
+  }
+
+  .hsdc-feature-card-8 {
+    animation-delay: 490ms;
+  }
+
+  .hsdc-feature-card-9 {
+    animation-delay: 560ms;
+  }
+
+
+  /* =========================================================
+     减少动态效果
+     ========================================================= */
+
+  @media (prefers-reduced-motion: reduce) {
+    .hsdc-feature-card,
+    .hsdc-feature-icon {
+      transition: none !important;
+      animation: none !important;
+      transform: none !important;
+    }
+  }
+</style>
