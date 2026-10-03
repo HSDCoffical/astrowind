@@ -30,7 +30,7 @@ if (image) {
 
 <section
   data-home-hero
-  class="relative not-prose min-h-screen md:min-h-[100dvh] flex items-center pointer-events-none bg-black"
+  class="relative not-prose min-h-screen md:min-h-[100dvh] flex items-center pointer-events-none bg-black overflow-x-clip"
   style="margin-top: 0;"
   {...id ? { id } : {}}
 >
@@ -40,17 +40,22 @@ if (image) {
 
   {imageUrl && (
     <div
-      class="absolute inset-0 w-full h-full bg-cover bg-center hsdc-hero-background"
+      class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat hsdc-hero-background pointer-events-none"
       style={`background-image: url('${imageUrl}');`}
+      aria-hidden="true"
     ></div>
   )}
 
   <!-- =====================================================
        黑色遮罩
+       保留原来的半透明黑色覆盖
   ====================================================== -->
 
   {imageUrl && (
-    <div class="absolute inset-0 w-full h-full bg-black/40 hsdc-hero-overlay"></div>
+    <div
+      class="absolute inset-0 w-full h-full bg-black/40 hsdc-hero-overlay pointer-events-none"
+      aria-hidden="true"
+    ></div>
   )}
 
   <!-- =====================================================
@@ -186,6 +191,10 @@ if (image) {
   }
 
 
+  /* =========================================================
+     Hero 黑色遮罩
+     ========================================================= */
+
   .hsdc-hero-overlay {
     transition: opacity 500ms ease;
   }
@@ -266,6 +275,15 @@ if (image) {
     section[data-home-hero] {
       margin-top: 0 !important;
       min-height: 100svh !important;
+
+      /*
+       * 防止手机浏览器横向回弹时把 Hero
+       * 拉出一个空白区域。
+       *
+       * 使用 clip 而不是 hidden，
+       * 避免创建新的滚动容器。
+       */
+      overflow-x: clip !important;
     }
 
 
@@ -297,6 +315,7 @@ if (image) {
   @media (min-width: 768px) {
     section[data-home-hero] {
       margin-top: -76px !important;
+      overflow-x: clip !important;
     }
 
     section[data-home-hero] > div.relative.max-w-7xl {
