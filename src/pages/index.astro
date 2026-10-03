@@ -461,432 +461,458 @@ const metadata = {
       }
     })();
   </script>
+<!-- ===== 首页搜索框 ===== -->
+  <script>
+    const SEARCH_HTML = `
+      <div
+        class="search-wrapper fixed left-0 right-0 z-50 px-4"
+        style="bottom: max(16px, env(safe-area-inset-bottom)); pointer-events: none;"
+      >
+        <div class="max-w-2xl mx-auto pointer-events-auto">
 
-  <!-- ===== 首页搜索框 ===== -->
-<script>
-  const SEARCH_HTML = `
-    <div
-      class="search-wrapper absolute bottom-5 sm:bottom-6 left-0 right-0 z-30 px-4"
-      style="pointer-events: none;"
-    >
-      <div class="max-w-2xl mx-auto pointer-events-auto">
-
-        <form
-          id="search-form"
-          class="relative"
-          action="https://www.bing.com/search"
-          method="GET"
-          target="_blank"
-        >
-
-          <input
-            type="hidden"
-            name="q1"
-            value="site:hsdc.dpdns.org"
+          <form
+            id="search-form"
+            class="relative"
+            action="https://www.bing.com/search"
+            method="GET"
+            target="_blank"
           >
 
-          <input
-            id="search-input"
-            type="text"
-            name="q"
-            placeholder="搜索本站内容..."
-            class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
-            autocomplete="off"
-          />
-
-          <button
-            id="search-toggle"
-            type="button"
-            class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
-            aria-label="聚焦搜索框"
-          >
-
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <input
+              type="hidden"
+              name="q1"
+              value="site:hsdc.dpdns.org"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
 
-          </button>
+            <input
+              id="search-input"
+              type="text"
+              name="q"
+              placeholder="搜索本站内容..."
+              class="w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg"
+              autocomplete="off"
+            />
 
-          <button
-            id="mode-toggle"
-            type="button"
-            class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full hover:bg-white/50 transition-colors"
-          >
-            <span id="mode-label">站外</span>
-          </button>
+            <button
+              id="search-toggle"
+              type="button"
+              class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+              aria-label="聚焦搜索框"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
 
-        </form>
+            <button
+              id="mode-toggle"
+              type="button"
+              class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full hover:bg-white/50 transition-colors"
+            >
+              <span id="mode-label">站外</span>
+            </button>
 
-        <div
-          id="search-results-container"
-          class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"
-        ></div>
+          </form>
 
+          <div
+            id="search-results-container"
+            class="mt-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl shadow-lg max-h-60 overflow-y-auto hidden"
+          ></div>
+
+        </div>
       </div>
-    </div>
-  `;
+    `;
 
 
-  function initSearch() {
+    function initSearch() {
 
-    const form = document.getElementById('search-form');
-    const input = document.getElementById('search-input');
-    const toggleBtn = document.getElementById('search-toggle');
-    const modeToggle = document.getElementById('mode-toggle');
-    const modeLabel = document.getElementById('mode-label');
-    const resultsContainer = document.getElementById(
-      'search-results-container'
-    );
+      const form = document.getElementById('search-form');
+      const input = document.getElementById('search-input');
+      const toggleBtn = document.getElementById('search-toggle');
+      const modeToggle = document.getElementById('mode-toggle');
+      const modeLabel = document.getElementById('mode-label');
+      const resultsContainer = document.getElementById(
+        'search-results-container'
+      );
 
-    if (
-      !form ||
-      !input ||
-      !toggleBtn ||
-      !modeToggle ||
-      !modeLabel ||
-      !resultsContainer
-    ) {
-      return;
-    }
-
-
-    let mode = 'external';
-
-    let searchData = null;
-
-
-    async function loadSearchData() {
-
-      try {
-
-        const resp = await fetch('/search.json');
-
-        if (resp.ok) {
-
-          searchData = await resp.json();
-
-          console.log(
-            '✅ 搜索索引已加载:',
-            searchData.length,
-            '个页面'
-          );
-
-        }
-
-      } catch (e) {}
-
-    }
-
-
-    function searchInternal(query) {
-
-      if (!searchData || !query.trim()) {
-        return [];
+      if (
+        !form ||
+        !input ||
+        !toggleBtn ||
+        !modeToggle ||
+        !modeLabel ||
+        !resultsContainer
+      ) {
+        return;
       }
 
-      const q = query.toLowerCase().trim();
 
-      return searchData
-        .filter((page) => {
+      /*
+       * 防止 Astro 页面切换后重复绑定事件。
+       */
+      if (form.dataset.searchInitialized === 'true') {
+        return;
+      }
 
-          const title = String(page.title || '').toLowerCase();
+      form.dataset.searchInitialized = 'true';
 
-          const desc = String(page.description || '').toLowerCase();
 
-          const content = String(page.content || '').toLowerCase();
+      let mode = 'external';
 
-          return (
-            title.includes(q) ||
-            desc.includes(q) ||
-            content.includes(q)
+      let searchData = null;
+
+
+      async function loadSearchData() {
+
+        try {
+
+          const resp = await fetch('/search.json');
+
+          if (resp.ok) {
+
+            searchData = await resp.json();
+
+            console.log(
+              '✅ 搜索索引已加载:',
+              searchData.length,
+              '个页面'
+            );
+
+          }
+
+        } catch (e) {}
+
+      }
+
+
+      function searchInternal(query) {
+
+        if (!searchData || !query.trim()) {
+          return [];
+        }
+
+        const q = query.toLowerCase().trim();
+
+        return searchData
+          .filter((page) => {
+
+            const title = String(page.title || '').toLowerCase();
+
+            const desc = String(page.description || '').toLowerCase();
+
+            const content = String(page.content || '').toLowerCase();
+
+            return (
+              title.includes(q) ||
+              desc.includes(q) ||
+              content.includes(q)
+            );
+
+          })
+          .slice(0, 10);
+      }
+
+
+      function showResults(results) {
+
+        resultsContainer.innerHTML = '';
+
+        if (results.length === 0) {
+
+          resultsContainer.classList.add('hidden');
+
+          return;
+        }
+
+
+        let html = '';
+
+
+        for (const page of results) {
+
+          html += `
+            <a
+              href="${page.url}"
+              class="block px-4 py-2 hover:bg-white/20 transition-colors border-b border-white/10 last:border-0"
+            >
+              <div class="font-medium text-gray-800">
+                ${page.title || ''}
+              </div>
+
+              <div class="text-sm text-gray-600 truncate">
+                ${page.description || ''}
+              </div>
+            </a>
+          `;
+        }
+
+
+        resultsContainer.innerHTML = html;
+
+        resultsContainer.classList.remove('hidden');
+      }
+
+
+      function clearResults() {
+
+        resultsContainer.innerHTML = '';
+
+        resultsContainer.classList.add('hidden');
+      }
+
+
+      function updateMode(newMode) {
+
+        mode = newMode;
+
+        clearResults();
+
+
+        if (mode === 'external') {
+
+          form.action = 'https://www.bing.com/search';
+
+          form.target = '_blank';
+
+
+          let hidden = form.querySelector(
+            'input[name="q1"]'
           );
 
-        })
-        .slice(0, 10);
+
+          if (!hidden) {
+
+            hidden = document.createElement('input');
+
+            hidden.type = 'hidden';
+
+            hidden.name = 'q1';
+
+            form.appendChild(hidden);
+          }
+
+
+          hidden.value = 'site:hsdc.dpdns.org';
+
+          input.name = 'q';
+
+          input.placeholder = '输入关键字以联网检索';
+
+
+          input.className =
+            'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
+
+
+          modeLabel.textContent = '必应搜索';
+
+        } else {
+
+          form.action = '#';
+
+          form.target = '';
+
+
+          const hidden = form.querySelector(
+            'input[name="q1"]'
+          );
+
+
+          if (hidden) {
+            hidden.remove();
+          }
+
+
+          input.name = '';
+
+          input.placeholder = '输入关键词检索本站';
+
+
+          input.className =
+            'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
+
+
+          modeLabel.textContent = '站内检索';
+
+
+          if (input.value.trim()) {
+
+            const results = searchInternal(
+              input.value
+            );
+
+            showResults(results);
+          }
+        }
+
+
+        input.focus();
+      }
+
+
+      input.addEventListener(
+        'input',
+        function () {
+
+          if (mode === 'internal') {
+
+            const query = this.value.trim();
+
+
+            if (!query) {
+
+              clearResults();
+
+              return;
+            }
+
+
+            const results = searchInternal(query);
+
+            showResults(results);
+
+          } else {
+
+            clearResults();
+
+          }
+
+        }
+      );
+
+
+      modeToggle.addEventListener(
+        'click',
+        function (e) {
+
+          e.preventDefault();
+
+          e.stopPropagation();
+
+
+          const newMode =
+            mode === 'external'
+              ? 'internal'
+              : 'external';
+
+
+          updateMode(newMode);
+        }
+      );
+
+
+      toggleBtn.addEventListener(
+        'click',
+        function (e) {
+
+          e.preventDefault();
+
+          input.focus();
+        }
+      );
+
+
+      resultsContainer.addEventListener(
+        'click',
+        function () {
+          clearResults();
+        }
+      );
+
+
+      updateMode('external');
+
+      loadSearchData();
     }
 
 
-    function showResults(results) {
+    function injectSearch() {
 
-      resultsContainer.innerHTML = '';
+      /*
+       * 只有首页存在 Hero 才创建搜索框。
+       */
+      const hero = document.querySelector('[data-home-hero]');
 
-      if (results.length === 0) {
+      if (!hero) {
+        return;
+      }
 
-        resultsContainer.classList.add('hidden');
+
+      /*
+       * 搜索框现在属于 body 的固定层，
+       * 不再插入 Hero 内部。
+       */
+      const existing = document.querySelector('.search-wrapper');
+
+      if (existing) {
+
+        initSearch();
 
         return;
       }
 
 
-      let html = '';
+      /*
+       * 直接插入 body。
+       *
+       * 这样 fixed 的定位参照整个视口，
+       * 不会受到 Hero 高度和滚动位置影响。
+       */
+      document.body.insertAdjacentHTML(
+        'beforeend',
+        SEARCH_HTML
+      );
 
 
-      for (const page of results) {
-
-        html += `
-          <a
-            href="${page.url}"
-            class="block px-4 py-2 hover:bg-white/20 transition-colors border-b border-white/10 last:border-0"
-          >
-            <div class="font-medium text-gray-800">
-              ${page.title || ''}
-            </div>
-
-            <div class="text-sm text-gray-600 truncate">
-              ${page.description || ''}
-            </div>
-          </a>
-        `;
-      }
-
-
-      resultsContainer.innerHTML = html;
-
-      resultsContainer.classList.remove('hidden');
+      setTimeout(
+        initSearch,
+        50
+      );
     }
 
 
-    function clearResults() {
+    /*
+     * 初次加载。
+     */
+    if (document.readyState === 'complete') {
 
-      resultsContainer.innerHTML = '';
+      setTimeout(
+        injectSearch,
+        100
+      );
 
-      resultsContainer.classList.add('hidden');
-    }
+    } else {
 
+      window.addEventListener(
+        'load',
+        function () {
 
-    function updateMode(newMode) {
-
-      mode = newMode;
-
-      clearResults();
-
-
-      if (mode === 'external') {
-
-        form.action = 'https://www.bing.com/search';
-
-        form.target = '_blank';
-
-
-        let hidden = form.querySelector(
-          'input[name="q1"]'
-        );
-
-
-        if (!hidden) {
-
-          hidden = document.createElement('input');
-
-          hidden.type = 'hidden';
-
-          hidden.name = 'q1';
-
-          form.appendChild(hidden);
-        }
-
-
-        hidden.value = 'site:hsdc.dpdns.org';
-
-        input.name = 'q';
-
-        input.placeholder = '输入关键字以联网检索';
-
-
-        input.className =
-          'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
-
-
-        modeLabel.textContent = '必应搜索';
-
-      } else {
-
-        form.action = '#';
-
-        form.target = '';
-
-
-        const hidden = form.querySelector(
-          'input[name="q1"]'
-        );
-
-
-        if (hidden) {
-          hidden.remove();
-        }
-
-
-        input.name = '';
-
-        input.placeholder = '输入关键词检索本站';
-
-
-        input.className =
-          'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
-
-
-        modeLabel.textContent = '站内检索';
-
-
-        if (input.value.trim()) {
-
-          const results = searchInternal(
-            input.value
+          setTimeout(
+            injectSearch,
+            100
           );
 
-          showResults(results);
-        }
-      }
+        },
+        { once: true }
+      );
 
-
-      input.focus();
-    }
-
-
-    input.addEventListener(
-      'input',
-      function () {
-
-        if (mode === 'internal') {
-
-          const query = this.value.trim();
-
-
-          if (!query) {
-
-            clearResults();
-
-            return;
-          }
-
-
-          const results = searchInternal(query);
-
-          showResults(results);
-
-        } else {
-
-          clearResults();
-
-        }
-
-      }
-    );
-
-
-    modeToggle.addEventListener(
-      'click',
-      function (e) {
-
-        e.preventDefault();
-
-        e.stopPropagation();
-
-
-        const newMode =
-          mode === 'external'
-            ? 'internal'
-            : 'external';
-
-
-        updateMode(newMode);
-      }
-    );
-
-
-    toggleBtn.addEventListener(
-      'click',
-      function (e) {
-
-        e.preventDefault();
-
-        input.focus();
-      }
-    );
-
-
-    /*
-     * 搜索框内部点击不会触发页面关闭逻辑。
-     */
-    resultsContainer.addEventListener(
-      'click',
-      function () {
-        clearResults();
-      }
-    );
-
-
-    updateMode('external');
-
-    loadSearchData();
-  }
-
-
-  function injectSearch() {
-
-    const hero =
-      document.querySelector('[data-home-hero]');
-
-
-    /*
-     * 不是首页时不创建搜索框。
-     */
-    if (!hero) {
-      return;
     }
 
 
     /*
-     * 如果已经存在搜索框，不重复创建。
+     * Astro ClientRouter 页面切换后重新检查。
      */
-    const existing =
-      hero.querySelector('.search-wrapper');
-
-
-    if (existing) {
-
-      initSearch();
-
-      return;
-    }
-
-
-    hero.insertAdjacentHTML(
-      'beforeend',
-      SEARCH_HTML
-    );
-
-
-    setTimeout(
-      initSearch,
-      50
-    );
-  }
-
-
-  /*
-   * 初次加载。
-   */
-  if (document.readyState === 'complete') {
-
-    setTimeout(
-      injectSearch,
-      100
-    );
-
-  } else {
-
-    window.addEventListener(
-      'load',
+    document.addEventListener(
+      'astro:after-swap',
       function () {
 
         setTimeout(
@@ -894,27 +920,9 @@ const metadata = {
           100
         );
 
-      },
-      { once: true }
+      }
     );
-
-  }
-
-
-  /*
-   * Astro ClientRouter 页面切换后重新检查。
-   */
-  document.addEventListener(
-    'astro:after-swap',
-    function () {
-
-      setTimeout(
-        injectSearch,
-        100
-      );
-
-    }
-  );
-</script>
+  </script>
+  
 
 </Layout>
