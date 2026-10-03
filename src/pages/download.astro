@@ -1,0 +1,118 @@
+---
+import PageLayout from '~/layouts/PageLayout.astro';
+
+const softwareList = [
+  {
+    name: 'HSDC Studio',
+    version: '1.0.0',
+    status: 'Latest',
+    description: 'HSDC Studio 是由 HSDC 开发的 Android 代码编辑器，提供轻量、便捷的移动端代码编辑体验。',
+    icon: 'https://raw.githubusercontent.com/HSDCoffical/HSDC-Code-for-Android/main/1791050171702.png',
+    downloadUrl: 'https://github.com/HSDCoffical/HSDC-Code-for-Android/releases/download/v1.0.0/CodeEditor_1.0.0.apk',
+    releaseUrl: 'https://github.com/HSDCoffical/HSDC-Code-for-Android/releases/tag/v1.0.0',
+    repositoryUrl: 'https://github.com/HSDCoffical/HSDC-Code-for-Android',
+    platforms: ['Android'],
+    releaseDate: '2026-10-04',
+    changelog: ['首次正式发布 HSDC Studio Android 版本', '提供移动端代码编辑能力', '完善基础使用体验'],
+  },
+];
+
+const totalProducts = softwareList.length;
+const totalPlatforms = new Set(softwareList.flatMap((item) => item.platforms)).size;
+---
+
+<PageLayout title="下载中心" description="下载 HSDC 开发的软件与应用，获取最新版本、更新日志与 GitHub 源代码。">
+  <main class="download-page">
+    <section class="download-hero">
+      <div class="hero-glow hero-glow-one"></div>
+      <div class="hero-glow hero-glow-two"></div>
+      <div class="hero-inner">
+        <div class="eyebrow reveal"><span class="eyebrow-dot"></span>HSDC SOFTWARE</div>
+        <h1 class="reveal reveal-delay-1">下载中心<span>Download Center</span></h1>
+        <p class="hero-description reveal reveal-delay-2">探索 HSDC 开发的软件与应用。<br />获取最新版本、更新日志以及项目源代码。</p>
+        <div class="hero-stats reveal reveal-delay-3">
+          <div><strong>{totalProducts}</strong><span>软件产品</span></div>
+          <div><strong>{totalPlatforms}</strong><span>支持平台</span></div>
+          <div><strong>GitHub</strong><span>开源发布</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="software-section">
+      <div class="section-heading reveal">
+        <div><p class="section-kicker">SOFTWARE</p><h2>软件产品</h2></div>
+        <p>每一个项目都通过 GitHub Release 发布正式版本。</p>
+      </div>
+
+      <div class="software-grid">
+        {softwareList.map((software) => (
+          <article class="software-card reveal">
+            <div class="card-top">
+              <div class="software-icon-wrap"><img src={software.icon} alt={`${software.name} 图标`} class="software-icon" loading="lazy" /></div>
+              <div class="software-meta">
+                <span class="latest-badge"><span></span>{software.status}</span>
+                <span class="version">v{software.version}</span>
+              </div>
+            </div>
+
+            <div class="card-content">
+              <h3>{software.name}</h3>
+              <p class="software-description">{software.description}</p>
+              <div class="platforms">{software.platforms.map((platform) => <span>{platform}</span>)}<span>Open Source</span></div>
+
+              <div class="release-info">
+                <div><span>VERSION</span><strong>v{software.version}</strong></div>
+                <div><span>RELEASE</span><strong>{software.releaseDate}</strong></div>
+              </div>
+
+              <div class="changelog">
+                <div class="changelog-title">
+                  <span>LATEST UPDATE</span>
+                  <a href={software.releaseUrl} target="_blank" rel="noopener noreferrer">查看完整 Release ↗</a>
+                </div>
+                <ul>{software.changelog.map((item) => <li>{item}</li>)}</ul>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <a class="download-button" href={software.downloadUrl} target="_blank" rel="noopener noreferrer"><span class="download-icon">↓</span>下载 APK</a>
+              <a class="github-button" href={software.repositoryUrl} target="_blank" rel="noopener noreferrer">GitHub <span>↗</span></a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="release-note reveal">
+      <div class="release-note-icon">↗</div>
+      <div>
+        <p class="section-kicker">OPEN SOURCE RELEASE</p>
+        <h2>每个版本都可追溯</h2>
+        <p>软件、源代码与更新日志统一通过 GitHub Release 管理。你可以查看完整版本记录，也可以直接下载最新 APK。</p>
+      </div>
+    </section>
+  </main>
+</PageLayout>
+
+<style>
+  .download-page{overflow:hidden;background:radial-gradient(circle at 80% 8%,rgba(59,130,246,.08),transparent 28rem),radial-gradient(circle at 10% 34%,rgba(14,165,233,.06),transparent 24rem)}
+  .download-hero{position:relative;min-height:520px;display:flex;align-items:center;border-bottom:1px solid rgba(100,116,139,.14);overflow:hidden}
+  .hero-inner,.software-section{width:min(1180px,calc(100% - 40px));margin:0 auto}.hero-inner{padding:100px 0 88px;position:relative;z-index:2}
+  .hero-glow{position:absolute;width:420px;height:420px;border-radius:999px;filter:blur(90px);opacity:.24;pointer-events:none}.hero-glow-one{right:-130px;top:10px;background:#38bdf8}.hero-glow-two{left:-180px;bottom:-220px;background:#6366f1}
+  .eyebrow,.section-kicker{font-size:.72rem;font-weight:700;letter-spacing:.18em;color:rgb(14 165 233)}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid rgba(14,165,233,.2);border-radius:999px;background:rgba(14,165,233,.05)}.eyebrow-dot,.latest-badge span{width:6px;height:6px;border-radius:50%;background:rgb(34 197 94);box-shadow:0 0 0 4px rgba(34,197,94,.1)}
+  h1{margin:24px 0 0;font-size:clamp(3.1rem,8vw,6.8rem);line-height:.95;letter-spacing:-.055em;font-weight:800;max-width:850px}h1 span{display:block;margin-top:13px;color:rgb(100 116 139 / .55);font-size:clamp(1.35rem,3vw,2.35rem);letter-spacing:-.025em;font-weight:600}
+  .hero-description{margin:30px 0 0;color:rgb(100 116 139);font-size:1.05rem;line-height:1.85}.hero-stats{display:flex;gap:48px;margin-top:46px}.hero-stats div{display:flex;flex-direction:column;gap:5px}.hero-stats strong{font-size:1.45rem;line-height:1}.hero-stats span{color:rgb(100 116 139);font-size:.78rem}
+  .software-section{padding:92px 0}.section-heading{display:flex;align-items:end;justify-content:space-between;gap:30px;margin-bottom:36px}.section-heading h2,.release-note h2{margin:8px 0 0;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.04em}.section-heading>p{max-width:380px;margin:0;color:rgb(100 116 139);line-height:1.7;text-align:right}
+  .software-grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:24px}.software-card{position:relative;overflow:hidden;border:1px solid rgba(100,116,139,.16);border-radius:28px;background:rgba(255,255,255,.68);box-shadow:0 20px 70px rgba(15,23,42,.07);transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s ease,border-color .45s ease}.software-card:hover{transform:translateY(-6px);box-shadow:0 28px 90px rgba(15,23,42,.12);border-color:rgba(14,165,233,.3)}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;padding:30px 30px 0}.software-icon-wrap{width:84px;height:84px;border-radius:22px;overflow:hidden;background:rgb(241 245 249);box-shadow:0 12px 28px rgba(15,23,42,.1)}.software-icon{width:100%;height:100%;object-fit:cover}.software-meta{display:flex;align-items:center;gap:10px}.latest-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border-radius:999px;background:rgba(34,197,94,.08);color:rgb(22 163 74);font-size:.72rem;font-weight:700}.version{color:rgb(100 116 139);font-size:.78rem;font-weight:600}
+  .card-content{padding:28px 30px 26px}.card-content h3{margin:0;font-size:2rem;letter-spacing:-.04em}.software-description{min-height:52px;margin:13px 0 0;color:rgb(100 116 139);line-height:1.75}.platforms{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}.platforms span{padding:6px 10px;border:1px solid rgba(100,116,139,.15);border-radius:999px;color:rgb(71 85 105);background:rgba(248,250,252,.7);font-size:.72rem}
+  .release-info{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:24px}.release-info div{padding:14px;border-radius:16px;background:rgba(248,250,252,.7)}.release-info span{display:block;margin-bottom:5px;color:rgb(148 163 184);font-size:.63rem;letter-spacing:.12em;font-weight:700}.release-info strong{font-size:.88rem}
+  .changelog{margin-top:24px;padding-top:22px;border-top:1px solid rgba(100,116,139,.12)}.changelog-title{display:flex;align-items:center;justify-content:space-between;gap:15px}.changelog-title>span{color:rgb(100 116 139);font-size:.66rem;font-weight:700;letter-spacing:.14em}.changelog-title a{color:rgb(14 165 233);font-size:.76rem;text-decoration:none}.changelog ul{margin:12px 0 0;padding:0;list-style:none}.changelog li{position:relative;padding-left:17px;margin-top:8px;color:rgb(71 85 105);font-size:.84rem}.changelog li::before{content:'';position:absolute;left:0;top:.55em;width:5px;height:5px;border-radius:50%;background:rgb(14 165 233)}
+  .card-actions{display:grid;grid-template-columns:1.35fr 1fr;gap:10px;padding:0 30px 30px}.download-button,.github-button{min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:9px;border-radius:14px;text-decoration:none;font-size:.88rem;font-weight:700;transition:transform .25s ease,opacity .25s ease}.download-button:hover,.github-button:hover{transform:translateY(-2px);opacity:.9}.download-button{color:white;background:rgb(15 23 42);box-shadow:0 12px 24px rgba(15,23,42,.16)}.github-button{color:rgb(15 23 42);border:1px solid rgba(100,116,139,.18);background:transparent}
+  .release-note{width:min(1180px,calc(100% - 40px));margin:0 auto 90px;display:flex;gap:22px;padding:30px;border:1px solid rgba(14,165,233,.14);border-radius:24px;background:linear-gradient(135deg,rgba(14,165,233,.06),rgba(99,102,241,.04))}.release-note-icon{flex:0 0 auto;width:44px;height:44px;display:grid;place-items:center;border-radius:14px;color:rgb(14 165 233);background:rgba(14,165,233,.1);font-size:1.2rem}.release-note p:last-child{max-width:720px;margin:10px 0 0;color:rgb(100 116 139);line-height:1.75}
+  .reveal{opacity:0;transform:translateY(22px);animation:downloadReveal .8s cubic-bezier(.22,1,.36,1) forwards}.reveal-delay-1{animation-delay:.08s}.reveal-delay-2{animation-delay:.16s}.reveal-delay-3{animation-delay:.24s}@keyframes downloadReveal{to{opacity:1;transform:translateY(0)}}
+  @media (min-width:760px){.software-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (prefers-color-scheme:dark){.software-card{background:rgba(15,23,42,.62);box-shadow:0 20px 70px rgba(0,0,0,.18)}.software-icon-wrap{background:rgb(30 41 59)}.platforms span,.release-info div{background:rgba(30,41,59,.55)}.download-button{background:rgb(248 250 252);color:rgb(15 23 42)}.github-button{color:rgb(226 232 240)}.release-note{background:linear-gradient(135deg,rgba(14,165,233,.08),rgba(99,102,241,.07))}}
+  @media (max-width:640px){.download-hero{min-height:470px}.hero-inner,.software-section{width:min(100% - 32px,1180px)}.hero-inner{padding:75px 0 65px}.hero-stats{gap:24px}.hero-stats strong{font-size:1.15rem}.software-section{padding:65px 0}.section-heading{display:block}.section-heading>p{margin-top:14px;text-align:left}.card-top{padding:22px 22px 0}.card-content{padding:22px}.card-actions{padding:0 22px 22px}.software-icon-wrap{width:68px;height:68px;border-radius:18px}.software-meta{flex-direction:column;align-items:flex-end;gap:7px}.card-content h3{font-size:1.7rem}.release-note{width:min(100% - 32px,1180px);margin-bottom:65px;padding:22px}}
+  @media (prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}.software-card,.download-button,.github-button{transition:none}}
+</style>
