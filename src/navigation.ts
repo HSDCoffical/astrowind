@@ -19,6 +19,10 @@ export const headerData = {
       href: 'https://it-toolbox-19l.pages.dev/'
     },
     {
+      text: '下载中心',
+      href: getPermalink('/download'),
+    },
+    {
       text: '个人中心',
       href: 'https://users-manage-react.pages.dev/account?sessionId=',
     },
