@@ -50,53 +50,96 @@ const columnsClass =
       subtitle: 'max-w-3xl mx-auto sm:text-center text-xl text-muted dark:text-slate-400',
     }}
   />
+
   <div class="mx-auto max-w-7xl p-4 md:px-8">
+
     <div class={`md:flex ${isReversed ? 'md:flex-row-reverse' : ''} md:gap-16`}>
+
+      <!-- ===================================================
+           左侧文字
+      ==================================================== -->
+
       <div class="md:basis-1/2 self-center">
-        {content && <div class="mb-12 text-lg dark:text-slate-400" set:html={content} />}
 
         {
-          callToAction && (
-            <div class="mt-[-40px] mb-8 text-primary">
-              <Button variant="link" {...callToAction} />
+          content && (
+            <div class="mb-12 text-lg dark:text-slate-400 hsdc-content-main">
+              <Fragment set:html={content} />
             </div>
           )
         }
 
+
+        {
+          callToAction && (
+            <div class="mt-[-40px] mb-8 text-primary">
+              <Button
+                variant="link"
+                {...callToAction}
+              />
+            </div>
+          )
+        }
+
+
         {
           items.length > 0 && (
             <div class:list={['grid mx-auto gap-y-4 md:gap-y-8 gap-8', columnsClass]}>
-              {items.map(({ title: itemTitle, description, icon, callToAction }) => (
-                <div class="intersect-once motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade">
+              {items.map(({ title: itemTitle, description, icon, callToAction }, index) => (
+                <div
+                  class:list={[
+                    'intersect-once motion-safe:opacity-0 motion-safe:intersect:animate-fade',
+                    'hsdc-content-item',
+                    `hsdc-content-item-${index + 1}`,
+                  ]}
+                >
                   <div class="flex flex-row max-w-none">
+
                     <div class="flex justify-center">
                       <Icon
                         name={icon || 'tabler:check'}
-                        class="flex h-7 w-7 items-center justify-center rounded-full bg-green-600 dark:bg-green-700 text-gray-50 p-1 mr-2 rtl:mr-0 rtl:ml-2"
+                        class="flex h-7 w-7 items-center justify-center rounded-full bg-green-600 dark:bg-green-700 text-gray-50 p-1 mr-2 rtl:mr-0 rtl:ml-2 hsdc-content-icon"
                       />
                     </div>
+
                     <div class="mt-0.5">
-                      {itemTitle && (
-                        <h3 class="text-lg font-medium leading-6 dark:text-white ml-2 rtl:ml-0 rtl:mr-2">
-                          {itemTitle}
-                        </h3>
-                      )}
-                      {description && (
-                        <p
-                          class:list={[{ 'mt-3': itemTitle }, 'text-muted dark:text-slate-400 ml-2 rtl:ml-0 rtl:mr-2']}
-                          set:html={description}
-                        />
-                      )}
-                      {callToAction && (
-                        <div
-                          class:list={[
-                            { 'mt-3': itemTitle || description },
-                            'text-lg font-medium leading-6 dark:text-white ml-2 rtl:ml-0 rtl:mr-2',
-                          ]}
-                        >
-                          <Button variant="link" {...callToAction} />
-                        </div>
-                      )}
+
+                      {
+                        itemTitle && (
+                          <h3 class="text-lg font-medium leading-6 dark:text-white ml-2 rtl:ml-0 rtl:mr-2">
+                            {itemTitle}
+                          </h3>
+                        )
+                      }
+
+                      {
+                        description && (
+                          <p
+                            class:list={[
+                              { 'mt-3': itemTitle },
+                              'text-muted dark:text-slate-400 ml-2 rtl:ml-0 rtl:mr-2',
+                            ]}
+                            set:html={description}
+                          />
+                        )
+                      }
+
+                      {
+                        callToAction && (
+                          <div
+                            class:list={[
+                              { 'mt-3': itemTitle || description },
+                              'text-lg font-medium leading-6 dark:text-white ml-2 rtl:ml-0 rtl:mr-2',
+                            ]}
+                          >
+                            <Button
+                              variant="link"
+                              {...callToAction}
+                            />
+                          </div>
+                        )
+                      }
+
                     </div>
                   </div>
                 </div>
@@ -104,29 +147,180 @@ const columnsClass =
             </div>
           )
         }
+
       </div>
-      <div aria-hidden="true" class="mt-10 md:mt-0 md:basis-1/2">
+
+
+      <!-- ===================================================
+           右侧图片
+      ==================================================== -->
+
+      <div
+        aria-hidden="true"
+        class="mt-10 md:mt-0 md:basis-1/2"
+      >
         {
           image && (
-            <div class="relative m-auto max-w-4xl">
-              {typeof image === 'string' ? (
-                <Fragment set:html={image} />
-              ) : (
-                <Image
-                  class="mx-auto w-full rounded-lg bg-gray-500 shadow-lg"
-                  width={500}
-                  height={500}
-                  widths={[400, 768]}
-                  sizes="(max-width: 768px) 100vw, 432px"
-                  layout="responsive"
-                  format="webp"
-                  {...image}
-                />
-              )}
+            <div class="relative m-auto max-w-4xl hsdc-content-visual">
+
+              {
+                typeof image === 'string' ? (
+                  <Fragment set:html={image} />
+                ) : (
+                  <Image
+                    class="mx-auto w-full rounded-lg bg-gray-500 shadow-lg"
+                    width={500}
+                    height={500}
+                    widths={[400, 768]}
+                    sizes="(max-width: 768px) 100vw, 432px"
+                    layout="responsive"
+                    format="webp"
+                    {...image}
+                  />
+                )
+              }
+
             </div>
           )
         }
       </div>
+
     </div>
+
   </div>
 </WidgetWrapper>
+
+
+<style>
+  /* =========================================================
+     内容项目
+     ========================================================= */
+
+  .hsdc-content-item {
+    will-change: opacity, transform;
+  }
+
+
+  /* =========================================================
+     内容项目依次进入
+     ========================================================= */
+
+  .hsdc-content-item-1 {
+    animation-delay: 0ms;
+  }
+
+  .hsdc-content-item-2 {
+    animation-delay: 80ms;
+  }
+
+  .hsdc-content-item-3 {
+    animation-delay: 160ms;
+  }
+
+  .hsdc-content-item-4 {
+    animation-delay: 240ms;
+  }
+
+
+  /* =========================================================
+     Icon
+     ========================================================= */
+
+  .hsdc-content-icon {
+    transition:
+      transform 250ms ease,
+      box-shadow 250ms ease;
+  }
+
+
+  @media (hover: hover) and (pointer: fine) {
+    .hsdc-content-item:hover .hsdc-content-icon {
+      transform: scale(1.08) rotate(-4deg);
+      box-shadow: 0 6px 18px rgb(34 197 94 / 20%);
+    }
+  }
+
+
+  /* =========================================================
+     图片
+     ========================================================= */
+
+  .hsdc-content-visual {
+    transform: translate3d(0, 0, 0);
+    transition:
+      transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
+      filter 500ms ease;
+    will-change: transform;
+  }
+
+
+  .hsdc-content-visual :global(img) {
+    transition:
+      transform 600ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 500ms ease;
+    will-change: transform;
+  }
+
+
+  /* =========================================================
+     PC 图片 Hover
+     ========================================================= */
+
+  @media (hover: hover) and (pointer: fine) {
+    .hsdc-content-visual:hover {
+      transform: translate3d(0, -6px, 0) scale(1.01);
+      filter: saturate(1.04);
+    }
+
+    .hsdc-content-visual:hover :global(img) {
+      transform: scale(1.018);
+      box-shadow: 0 22px 55px rgb(15 23 42 / 16%);
+    }
+  }
+
+
+  /* =========================================================
+     手机端
+     ========================================================= */
+
+  @media (max-width: 767px) {
+    .hsdc-content-visual {
+      transition:
+        transform 220ms ease,
+        filter 220ms ease;
+    }
+
+    /*
+     * 手机触摸反馈
+     */
+
+    .hsdc-content-visual:active {
+      transform: scale(0.985);
+    }
+
+    .hsdc-content-visual:active :global(img) {
+      transform: scale(1.005);
+    }
+
+    /*
+     * 手机不持续做图片浮动
+     */
+    .hsdc-content-visual {
+      animation: none !important;
+    }
+  }
+
+
+  /* =========================================================
+     减少动态效果
+     ========================================================= */
+
+  @media (prefers-reduced-motion: reduce) {
+    .hsdc-content-visual,
+    .hsdc-content-visual :global(img),
+    .hsdc-content-icon {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+</style>
