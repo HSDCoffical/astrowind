@@ -50,17 +50,26 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 <header
   id={id}
   data-aw-sticky-header={isSticky ? true : undefined}
-  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30"
+  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30 hsdc-header"
   style="background: transparent !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
     /* =========================================================
-       Header 原有样式
+       Header 基础
     ========================================================= */
+
+    header#header {
+      transition:
+        background-color 280ms ease,
+        border-color 280ms ease,
+        box-shadow 280ms ease;
+    }
+
 
     header#header * {
       background: transparent !important;
     }
+
 
     header#header .bg-white,
     header#header .dark\:bg-gray-900,
@@ -70,36 +79,55 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       background: transparent !important;
     }
 
-    header#header button:hover,
-    header#header a:hover {
-      background: rgba(255, 255, 255, 0.1) !important;
-    }
 
-    .dark header#header button:hover,
-    .dark header#header a:hover {
-      background: rgba(255, 255, 255, 0.05) !important;
-    }
+    /* =========================================================
+       桌面端 Hover
+    ========================================================= */
 
-    .menu-theme-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1rem;
-      margin-top: 0.5rem;
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
-      color: #666;
-    }
+    @media (hover: hover) and (pointer: fine) {
+      header#header button:hover,
+      header#header a:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+      }
 
-    .dark .menu-theme-item {
-      border-top-color: rgba(255, 255, 255, 0.06);
-      color: #aaa;
-    }
+      .dark header#header button:hover,
+      .dark header#header a:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+      }
 
-    @media (min-width: 768px) {
-      .menu-theme-item {
-        display: none !important;
+      header#header nav > ul > li > a,
+      header#header nav > ul > li > button {
+        transition:
+          color 180ms ease,
+          transform 180ms ease,
+          background-color 180ms ease;
+      }
+
+      header#header nav > ul > li > a:hover,
+      header#header nav > ul > li > button:hover {
+        transform: translateY(-1px);
       }
     }
+
+
+    /* =========================================================
+       Logo
+    ========================================================= */
+
+    header#header a[href="/"] {
+      transition:
+        transform 220ms ease,
+        opacity 220ms ease;
+    }
+
+
+    @media (hover: hover) and (pointer: fine) {
+      header#header a[href="/"]:hover {
+        transform: translateY(-1px);
+        opacity: 0.92;
+      }
+    }
+
 
     /* =========================================================
        手机端禁用毛玻璃
@@ -115,11 +143,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
     /* =========================================================
        手机端菜单动画
-       
-       注意：
-       不修改 ToggleMenu 按钮
-       不修改 body / html 滚动
-       不使用 JS
     ========================================================= */
 
     @media (max-width: 767px) {
@@ -149,13 +172,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
 
 
-      /*
-       * ToggleMenu 展开后，
-       * AstroWind 会给菜单区域/父级产生 expanded 状态。
-       *
-       * 这里兼容常见的 expanded 写法。
-       */
-
       header#header nav.expanded,
       header#header nav[data-expanded="true"],
       header#header:has(.expanded) nav {
@@ -181,18 +197,17 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
       /* =====================================================
          菜单列表
-      ===================================================== */
+      ====================================================== */
 
       header#header nav > ul {
         padding-top: 8px;
-
         padding-bottom: 12px;
       }
 
 
       /* =====================================================
          菜单项目初始状态
-      ===================================================== */
+      ====================================================== */
 
       header#header nav > ul > li {
         opacity: 0;
@@ -207,19 +222,18 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
       /* =====================================================
          菜单打开
-      ===================================================== */
+      ====================================================== */
 
       header#header:has(nav.expanded) nav > ul > li,
       header#header:has(.expanded) nav > ul > li {
         opacity: 1;
-
         transform: translateY(0);
       }
 
 
       /* =====================================================
-         菜单项依次出现
-      ===================================================== */
+         菜单依次进入
+      ====================================================== */
 
       header#header:has(.expanded) nav > ul > li:nth-child(1) {
         transition-delay: 0.04s;
@@ -255,8 +269,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 
       /* =====================================================
-         菜单关闭时立即开始收回
-      ===================================================== */
+         关闭菜单
+      ====================================================== */
 
       header#header nav:not(.expanded) > ul > li {
         transition-delay: 0s;
@@ -264,8 +278,8 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 
       /* =====================================================
-         手机菜单文字点击区域
-      ===================================================== */
+         手机菜单文字
+      ====================================================== */
 
       header#header nav > ul > li > a,
       header#header nav > ul > li > button {
@@ -274,14 +288,28 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         box-sizing: border-box;
 
         padding-top: 13px;
-
         padding-bottom: 13px;
+
+        transition:
+          transform 160ms ease,
+          opacity 160ms ease;
+      }
+
+
+      /*
+       * 手指按下反馈
+       */
+
+      header#header nav > ul > li > a:active,
+      header#header nav > ul > li > button:active {
+        transform: scale(0.975);
+        opacity: 0.72;
       }
 
 
       /* =====================================================
          手机菜单滚动条
-      ===================================================== */
+      ====================================================== */
 
       header#header nav::-webkit-scrollbar {
         width: 4px;
@@ -295,7 +323,33 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         background: rgba(100, 116, 139, 0.25);
         border-radius: 999px;
       }
+    }
 
+
+    /* =========================================================
+       手机主题按钮
+    ========================================================= */
+
+    .menu-theme-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      margin-top: 0.5rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      color: #666;
+    }
+
+    .dark .menu-theme-item {
+      border-top-color: rgba(255, 255, 255, 0.06);
+      color: #aaa;
+    }
+
+
+    @media (min-width: 768px) {
+      .menu-theme-item {
+        display: none !important;
+      }
     }
 
 
@@ -304,16 +358,20 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     ========================================================= */
 
     @media (prefers-reduced-motion: reduce) {
-
+      header#header,
       header#header nav,
-      header#header nav > ul > li {
+      header#header nav > ul > li,
+      header#header nav > ul > li > a,
+      header#header nav > ul > li > button {
         transition: none !important;
       }
-
     }
-
   </style>
 
+
+  <!-- =====================================================
+       Header 背景
+  ====================================================== -->
 
   <div
     class="absolute inset-0"
@@ -336,7 +394,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     ]}
   >
 
-
     <!-- =====================================================
          Logo + 菜单按钮
     ====================================================== -->
@@ -357,10 +414,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         <Logo />
       </a>
 
-
-      <!--
-        三按钮保持完全不动
-      -->
 
       <div class="flex items-center md:hidden">
         <ToggleMenu />
@@ -384,23 +437,16 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
         {
           links.map(({ text, href, links }) => (
-
-            <li
-              class={links?.length ? 'dropdown' : ''}
-            >
+            <li class={links?.length ? 'dropdown' : ''}>
 
               {
                 links?.length ? (
-
                   <>
-
                     <button
                       type="button"
                       class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
                     >
                       {text}
-
-                      {' '}
 
                       <Icon
                         name="tabler:chevron-down"
@@ -412,16 +458,13 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
                     <ul
                       class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl"
                     >
-
                       {
                         links.map(
                           ({
                             text: text2,
                             href: href2,
                           }) => (
-
                             <li>
-
                               <a
                                 class:list={[
                                   'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
@@ -434,19 +477,13 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
                               >
                                 {text2}
                               </a>
-
                             </li>
-
                           )
                         )
                       }
-
                     </ul>
-
                   </>
-
                 ) : (
-
                   <a
                     class:list={[
                       'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
@@ -459,28 +496,24 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
                   >
                     {text}
                   </a>
-
                 )
               }
 
             </li>
-
           ))
         }
 
 
         <!-- ===================================================
-             手机端主题切换
+             手机主题切换
         ==================================================== -->
 
         <li class="menu-theme-item">
-
           <ToggleTheme iconClass="w-5 h-5" />
 
           <span class="text-sm">
             切换主题
           </span>
-
         </li>
 
       </ul>
@@ -519,20 +552,16 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
           {
             showRssFeed && (
-
               <a
                 class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
                 aria-label="RSS Feed"
                 href={getAsset('/rss.xml')}
               >
-
                 <Icon
                   name="tabler:rss"
                   class="w-5 h-5"
                 />
-
               </a>
-
             )
           }
 
@@ -541,26 +570,18 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
         {
           actions?.length ? (
-
             <span class="ml-4 rtl:ml-0 rtl:mr-4">
-
               {
                 actions.map((btnProps) => (
-
                   <Button
                     {...btnProps}
                     class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto"
                   />
-
                 ))
               }
-
             </span>
-
           ) : (
-
             ''
-
           )
         }
 
