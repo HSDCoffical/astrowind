@@ -169,9 +169,11 @@ const {
         padding-left: 12px;
         padding-right: 12px;
         padding-bottom: max(
-          28px,
-          env(safe-area-inset-bottom)
-        );
+  88px,
+  calc(
+    64px + env(safe-area-inset-bottom)
+  )
+);
 
         display: flex !important;
         flex-direction: column;
