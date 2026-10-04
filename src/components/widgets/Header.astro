@@ -67,7 +67,7 @@ const {
     }
 
     header#header .bg-white,
-    header#header .dark\:bg-gray-900,
+    header#header .dark\\:bg-gray-900,
     header#header .bg-gray-100,
     header#header .bg-gray-50,
     header#header [class*="bg-"] {
@@ -166,14 +166,16 @@ const {
           --hsdc-mobile-header-height,
           72px
         );
+
         padding-left: 12px;
         padding-right: 12px;
+
         padding-bottom: max(
-  88px,
-  calc(
-    64px + env(safe-area-inset-bottom)
-  )
-);
+          88px,
+          calc(
+            64px + env(safe-area-inset-bottom)
+          )
+        );
 
         display: flex !important;
         flex-direction: column;
@@ -214,6 +216,7 @@ const {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
+
         transform: translate3d(
           0,
           0,
@@ -423,87 +426,91 @@ const {
 
       /* =====================================================
          Mobile 日间 / 夜间模式
+
+         注意：
+         主题按钮不再放在可滚动的 hsdc-mobile-nav 内部。
+         实际 DOM 会在 nav 外部，因此这里使用 fixed。
       ===================================================== */
 
       .hsdc-mobile-theme {
-  position: absolute;
+        position: fixed;
 
-  right: 20px;
-  bottom: max(
-    22px,
-    env(safe-area-inset-bottom)
-  );
+        right: 20px;
+        bottom: max(
+          22px,
+          env(safe-area-inset-bottom)
+        );
 
-  z-index: 50;
+        z-index: 100;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-  width: 44px;
-  height: 44px;
+        width: 44px;
+        height: 44px;
 
-  border-radius: 50%;
+        border-radius: 50%;
 
-  box-sizing: border-box;
+        box-sizing: border-box;
 
-  background: rgba(
-    255,
-    255,
-    255,
-    0.16
-  ) !important;
+        background: rgba(
+          255,
+          255,
+          255,
+          0.16
+        ) !important;
 
-  border: 1px solid rgba(
-    255,
-    255,
-    255,
-    0.28
-  );
+        border: 1px solid rgba(
+          255,
+          255,
+          255,
+          0.28
+        );
 
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
 
-  box-shadow:
-    0 6px 24px rgba(
-      0,
-      0,
-      0,
-      0.12
-    );
+        box-shadow:
+          0 6px 24px rgba(
+            0,
+            0,
+            0,
+            0.12
+          );
 
-  transition:
-    transform 180ms ease,
-    opacity 180ms ease;
-}
+        transition:
+          transform 180ms ease,
+          opacity 180ms ease;
+      }
 
-.hsdc-mobile-theme button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+      .hsdc-mobile-theme button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-  width: 100%;
-  height: 100%;
+        width: 100%;
+        height: 100%;
 
-  padding: 0;
+        padding: 0;
 
-  border: 0;
-  border-radius: 50%;
+        border: 0;
+        border-radius: 50%;
 
-  color: inherit;
+        color: inherit;
 
-  background: transparent !important;
-}
+        background: transparent !important;
+      }
 
-.hsdc-mobile-theme svg {
-  width: 22px;
-  height: 22px;
-}
+      .hsdc-mobile-theme svg {
+        width: 22px;
+        height: 22px;
+      }
 
-.hsdc-mobile-theme:active {
-  transform: scale(0.92);
-  opacity: 0.72;
-}
+      .hsdc-mobile-theme:active {
+        transform: scale(0.92);
+        opacity: 0.72;
+      }
 
       .hsdc-mobile-nav::-webkit-scrollbar {
         width: 4px;
@@ -531,6 +538,10 @@ const {
 
     @media (min-width: 768px) {
       .hsdc-mobile-header {
+        display: none !important;
+      }
+
+      .hsdc-mobile-theme {
         display: none !important;
       }
 
@@ -934,21 +945,23 @@ const {
           </div>
         ))
       }
-
-      <!-- =====================================================
-           Mobile Theme Toggle
-           恢复原来的日间 / 夜间模式切换
-      ====================================================== -->
-
-      {
-        showToggleTheme && (
-          <div class="hsdc-mobile-theme">
-            <ToggleTheme />
-          </div>
-        )
-      }
     </nav>
-  </div>
+
+    <!-- =====================================================
+         Mobile Theme Toggle
+         
+         必须放在 nav 外面：
+         .hsdc-mobile-nav 本身是 overflow-y:auto，
+         如果放在里面，按钮会被滚动区域裁切。
+    ====================================================== -->
+
+    {
+      showToggleTheme && (
+        <div class="hsdc-mobile-theme">
+          <ToggleTheme />
+        </div>
+      )
+    }  </div>
 
   <!-- =======================================================
        Desktop / Tablet Header
