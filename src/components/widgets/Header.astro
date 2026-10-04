@@ -126,34 +126,23 @@ const {
 
     @media (max-width: 767px) {
       header#header {
-        /*
-         * 移动端不要让 Header 自己成为 backdrop-filter
-         * 的 containing block。
-         *
-         * 主菜单会使用 position: fixed。
-         */
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
-
         overflow: visible;
       }
 
       .hsdc-mobile-header {
         display: flex;
         flex-direction: column;
-
         width: 100%;
       }
 
       .hsdc-mobile-bar {
         display: flex;
         align-items: center;
-
         width: 100%;
         min-height: 64px;
-
         box-sizing: border-box;
-
         position: relative;
         z-index: 30;
       }
@@ -162,18 +151,8 @@ const {
         display: none !important;
       }
 
-      /* =====================================================
-         Mobile 主菜单
-
-         关键修复：
-         不再使用 max-height 撑开 Header。
-
-         主菜单完全脱离正常布局流。
-      ===================================================== */
-
       .hsdc-mobile-nav {
         position: fixed;
-
         top: 0;
         right: 0;
         bottom: 0;
@@ -181,19 +160,12 @@ const {
 
         width: 100%;
         height: 100dvh;
-
         box-sizing: border-box;
 
-        /*
-         * 由 JS 根据顶部 Header 实际高度写入。
-         *
-         * 如果 JS 尚未执行，则使用 72px 作为安全默认值。
-         */
         padding-top: var(
           --hsdc-mobile-header-height,
           72px
         );
-
         padding-left: 12px;
         padding-right: 12px;
         padding-bottom: max(
@@ -203,10 +175,6 @@ const {
 
         display: flex !important;
         flex-direction: column;
-
-        /*
-         * 不再参与 Header 的 flex 布局。
-         */
         flex: none;
 
         overflow-x: hidden;
@@ -216,11 +184,6 @@ const {
         visibility: hidden;
         pointer-events: none;
 
-        /*
-         * 只动画 transform + opacity。
-         *
-         * 不再动画 max-height。
-         */
         transform: translate3d(
           0,
           -14px,
@@ -231,11 +194,6 @@ const {
           opacity,
           transform;
 
-        /*
-         * 这里不设置 backdrop-filter。
-         *
-         * Header 本身负责菜单打开状态下的背景。
-         */
         background: transparent !important;
 
         transition:
@@ -249,18 +207,11 @@ const {
           visibility 0s linear 420ms;
       }
 
-      /*
-       * 打开状态
-       */
-
       header#header .hsdc-mobile-nav.expanded,
       header#header .hsdc-mobile-nav[data-expanded="true"] {
         opacity: 1;
-
         visibility: visible;
-
         pointer-events: auto;
-
         transform: translate3d(
           0,
           0,
@@ -278,41 +229,27 @@ const {
           visibility 0s linear 0s;
       }
 
-      /* =====================================================
-         Hamburger
-
-         保持按钮本身不移动。
-      ===================================================== */
-
       header#header [data-aw-toggle-menu] {
         transform: none !important;
-
         will-change: auto;
-
         position: relative;
         z-index: 40;
       }
 
       /* =====================================================
-         首页
+         Mobile 首页
       ===================================================== */
 
       .hsdc-mobile-home {
         display: flex;
         align-items: center;
-
         width: 100%;
         min-height: 48px;
-
         box-sizing: border-box;
-
         padding: 13px 16px;
-
         margin-bottom: 4px;
-
         font-size: 1.05rem;
         font-weight: 500;
-
         border-radius: 10px;
 
         transition:
@@ -327,12 +264,11 @@ const {
       }
 
       /* =====================================================
-         一级菜单
+         Mobile 一级菜单
       ===================================================== */
 
       .hsdc-mobile-group {
         width: 100%;
-
         flex: 0 0 auto;
       }
 
@@ -345,7 +281,6 @@ const {
         min-height: 48px;
 
         box-sizing: border-box;
-
         padding: 13px 16px;
 
         border: 0;
@@ -353,11 +288,9 @@ const {
 
         font-size: 1.05rem;
         font-weight: 500;
-
         color: inherit;
 
         cursor: pointer;
-
         text-align: left;
 
         transition:
@@ -371,19 +304,13 @@ const {
         opacity: 0.72;
       }
 
-      /* =====================================================
-         一级菜单箭头
-      ===================================================== */
-
       .hsdc-mobile-group-chevron {
         display: inline-flex;
-
         align-items: center;
         justify-content: center;
 
         width: 22px;
         height: 22px;
-
         flex: 0 0 22px;
 
         font-size: 25px;
@@ -407,16 +334,14 @@ const {
       }
 
       /* =====================================================
-         二级菜单
+         Mobile 二级菜单
       ===================================================== */
 
       .hsdc-mobile-submenu {
         display: flex;
-
         flex-direction: column;
 
         width: 100%;
-
         max-height: 0;
 
         padding-left: 12px;
@@ -425,9 +350,7 @@ const {
         box-sizing: border-box;
 
         opacity: 0;
-
         overflow: hidden;
-
         pointer-events: none;
 
         transform: translate3d(
@@ -460,7 +383,6 @@ const {
       .hsdc-mobile-group.is-open
         .hsdc-mobile-submenu {
         opacity: 1;
-
         pointer-events: auto;
 
         transform: translate3d(
@@ -470,17 +392,11 @@ const {
         );
       }
 
-      /* =====================================================
-         二级菜单链接
-      ===================================================== */
-
       .hsdc-mobile-submenu a {
         display: flex;
-
         align-items: center;
 
         width: 100%;
-
         min-height: 42px;
 
         box-sizing: border-box;
@@ -488,7 +404,6 @@ const {
         padding: 9px 16px;
 
         font-size: 0.96rem;
-
         color: inherit;
 
         border-radius: 10px;
@@ -505,8 +420,41 @@ const {
       }
 
       /* =====================================================
-         Mobile scrollbar
+         Mobile 日间 / 夜间模式
       ===================================================== */
+
+      .hsdc-mobile-theme {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+
+        margin-top: auto;
+
+        padding:
+          28px
+          16px
+          max(
+            8px,
+            env(safe-area-inset-bottom)
+          );
+
+        box-sizing: border-box;
+
+        flex: 0 0 auto;
+      }
+
+      .hsdc-mobile-theme > * {
+        transition:
+          transform 180ms ease,
+          opacity 180ms ease;
+      }
+
+      .hsdc-mobile-theme > *:active {
+        transform: scale(0.94);
+        opacity: 0.72;
+      }
 
       .hsdc-mobile-nav::-webkit-scrollbar {
         width: 4px;
@@ -543,7 +491,6 @@ const {
 
       .hsdc-desktop-nav {
         display: flex;
-
         align-items: center;
         justify-content: center;
 
@@ -555,7 +502,6 @@ const {
       .hsdc-home-link,
       .hsdc-desktop-group-button {
         display: flex;
-
         align-items: center;
         justify-content: center;
 
@@ -563,10 +509,11 @@ const {
 
         min-height: 42px;
 
-        padding: 0.55rem 0.85rem;
+        padding:
+          0.55rem
+          0.85rem;
 
         border: 0;
-
         border-radius: 10px;
 
         color: inherit;
@@ -575,7 +522,6 @@ const {
         font-weight: 500;
 
         cursor: pointer;
-
         white-space: nowrap;
 
         transition:
@@ -656,7 +602,7 @@ const {
       }
 
       /* =====================================================
-         Windows-style Desktop Dropdown
+         Desktop 下拉菜单
       ===================================================== */
 
       .hsdc-desktop-dropdown {
@@ -669,7 +615,8 @@ const {
 
         padding: 6px;
 
-        border: 1px solid
+        border:
+          1px solid
           rgba(
             148,
             163,
@@ -706,9 +653,7 @@ const {
         -webkit-backdrop-filter: blur(18px);
 
         opacity: 0;
-
         visibility: hidden;
-
         pointer-events: none;
 
         transform:
@@ -764,9 +709,7 @@ const {
       .hsdc-desktop-group.is-open
         .hsdc-desktop-dropdown {
         opacity: 1;
-
         visibility: visible;
-
         pointer-events: auto;
 
         transform:
@@ -786,12 +729,13 @@ const {
 
       .hsdc-desktop-dropdown a {
         display: flex;
-
         align-items: center;
 
         min-height: 38px;
 
-        padding: 0.45rem 0.8rem;
+        padding:
+          0.45rem
+          0.8rem;
 
         border-radius: 8px;
 
@@ -836,7 +780,6 @@ const {
 
       .hsdc-header-right {
         display: flex;
-
         align-items: center;
         justify-content: flex-end;
 
@@ -845,7 +788,7 @@ const {
     }
 
     /* =========================================================
-       Reduced motion
+       Reduced Motion
     ========================================================= */
 
     @media (prefers-reduced-motion: reduce) {
@@ -855,6 +798,7 @@ const {
       .hsdc-mobile-group-chevron,
       .hsdc-mobile-submenu,
       .hsdc-mobile-submenu a,
+      .hsdc-mobile-theme > *,
       .hsdc-desktop-group-button,
       .hsdc-chevron,
       .hsdc-desktop-dropdown,
@@ -870,9 +814,9 @@ const {
     style="background: transparent !important;"
   ></div>
 
-  <!-- =========================================================
+  <!-- =======================================================
        Mobile Header
-  ========================================================== -->
+  ======================================================== -->
 
   <div
     class="hsdc-mobile-header relative text-default py-1.5 px-3 w-full"
@@ -941,12 +885,25 @@ const {
           </div>
         ))
       }
+
+      <!-- =====================================================
+           Mobile Theme Toggle
+           恢复原来的日间 / 夜间模式切换
+      ====================================================== -->
+
+      {
+        showToggleTheme && (
+          <div class="hsdc-mobile-theme">
+            <ToggleTheme />
+          </div>
+        )
+      }
     </nav>
   </div>
 
-  <!-- =========================================================
+  <!-- =======================================================
        Desktop / Tablet Header
-  ========================================================== -->
+  ======================================================== -->
 
   <div
     class:list={[
@@ -961,8 +918,6 @@ const {
     ]}
   >
     <div class="flex items-center w-full min-h-[64px]">
-      <!-- Logo -->
-
       <a
         class="hsdc-brand flex items-center shrink-0"
         href={getHomePermalink()}
@@ -970,8 +925,6 @@ const {
       >
         <Logo />
       </a>
-
-      <!-- Desktop Navigation -->
 
       <nav
         class="hsdc-desktop-nav"
@@ -1040,8 +993,6 @@ const {
         }
       </nav>
 
-      <!-- Right side -->
-
       <div class="hsdc-header-right flex items-center ml-4 shrink-0">
         {
           showToggleTheme && (
@@ -1075,8 +1026,8 @@ const {
         null;
 
       let closeTimer:
-        ReturnType<typeof setTimeout> | null =
-        null;
+        | ReturnType<typeof setTimeout>
+        | null = null;
 
       const initHeader = () => {
         controller?.abort();
@@ -1084,8 +1035,7 @@ const {
         controller =
           new AbortController();
 
-        const { signal } =
-          controller;
+        const { signal } = controller;
 
         const header =
           document.querySelector<HTMLElement>(
@@ -1093,10 +1043,6 @@ const {
           );
 
         if (!header) return;
-
-        /* =====================================================
-           Mobile Header 高度同步
-        ===================================================== */
 
         const mobileBar =
           header.querySelector<HTMLElement>(
@@ -1134,13 +1080,11 @@ const {
         window.addEventListener(
           'resize',
           syncMobileHeaderHeight,
-          {
-            signal,
-          }
+          { signal }
         );
 
         /* =====================================================
-           Desktop Menu
+           Desktop
         ===================================================== */
 
         const desktopGroups =
@@ -1270,8 +1214,7 @@ const {
           'keydown',
           (event) => {
             if (
-              event.key ===
-              'Escape'
+              event.key === 'Escape'
             ) {
               closeDesktopGroups();
             }
@@ -1401,7 +1344,106 @@ const {
                 if (
                   otherSubmenu
                 ) {
-                  otherSubmenu.style.maxHeight ='0px';
+                  otherSubmenu.style.maxHeight =
+                    '0px';
+
+                  otherSubmenu.style.opacity =
+                    '0';
+
+                  otherSubmenu.style.transform =
+                    'translate3d(0, -5px, 0)';
+                }
+              }
+            );
+
+            if (isOpen) {
+              currentGroup.classList.remove(
+                'is-open'
+              );
+
+              button.setAttribute(
+                'aria-expanded',
+                'false'
+              );
+
+              submenu.style.maxHeight =
+                '0px';
+
+              submenu.style.opacity =
+              '0';
+
+                submenu.style.transform =
+                  'translate3d(0, -5px, 0)';
+
+                if (immediate) {
+                  void submenu.offsetHeight;
+
+                  submenu.style.transition =
+                    '';
+                }
+              }
+            );
+          };
+
+        const openMobileGroup =
+          (
+            currentGroup: HTMLElement
+          ) => {
+            const button =
+              currentGroup.querySelector<HTMLButtonElement>(
+                '.hsdc-mobile-group-button'
+              );
+
+            const submenu =
+              currentGroup.querySelector<HTMLElement>(
+                '.hsdc-mobile-submenu'
+              );
+
+            if (
+              !button ||
+              !submenu
+            ) {
+              return;
+            }
+
+            const isOpen =
+              currentGroup.classList.contains(
+                'is-open'
+              );
+
+            mobileGroups.forEach(
+              (group) => {
+                if (
+                  group ===
+                  currentGroup
+                ) {
+                  return;
+                }
+
+                const otherButton =
+                  group.querySelector<HTMLButtonElement>(
+                    '.hsdc-mobile-group-button'
+                  );
+
+                const otherSubmenu =
+                  group.querySelector<HTMLElement>(
+                    '.hsdc-mobile-submenu'
+                  );
+
+                group.classList.remove(
+                  'is-open'
+                );
+
+                otherButton?.setAttribute(
+                  'aria-expanded',
+                  'false'
+                );
+
+                if (
+                  otherSubmenu
+                ) {
+                  otherSubmenu.style.maxHeight =
+                    '0px';
 
                   otherSubmenu.style.opacity =
                     '0';
@@ -1478,7 +1520,7 @@ const {
         );
 
         /* =====================================================
-           Mobile 主菜单状态
+           Mobile 主菜单
         ===================================================== */
 
         const clearCloseTimer =
@@ -1500,12 +1542,6 @@ const {
 
             if (!mobileNav) return;
 
-            /*
-             * Header 先保持全屏。
-             *
-             * 这样关闭时不会在动画中途
-             * 把 Header 高度瞬间缩回去。
-             */
             header.classList.add(
               'h-screen',
               'expanded',
@@ -1587,9 +1623,6 @@ const {
               return;
             }
 
-            /*
-             * 先让按钮恢复为“三”。
-             */
             toggleMenu?.classList.remove(
               'expanded'
             );
@@ -1599,25 +1632,10 @@ const {
               'false'
             );
 
-            /*
-             * 二级菜单立即收起，
-             * 防止关闭主菜单时留下展开内容。
-             */
             closeMobileGroups(
               true
             );
 
-            /*
-             * 关键：
-             *
-             * 这里只关闭 mobile-nav。
-             *
-             * Header 的 h-screen / bg-page
-             * 暂时保留。
-             *
-             * 等 nav 的 opacity / transform
-             * 动画完成后再真正关闭 Header。
-             */
             mobileNav.classList.remove(
               'expanded'
             );
@@ -1627,11 +1645,6 @@ const {
               'false'
             );
 
-            /*
-             * transitionend 作为主要结束信号。
-             *
-             * 同时保留 timeout 作为极端情况下的兜底。
-             */
             closeTimer =
               window.setTimeout(
                 () => {
@@ -1641,9 +1654,6 @@ const {
               );
           };
 
-        /*
-         * transition 完成后真正释放 Header。
-         */
         mobileNav?.addEventListener(
           'transitionend',
           (event) => {
@@ -1680,33 +1690,12 @@ const {
 
         /* =====================================================
            ToggleMenu
-
-           这里必须使用 capture。
-
-           BasicScripts.astro 当前也监听了
-           [data-aw-toggle-menu] 的 click。
-
-           如果让 BasicScripts 先执行，
-           它会立即删除：
-
-             h-screen
-             expanded
-             bg-page
-
-           从而再次产生你截图里的
-           “关闭瞬间布局跳变”。
-
-           所以 Header 在 capture 阶段接管这个点击。
         ===================================================== */
 
         if (toggleMenu) {
           toggleMenu.addEventListener(
             'click',
             (event) => {
-              /*
-               * 阻止 BasicScripts 的
-               * bubble listener。
-               */
               event.preventDefault();
 
               event.stopImmediatePropagation();
@@ -1730,10 +1719,7 @@ const {
         }
 
         /* =====================================================
-           Mobile 二级链接
-
-           点击后交给 Astro Router 导航。
-           同时立即清理菜单状态。
+           Mobile links
         ===================================================== */
 
         header
@@ -1745,20 +1731,11 @@ const {
               'click',
               () => {
                 clearCloseTimer();
-
-                /*
-                 * 导航发生前直接清理，
-                 * 不等待关闭动画。
-                 */
                 finishMobileHeaderClose();
               },
               { signal }
             );
           });
-
-        /* =====================================================
-           首页链接
-        ===================================================== */
 
         header
           .querySelectorAll<HTMLAnchorElement>(
@@ -1769,7 +1746,6 @@ const {
               'click',
               () => {
                 clearCloseTimer();
-
                 finishMobileHeaderClose();
               },
               { signal }
@@ -1777,14 +1753,11 @@ const {
           });
 
         /* =====================================================
-           初始化
+           初始状态
         ===================================================== */
 
         closeDesktopGroups();
 
-        /*
-         * 初始状态必须完全关闭。
-         */
         clearCloseTimer();
 
         header.classList.remove(
@@ -1841,7 +1814,6 @@ const {
               closeDesktopGroups();
             } else {
               closeDesktopGroups();
-
               syncMobileHeaderHeight();
             }
           };
@@ -1853,17 +1825,7 @@ const {
         );
       };
 
-      /* =======================================================
-         首次初始化
-      ======================================================= */
-
       initHeader();
-
-      /* =======================================================
-         Astro ClientRouter
-
-         页面交换后重新绑定 Header。
-      ======================================================= */
 
       document.addEventListener(
         'astro:after-swap',
@@ -1872,13 +1834,6 @@ const {
         }
       );
 
-      /*
-       * 在 Astro 开始交换页面之前，
-       * 直接释放旧 Header 的菜单状态。
-       *
-       * 这样 View Transition 截图不会把
-       * 打开的移动菜单带到下一页。
-       */
       document.addEventListener(
         'astro:before-swap',
         () => {
