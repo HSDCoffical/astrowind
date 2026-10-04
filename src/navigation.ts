@@ -15,12 +15,16 @@ export const headerData = {
       href: 'https://hono-bbs-9qj.pages.dev',
     },
     {
-      text: '工具中心',        
-      href: 'https://it-toolbox-19l.pages.dev/'
+      text: '工具中心',
+      href: 'https://it-toolbox-19l.pages.dev/',
     },
     {
       text: '下载中心',
       href: getPermalink('/download'),
+    },
+    {
+      text: '人员介绍',
+      href: getPermalink('/team'),
     },
     {
       text: '个人中心',
@@ -47,20 +51,34 @@ export const footerData = {
       links: [
         { text: '公司简介', href: '/about' },
         { text: '加入我们', href: '#' },
+        { text: '人员介绍', href: '/team' },
       ],
     },
     {
       title: '联系方式',
       links: [
-        { text: '邮箱联系', href: 'mailto:xuexiang@lianggong.dpdns.org' },
+        {
+          text: '邮箱联系',
+          href: 'mailto:xuexiang@lianggong.dpdns.org',
+        },
       ],
     },
   ],
+
   secondaryLinks: [
-    { text: '隐私政策', href: getPermalink('/privacy') },
+    {
+      text: '隐私政策',
+      href: getPermalink('/privacy'),
+    },
   ],
+
   socialLinks: [
-    { ariaLabel: 'GitHub', icon: 'tabler:brand-github', href: 'https://github.com/HSDCoffical' },
+    {
+      ariaLabel: 'GitHub',
+      icon: 'tabler:brand-github',
+      href: 'https://github.com/HSDCoffical',
+    },
   ],
+
   footNote: `© ${new Date().getFullYear()} 凉宫数据 · 版权所有`,
 };
