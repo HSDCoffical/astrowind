@@ -45,6 +45,9 @@ const {
 } = Astro.props;
 
 const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
+
+const desktopFirstLinks = links.slice(0, 3);
+const desktopSecondLinks = links.slice(3);
 ---
 
 <header
@@ -54,6 +57,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   style="background: transparent !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
   <style>
+
     /* =========================================================
        Header 基础
     ========================================================= */
@@ -65,11 +69,9 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         box-shadow 280ms ease;
     }
 
-
     header#header * {
       background: transparent !important;
     }
-
 
     header#header .bg-white,
     header#header .dark\:bg-gray-900,
@@ -85,6 +87,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     ========================================================= */
 
     @media (hover: hover) and (pointer: fine) {
+
       header#header button:hover,
       header#header a:hover {
         background: rgba(255, 255, 255, 0.1) !important;
@@ -120,11 +123,279 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         opacity 220ms ease;
     }
 
-
     @media (hover: hover) and (pointer: fine) {
+
       header#header a[href="/"]:hover {
         transform: translateY(-1px);
         opacity: 0.92;
+      }
+    }
+
+
+    /* =========================================================
+       品牌区域
+    ========================================================= */
+
+    .hsdc-brand {
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+      min-width: 0;
+    }
+
+    .hsdc-brand-name {
+      margin-left: 10px;
+
+      white-space: nowrap;
+
+      font-size: 0.9375rem;
+      font-weight: 600;
+      letter-spacing: 0.01rem;
+
+      color: inherit;
+
+      opacity: 0.95;
+
+      transition:
+        opacity 180ms ease,
+        transform 180ms ease;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+
+      .hsdc-brand:hover .hsdc-brand-name {
+        opacity: 0.82;
+      }
+    }
+
+
+    /* =========================================================
+       桌面端布局
+    ========================================================= */
+
+    @media (min-width: 768px) {
+
+      .hsdc-header-inner {
+        display: flex;
+
+        align-items: center;
+
+        width: 100%;
+
+        min-width: 0;
+      }
+
+
+      /* =====================================================
+         搜索框预留区域
+      ====================================================== */
+
+      .hsdc-search-placeholder {
+
+        flex: 1 1 180px;
+
+        min-width: 70px;
+
+        max-width: 250px;
+
+        height: 38px;
+
+        margin-left: 22px;
+
+        margin-right: 14px;
+      }
+
+
+      /* =====================================================
+         桌面导航区域
+      ====================================================== */
+
+      .hsdc-desktop-navigation {
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: flex-end;
+
+        flex: 0 1 auto;
+
+        min-width: 0;
+
+        margin-left: auto;
+      }
+
+
+      /* =====================================================
+         导航分页
+      ====================================================== */
+
+      .hsdc-nav-pages {
+
+        position: relative;
+
+        display: flex;
+
+        align-items: center;
+
+        min-width: 0;
+
+        overflow: hidden;
+      }
+
+
+      .hsdc-nav-page {
+
+        display: flex;
+
+        align-items: center;
+
+        flex-shrink: 0;
+
+        white-space: nowrap;
+
+        opacity: 1;
+
+        transform: translateX(0);
+
+        transition:
+          opacity 260ms ease,
+          transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+
+        will-change: opacity, transform;
+      }
+
+
+      .hsdc-nav-page.is-hidden {
+
+        position: absolute;
+
+        top: 50%;
+
+        opacity: 0;
+
+        pointer-events: none;
+
+        transform:
+          translateX(30px)
+          translateY(-50%);
+      }
+
+
+      .hsdc-nav-page.page-one.is-hidden {
+
+        transform:
+          translateX(-30px)
+          translateY(-50%);
+      }
+
+
+      .hsdc-nav-page > li {
+
+        flex-shrink: 0;
+      }
+
+
+      .hsdc-nav-page > li > a,
+      .hsdc-nav-page > li > button {
+
+        padding-left: 10px !important;
+
+        padding-right: 10px !important;
+
+        white-space: nowrap;
+      }
+
+
+      /* =====================================================
+         箭头
+      ====================================================== */
+
+      .hsdc-nav-switch {
+
+        flex: 0 0 auto;
+
+        width: 36px;
+        height: 36px;
+
+        margin-left: 3px;
+
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        color: inherit;
+
+        cursor: pointer;
+
+        transition:
+          transform 180ms ease,
+          background-color 180ms ease,
+          opacity 180ms ease;
+      }
+
+
+      .hsdc-nav-switch:hover {
+
+        background: rgba(255, 255, 255, 0.1) !important;
+
+        transform: scale(1.05);
+      }
+
+
+      .dark .hsdc-nav-switch:hover {
+
+        background: rgba(255, 255, 255, 0.05) !important;
+      }
+
+
+      .hsdc-nav-switch:active {
+
+        transform: scale(0.9);
+      }
+
+
+      .hsdc-nav-switch-icon {
+
+        width: 19px;
+        height: 19px;
+
+        transition:
+          transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+
+      .hsdc-nav-switch.switching
+      .hsdc-nav-switch-icon {
+
+        transform: scale(0.85);
+      }
+
+
+      /* =====================================================
+         主题按钮
+      ====================================================== */
+
+      .hsdc-desktop-actions {
+
+        flex: 0 0 auto;
+
+        display: flex !important;
+
+        align-items: center;
+
+        margin-left: 2px;
+      }
+
+
+      .hsdc-desktop-actions-inner {
+
+        display: flex;
+
+        align-items: center;
       }
     }
 
@@ -134,6 +405,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     ========================================================= */
 
     @media (max-width: 768px) {
+
       header#header {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
@@ -148,6 +420,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     @media (max-width: 767px) {
 
       header#header nav {
+
         display: block !important;
 
         width: 100%;
@@ -175,6 +448,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       header#header nav.expanded,
       header#header nav[data-expanded="true"],
       header#header:has(.expanded) nav {
+
         max-height: calc(100vh - 72px);
 
         opacity: 1;
@@ -195,21 +469,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
 
 
-      /* =====================================================
-         菜单列表
-      ====================================================== */
-
       header#header nav > ul {
         padding-top: 8px;
         padding-bottom: 12px;
       }
 
 
-      /* =====================================================
-         菜单项目初始状态
-      ====================================================== */
-
       header#header nav > ul > li {
+
         opacity: 0;
 
         transform: translateY(-8px);
@@ -220,20 +487,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
 
 
-      /* =====================================================
-         菜单打开
-      ====================================================== */
-
       header#header:has(nav.expanded) nav > ul > li,
       header#header:has(.expanded) nav > ul > li {
+
         opacity: 1;
+
         transform: translateY(0);
       }
 
-
-      /* =====================================================
-         菜单依次进入
-      ====================================================== */
 
       header#header:has(.expanded) nav > ul > li:nth-child(1) {
         transition-delay: 0.04s;
@@ -268,21 +529,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
 
 
-      /* =====================================================
-         关闭菜单
-      ====================================================== */
-
       header#header nav:not(.expanded) > ul > li {
         transition-delay: 0s;
       }
 
 
-      /* =====================================================
-         手机菜单文字
-      ====================================================== */
-
       header#header nav > ul > li > a,
       header#header nav > ul > li > button {
+
         width: 100%;
 
         box-sizing: border-box;
@@ -296,20 +550,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
 
 
-      /*
-       * 手指按下反馈
-       */
-
       header#header nav > ul > li > a:active,
       header#header nav > ul > li > button:active {
+
         transform: scale(0.975);
+
         opacity: 0.72;
       }
 
-
-      /* =====================================================
-         手机菜单滚动条
-      ====================================================== */
 
       header#header nav::-webkit-scrollbar {
         width: 4px;
@@ -320,7 +568,9 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
 
       header#header nav::-webkit-scrollbar-thumb {
+
         background: rgba(100, 116, 139, 0.25);
+
         border-radius: 999px;
       }
     }
@@ -331,22 +581,33 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     ========================================================= */
 
     .menu-theme-item {
+
       display: flex;
+
       align-items: center;
+
       gap: 0.5rem;
+
       padding: 0.75rem 1rem;
+
       margin-top: 0.5rem;
+
       border-top: 1px solid rgba(0, 0, 0, 0.06);
+
       color: #666;
     }
 
+
     .dark .menu-theme-item {
+
       border-top-color: rgba(255, 255, 255, 0.06);
+
       color: #aaa;
     }
 
 
     @media (min-width: 768px) {
+
       .menu-theme-item {
         display: none !important;
       }
@@ -358,14 +619,20 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     ========================================================= */
 
     @media (prefers-reduced-motion: reduce) {
+
       header#header,
       header#header nav,
       header#header nav > ul > li,
       header#header nav > ul > li > a,
-      header#header nav > ul > li > button {
+      header#header nav > ul > li > button,
+      .hsdc-nav-page,
+      .hsdc-nav-switch,
+      .hsdc-nav-switch-icon {
+
         transition: none !important;
       }
     }
+
   </style>
 
 
@@ -379,51 +646,397 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   ></div>
 
 
+  <!-- =====================================================
+       Header 主体
+  ====================================================== -->
+
   <div
     class:list={[
       'relative text-default py-1.5 px-3 md:px-6 mx-auto w-full',
-      {
-        'md:flex md:justify-between': position !== 'center',
-      },
-      {
-        'md:grid md:grid-cols-3 md:items-center': position === 'center',
-      },
       {
         'max-w-7xl': !isFullWidth,
       },
     ]}
   >
 
-    <!-- =====================================================
-         Logo + 菜单按钮
-    ====================================================== -->
+    <div class="hsdc-header-inner">
 
-    <div
-      class:list={[
-        {
-          'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right',
-        },
-        'flex justify-between',
-      ]}
-    >
 
-      <a
-        class="flex items-center"
-        href={getHomePermalink()}
+      <!-- ===================================================
+           品牌区域
+      ==================================================== -->
+
+      <div class="hsdc-brand">
+
+        <a
+          class="flex items-center"
+          href={getHomePermalink()}
+          aria-label="凉宫数据"
+        >
+          <Logo />
+        </a>
+
+
+        <!-- Logo 右侧固定品牌文字 -->
+
+        <span class="hsdc-brand-name">
+          凉宫数据开放平台
+        </span>
+
+
+        <!-- 手机菜单按钮 -->
+
+        <div class="flex items-center md:hidden ml-3">
+          <ToggleMenu />
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           搜索框预留区域
+           现在故意留空
+      ==================================================== -->
+
+      <div
+        class="hsdc-search-placeholder hidden md:block"
+        aria-hidden="true"
+      ></div>
+
+
+      <!-- ===================================================
+           桌面端导航
+      ==================================================== -->
+
+      <div class="hsdc-desktop-navigation hidden md:flex">
+
+        <div class="hsdc-nav-pages">
+
+
+          <!-- ===============================================
+               第一页
+               首页 / 信息中心 / 社区中心
+          ================================================ -->
+
+          <ul
+            id="hsdc-nav-page-one"
+            class="hsdc-nav-page page-one flex items-center text-[0.9375rem] tracking-[0.01rem] font-medium"
+          >
+
+            {
+              desktopFirstLinks.map(({ text, href, links }) => (
+
+                <li class={links?.length ? 'dropdown' : ''}>
+
+                  {
+                    links?.length ? (
+
+                      <>
+
+                        <button
+                          type="button"
+                          class="hover:text-link dark:hover:text-white px-3 py-3 flex items-center whitespace-nowrap"
+                        >
+
+                          {text}
+
+                          <Icon
+                            name="tabler:chevron-down"
+                            class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline"
+                          />
+
+                        </button>
+
+
+                        <ul
+                          class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl"
+                        >
+
+                          {
+                            links.map(
+                              ({
+                                text: text2,
+                                href: href2,
+                              }) => (
+
+                                <li>
+
+                                  <a
+                                    class:list={[
+                                      'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
+                                      {
+                                        'aw-link-active':
+                                          href2 === currentPath,
+                                      },
+                                    ]}
+                                    href={href2}
+                                  >
+                                    {text2}
+                                  </a>
+
+                                </li>
+                              )
+                            )
+                          }
+
+                        </ul>
+
+                      </>
+
+                    ) : (
+
+                      <a
+                        class:list={[
+                          'hover:text-link dark:hover:text-white px-3 py-3 flex items-center whitespace-nowrap',
+                          {
+                            'aw-link-active':
+                              href === currentPath,
+                          },
+                        ]}
+                        href={href}
+                      >
+                        {text}
+                      </a>
+
+                    )
+                  }
+
+                </li>
+
+              ))
+            }
+
+          </ul>
+
+
+          <!-- ===============================================
+               第二页
+               工具中心 / 下载中心 / 人员介绍 /
+               个人中心 / 关于我们
+          ================================================ -->
+
+          <ul
+            id="hsdc-nav-page-two"
+            class="hsdc-nav-page page-two is-hidden flex items-center text-[0.9375rem] tracking-[0.01rem] font-medium"
+          >
+
+            {
+              desktopSecondLinks.map(({ text, href, links }) => (
+
+                <li class={links?.length ? 'dropdown' : ''}>
+
+                  {
+                    links?.length ? (
+
+                      <>
+
+                        <button
+                          type="button"
+                          class="hover:text-link dark:hover:text-white px-2 py-3 flex items-center whitespace-nowrap"
+                        >
+
+                          {text}
+
+                          <Icon
+                            name="tabler:chevron-down"
+                            class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline"
+                          />
+
+                        </button>
+
+
+                        <ul
+                          class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl"
+                        >
+
+                          {
+                            links.map(
+                              ({
+                                text: text2,
+                                href: href2,
+                              }) => (
+
+                                <li>
+
+                                  <a
+                                    class:list={[
+                                      'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
+                                      {
+                                        'aw-link-active':
+                                          href2 === currentPath,
+                                      },
+                                    ]}
+                                    href={href2}
+                                  >
+                                    {text2}
+                                  </a>
+
+                                </li>
+                              )
+                            )
+                          }
+
+                        </ul>
+
+                      </>
+
+                    ) : (
+
+                      <a
+                        class:list={[
+                          'hover:text-link dark:hover:text-white px-2 py-3 flex items-center whitespace-nowrap',
+                          {
+                            'aw-link-active':
+                              href === currentPath,
+                          },
+                        ]}
+                        href={href}
+                      >
+                        {text}
+                      </a>
+
+                    )
+                  }
+
+                </li>
+
+              ))
+            }
+
+          </ul>
+
+        </div>
+
+
+        <!-- =================================================
+             导航翻页箭头
+             永远位于主题按钮左侧
+        ================================================== -->
+
+        <button
+          id="hsdc-nav-switch"
+          class="hsdc-nav-switch"
+          type="button"
+          aria-label="显示更多导航"
+          aria-expanded="false"
+        >
+
+          <Icon
+            id="hsdc-nav-switch-icon"
+            name="tabler:chevron-right"
+            class="hsdc-nav-switch-icon"
+          />
+
+        </button>
+
+      </div>
+
+
+      <!-- ===================================================
+           桌面端主题 / RSS / Action
+      ==================================================== -->
+
+      <div
+        class:list={[
+          'hsdc-desktop-actions hidden md:flex',
+          {
+            'ml-auto rtl:ml-0 rtl:mr-auto':
+              position === 'left',
+          },
+        ]}
       >
-        <Logo />
-      </a>
+
+        <div class="hsdc-desktop-actions-inner">
+
+          <div class="hsdc-action-group">
+
+            {
+              showToggleTheme && (
+                <ToggleTheme
+                  iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block"
+                />
+              )
+            }
 
 
-      <div class="flex items-center md:hidden">
-        <ToggleMenu />
+            {
+              showRssFeed && (
+                <a
+                  class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
+                  aria-label="RSS Feed"
+                  href={getAsset('/rss.xml')}
+                >
+
+                  <Icon
+                    name="tabler:rss"
+                    class="w-5 h-5"
+                  />
+
+                </a>
+              )
+            }
+
+          </div>
+
+
+          {
+            actions?.length ? (
+
+              <span class="ml-4 rtl:ml-0 rtl:mr-4">
+
+                {
+                  actions.map((btnProps) => (
+
+                    <Button
+                      {...btnProps}
+                      class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto"
+                    />
+
+                  ))
+                }
+
+              </span>
+
+            ) : (
+
+              ''
+
+            )
+          }
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           手机端主题
+      ==================================================== -->
+
+      <div class="hidden">
+
+        <ul>
+
+          <li class="menu-theme-item">
+
+            <ToggleTheme iconClass="w-5 h-5" />
+
+            <span class="text-sm">
+              切换主题
+            </span>
+
+          </li>
+
+        </ul>
+
       </div>
 
     </div>
 
 
     <!-- =====================================================
-         导航菜单
+         手机端导航
+         保留原有逻辑
     ====================================================== -->
 
     <nav
@@ -437,34 +1050,42 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
         {
           links.map(({ text, href, links }) => (
+
             <li class={links?.length ? 'dropdown' : ''}>
 
               {
                 links?.length ? (
+
                   <>
+
                     <button
                       type="button"
                       class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
                     >
+
                       {text}
 
                       <Icon
                         name="tabler:chevron-down"
                         class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline"
                       />
+
                     </button>
 
 
                     <ul
                       class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl"
                     >
+
                       {
                         links.map(
                           ({
                             text: text2,
                             href: href2,
                           }) => (
+
                             <li>
+
                               <a
                                 class:list={[
                                   'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
@@ -477,13 +1098,18 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
                               >
                                 {text2}
                               </a>
+
                             </li>
                           )
                         )
                       }
+
                     </ul>
+
                   </>
+
                 ) : (
+
                   <a
                     class:list={[
                       'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
@@ -496,99 +1122,184 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
                   >
                     {text}
                   </a>
+
                 )
               }
 
             </li>
+
           ))
         }
 
 
-        <!-- ===================================================
+        <!-- =================================================
              手机主题切换
-        ==================================================== -->
+        ================================================== -->
 
         <li class="menu-theme-item">
+
           <ToggleTheme iconClass="w-5 h-5" />
 
           <span class="text-sm">
             切换主题
           </span>
+
         </li>
 
       </ul>
 
     </nav>
 
-
-    <!-- =====================================================
-         桌面端右侧功能
-    ====================================================== -->
-
-    <div
-      class:list={[
-        {
-          'ml-auto rtl:ml-0 rtl:mr-auto':
-            position === 'left',
-        },
-        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
-      ]}
-    >
-
-      <div
-        class="items-center flex justify-between w-full md:w-auto"
-      >
-
-        <div class="flex">
-
-          {
-            showToggleTheme && (
-              <ToggleTheme
-                iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block"
-              />
-            )
-          }
+  </div>
 
 
-          {
-            showRssFeed && (
-              <a
-                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
-                aria-label="RSS Feed"
-                href={getAsset('/rss.xml')}
-              >
-                <Icon
-                  name="tabler:rss"
-                  class="w-5 h-5"
-                />
-              </a>
-            )
-          }
+  <!-- =====================================================
+       桌面端导航切换
+  ====================================================== -->
 
-        </div>
+  <script is:inline>
+    (() => {
+
+      const initHSDCNavigation = () => {
+
+        const switchButton =
+          document.getElementById('hsdc-nav-switch');
+
+        const pageOne =
+          document.getElementById('hsdc-nav-page-one');
+
+        const pageTwo =
+          document.getElementById('hsdc-nav-page-two');
+
+        const icon =
+          document.getElementById('hsdc-nav-switch-icon');
 
 
-        {
-          actions?.length ? (
-            <span class="ml-4 rtl:ml-0 rtl:mr-4">
-              {
-                actions.map((btnProps) => (
-                  <Button
-                    {...btnProps}
-                    class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto"
-                  />
-                ))
-              }
-            </span>
-          ) : (
-            ''
-          )
+        if (
+          !switchButton ||
+          !pageOne ||
+          !pageTwo ||
+          !icon
+        ) {
+          return;
         }
 
-      </div>
 
-    </div>
+        let showingSecondPage = false;
 
-  </div>
+
+        switchButton.addEventListener('click', () => {
+
+          showingSecondPage = !showingSecondPage;
+
+
+          switchButton.classList.add('switching');
+
+
+          if (showingSecondPage) {
+
+            pageOne.classList.add('is-hidden');
+
+            pageTwo.classList.remove('is-hidden');
+
+
+            icon.setAttribute(
+              'data-icon',
+              'tabler:chevron-left'
+            );
+
+
+            /*
+             * astro-icon 已经渲染成 SVG，
+             * 因此直接替换 SVG 内容。
+             */
+
+            icon.innerHTML = `
+              <path
+                d="M15 6l-6 6l6 6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            `;
+
+
+            switchButton.setAttribute(
+              'aria-label',
+              '返回前面的导航'
+            );
+
+            switchButton.setAttribute(
+              'aria-expanded',
+              'true'
+            );
+
+          } else {
+
+            pageTwo.classList.add('is-hidden');
+
+            pageOne.classList.remove('is-hidden');
+
+
+            icon.setAttribute(
+              'data-icon',
+              'tabler:chevron-right'
+            );
+
+
+            icon.innerHTML = `
+              <path
+                d="M9 6l6 6l-6 6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            `;
+
+
+            switchButton.setAttribute(
+              'aria-label',
+              '显示更多导航'
+            );
+
+            switchButton.setAttribute(
+              'aria-expanded',
+              'false'
+            );
+
+          }
+
+
+          window.setTimeout(() => {
+
+            switchButton.classList.remove('switching');
+
+          }, 220);
+
+        });
+
+      };
+
+
+      if (document.readyState === 'loading') {
+
+        document.addEventListener(
+          'DOMContentLoaded',
+          initHSDCNavigation,
+          { once: true }
+        );
+
+      } else {
+
+        initHSDCNavigation();
+
+      }
+
+    })();
+  </script>
 
 </header>
