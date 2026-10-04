@@ -128,8 +128,10 @@ const metadata = {
     }}
   >
     <Fragment slot="content">
-      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">新数据化</h3>
-      多效化 
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">
+        新数据化
+      </h3>
+      多效化
     </Fragment>
 
     <Fragment slot="bg">
@@ -142,7 +144,7 @@ const metadata = {
     items={[
       {
         title: '中国',
-        description:'国内主要服务端，大部分云端服务由国内提供技术服务',
+        description: '国内主要服务端，大部分云端服务由国内提供技术服务',
       },
       {
         title: '美国',
@@ -247,7 +249,8 @@ const metadata = {
     items={[
       {
         title: '团队协作',
-        description: "多团队协作需要每个成员之间相互理解包容，在每一次协作时不断磨合，最终达成高效的协作能力",
+        description:
+          "多团队协作需要每个成员之间相互理解包容，在每一次协作时不断磨合，最终达成高效的协作能力",
         icon: 'flat-color-icons:template',
       },
       {
@@ -276,12 +279,14 @@ const metadata = {
       },
       {
         title: '团队意识',
-        description: '团队意识秉持着创立时的初衷[以民为本]，只有团队之间相互理解包容，才能在这条路上越走越远',
+        description:
+          '团队意识秉持着创立时的初衷[以民为本]，只有团队之间相互理解包容，才能在这条路上越走越远',
         icon: 'flat-color-icons:currency-exchange',
       },
       {
         title: '团队精神',
-        description: '走好每一步，让每一位成员都走好每一步，不需要急促的发展，需要每一位员工的参与，团队在此刻才会彰显出意义',
+        description:
+          '走好每一步，让每一位成员都走好每一步，不需要急促的发展，需要每一位员工的参与，团队在此刻才会彰显出意义',
         icon: 'flat-color-icons:voice-presentation',
       },
       {
@@ -361,107 +366,218 @@ const metadata = {
   <!-- ===== 邮箱地址 ===== -->
   <section class="px-6 sm:px-6 py-8 sm:py-12 pb-24 sm:pb-28 mx-auto max-w-4xl text-center">
     <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
-      <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">联系我们</p>
+      <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">
+        联系我们
+      </p>
+
       <a
         href="电子邮件地址"
         class="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
       >
         电子邮箱地址
       </a>
+
       <p class="text-gray-400 dark:text-gray-500 text-xs mt-3">
         xuexiang@lianggongoffice.dpdns.org
       </p>
     </div>
   </section>
 
-  <!-- ===== Hero 背景修复 ===== -->
+
+  <!-- =====================================================
+       Hero 背景修复
+  ====================================================== -->
+
   <script>
     (function() {
       function fixHeroScroll() {
         const hero = document.querySelector('[class*="Hero"]');
+
         if (!hero) return;
-        const bgLayers = hero.querySelectorAll('.absolute.inset-0, [class*="absolute"][class*="inset-0"]');
+
+        const bgLayers = hero.querySelectorAll(
+          '.absolute.inset-0, [class*="absolute"][class*="inset-0"]'
+        );
+
         bgLayers.forEach(el => {
           el.style.pointerEvents = 'none';
         });
-        const content = hero.querySelectorAll('a, button, [role="button"]');
+
+        const content = hero.querySelectorAll(
+          'a, button, [role="button"]'
+        );
+
         content.forEach(el => {
           el.style.pointerEvents = 'auto';
         });
+
         console.log('✅ Hero 背景已修复');
       }
+
       if (document.readyState === 'complete') {
         fixHeroScroll();
       } else {
-        window.addEventListener('load', fixHeroScroll);
+        window.addEventListener(
+          'load',
+          fixHeroScroll
+        );
       }
-      document.addEventListener('astro:after-swap', function() {
-        setTimeout(fixHeroScroll, 100);
-      });
+
+      document.addEventListener(
+        'astro:after-swap',
+        function() {
+          setTimeout(
+            fixHeroScroll,
+            100
+          );
+        }
+      );
     })();
   </script>
 
-  <!-- ===== 用户名接收 ===== -->
+
+  <!-- =====================================================
+       用户名接收
+  ====================================================== -->
+
   <script>
     (function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const encodedUsername = urlParams.get('username');
+      const urlParams = new URLSearchParams(
+        window.location.search
+      );
+
+      const encodedUsername =
+        urlParams.get('username');
+
 
       function getGreeting() {
         const hour = new Date().getHours();
-        if (hour >= 5 && hour < 9) return '早上好';
-        if (hour >= 9 && hour < 12) return '上午好';
-        if (hour >= 12 && hour < 14) return '中午好';
-        if (hour >= 14 && hour < 18) return '下午好';
-        if (hour >= 18 && hour < 21) return '傍晚好';
+
+        if (hour >= 5 && hour < 9) {
+          return '早上好';
+        }
+
+        if (hour >= 9 && hour < 12) {
+          return '上午好';
+        }
+
+        if (hour >= 12 && hour < 14) {
+          return '中午好';
+        }
+
+        if (hour >= 14 && hour < 18) {
+          return '下午好';
+        }
+
+        if (hour >= 18 && hour < 21) {
+          return '傍晚好';
+        }
+
         return '晚上好';
       }
 
+
       function updateGreeting(username) {
-        const el = document.getElementById('hero-greeting');
+        const el =
+          document.getElementById(
+            'hero-greeting'
+          );
+
         if (el) {
-          el.textContent = `${username}，${getGreeting()}`;
+          el.textContent =
+            `${username}，${getGreeting()}`;
         }
       }
+
 
       function setUsername(username) {
         try {
-          localStorage.setItem('username', username);
+          localStorage.setItem(
+            'username',
+            username
+          );
         } catch (e) {}
-        document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=10368000`;
+
+        document.cookie =
+          `username=${encodeURIComponent(username)}; path=/; max-age=10368000`;
       }
+
 
       function getUsername() {
         try {
-          const stored = localStorage.getItem('username');
-          if (stored) return stored;
+          const stored =
+            localStorage.getItem('username');
+
+          if (stored) {
+            return stored;
+          }
         } catch (e) {}
-        const cookie = document.cookie.split('; ').find(row => row.startsWith('username='));
-        if (cookie) return decodeURIComponent(cookie.split('=')[1]);
+
+        const cookie =
+          document.cookie
+            .split('; ')
+            .find(
+              row =>
+                row.startsWith('username=')
+            );
+
+        if (cookie) {
+          return decodeURIComponent(
+            cookie.split('=')[1]
+          );
+        }
+
         return null;
       }
 
+
       if (encodedUsername) {
         try {
-          const username = decodeURIComponent(encodedUsername);
+          const username =
+            decodeURIComponent(
+              encodedUsername
+            );
+
           if (username) {
             setUsername(username);
+
             updateGreeting(username);
-            window.history.replaceState({}, document.title, '/');
-            console.log(`✅ 欢迎语已更新: ${username}，${getGreeting()}`);
+
+            window.history.replaceState(
+              {},
+              document.title,
+              '/'
+            );
+
+            console.log(
+              `✅ 欢迎语已更新: ${username}，${getGreeting()}`
+            );
           }
         } catch (e) {
-          console.log('解码用户名失败:', e);
+          console.log(
+            '解码用户名失败:',
+            e
+          );
         }
       }
 
-      const storedUsername = getUsername();
+
+      const storedUsername =
+        getUsername();
+
       if (storedUsername) {
-        updateGreeting(storedUsername);
+        updateGreeting(
+          storedUsername
+        );
       }
     })();
   </script>
-<!-- ===== 首页搜索框 ===== -->
+
+
+  <!-- =====================================================
+       首页搜索框
+  ====================================================== -->
+
   <script>
     const SEARCH_HTML = `
       <div
@@ -519,7 +635,9 @@ const metadata = {
               type="button"
               class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 bg-white/30 backdrop-blur-sm px-2 py-1 rounded-full hover:bg-white/50 transition-colors"
             >
-              <span id="mode-label">站外</span>
+              <span id="mode-label">
+                站外
+              </span>
             </button>
 
           </form>
@@ -536,14 +654,36 @@ const metadata = {
 
     function initSearch() {
 
-      const form = document.getElementById('search-form');
-      const input = document.getElementById('search-input');
-      const toggleBtn = document.getElementById('search-toggle');
-      const modeToggle = document.getElementById('mode-toggle');
-      const modeLabel = document.getElementById('mode-label');
-      const resultsContainer = document.getElementById(
-        'search-results-container'
-      );
+      const form =
+        document.getElementById(
+          'search-form'
+        );
+
+      const input =
+        document.getElementById(
+          'search-input'
+        );
+
+      const toggleBtn =
+        document.getElementById(
+          'search-toggle'
+        );
+
+      const modeToggle =
+        document.getElementById(
+          'mode-toggle'
+        );
+
+      const modeLabel =
+        document.getElementById(
+          'mode-label'
+        );
+
+      const resultsContainer =
+        document.getElementById(
+          'search-results-container'
+        );
+
 
       if (
         !form ||
@@ -560,11 +700,16 @@ const metadata = {
       /*
        * 防止 Astro 页面切换后重复绑定事件。
        */
-      if (form.dataset.searchInitialized === 'true') {
+
+      if (
+        form.dataset.searchInitialized ===
+        'true'
+      ) {
         return;
       }
 
-      form.dataset.searchInitialized = 'true';
+      form.dataset.searchInitialized =
+        'true';
 
 
       let mode = 'external';
@@ -576,18 +721,19 @@ const metadata = {
 
         try {
 
-          const resp = await fetch('/search.json');
+          const resp =
+            await fetch('/search.json');
 
           if (resp.ok) {
 
-            searchData = await resp.json();
+            searchData =
+              await resp.json();
 
             console.log(
               '✅ 搜索索引已加载:',
               searchData.length,
               '个页面'
             );
-
           }
 
         } catch (e) {}
@@ -597,20 +743,33 @@ const metadata = {
 
       function searchInternal(query) {
 
-        if (!searchData || !query.trim()) {
+        if (
+          !searchData ||
+          !query.trim()
+        ) {
           return [];
         }
 
-        const q = query.toLowerCase().trim();
+        const q =
+          query.toLowerCase().trim();
 
         return searchData
           .filter((page) => {
 
-            const title = String(page.title || '').toLowerCase();
+            const title =
+              String(
+                page.title || ''
+              ).toLowerCase();
 
-            const desc = String(page.description || '').toLowerCase();
+            const desc =
+              String(
+                page.description || ''
+              ).toLowerCase();
 
-            const content = String(page.content || '').toLowerCase();
+            const content =
+              String(
+                page.content || ''
+              ).toLowerCase();
 
             return (
               title.includes(q) ||
@@ -625,11 +784,16 @@ const metadata = {
 
       function showResults(results) {
 
-        resultsContainer.innerHTML = '';
+        resultsContainer.innerHTML =
+          '';
 
-        if (results.length === 0) {
+        if (
+          results.length === 0
+        ) {
 
-          resultsContainer.classList.add('hidden');
+          resultsContainer.classList.add(
+            'hidden'
+          );
 
           return;
         }
@@ -638,7 +802,9 @@ const metadata = {
         let html = '';
 
 
-        for (const page of results) {
+        for (
+          const page of results
+        ) {
 
           html += `
             <a
@@ -657,17 +823,23 @@ const metadata = {
         }
 
 
-        resultsContainer.innerHTML = html;
+        resultsContainer.innerHTML =
+          html;
 
-        resultsContainer.classList.remove('hidden');
+        resultsContainer.classList.remove(
+          'hidden'
+        );
       }
 
 
       function clearResults() {
 
-        resultsContainer.innerHTML = '';
+        resultsContainer.innerHTML =
+          '';
 
-        resultsContainer.classList.add('hidden');
+        resultsContainer.classList.add(
+          'hidden'
+        );
       }
 
 
@@ -678,53 +850,72 @@ const metadata = {
         clearResults();
 
 
-        if (mode === 'external') {
+        if (
+          mode === 'external'
+        ) {
 
-          form.action = 'https://www.bing.com/search';
+          form.action =
+            'https://www.bing.com/search';
 
-          form.target = '_blank';
+          form.target =
+            '_blank';
 
 
-          let hidden = form.querySelector(
-            'input[name="q1"]'
-          );
+          let hidden =
+            form.querySelector(
+              'input[name="q1"]'
+            );
 
 
           if (!hidden) {
 
-            hidden = document.createElement('input');
+            hidden =
+              document.createElement(
+                'input'
+              );
 
-            hidden.type = 'hidden';
+            hidden.type =
+              'hidden';
 
-            hidden.name = 'q1';
+            hidden.name =
+              'q1';
 
-            form.appendChild(hidden);
+            form.appendChild(
+              hidden
+            );
           }
 
 
-          hidden.value = 'site:hsdc.dpdns.org';
+          hidden.value =
+            'site:hsdc.dpdns.org';
 
-          input.name = 'q';
+          input.name =
+            'q';
 
-          input.placeholder = '输入关键字以联网检索';
+          input.placeholder =
+            '输入关键字以联网检索';
 
 
           input.className =
             'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
 
 
-          modeLabel.textContent = '必应搜索';
+          modeLabel.textContent =
+            '必应搜索';
 
         } else {
 
-          form.action = '#';
+          form.action =
+            '#';
 
-          form.target = '';
+          form.target =
+            '';
 
 
-          const hidden = form.querySelector(
-            'input[name="q1"]'
-          );
+          const hidden =
+            form.querySelector(
+              'input[name="q1"]'
+            );
 
 
           if (hidden) {
@@ -732,25 +923,33 @@ const metadata = {
           }
 
 
-          input.name = '';
+          input.name =
+            '';
 
-          input.placeholder = '输入关键词检索本站';
+          input.placeholder =
+            '输入关键词检索本站';
 
 
           input.className =
             'w-full py-3 px-6 pl-12 bg-white/20 backdrop-blur-sm md:backdrop-blur-lg border border-white/30 rounded-full text-gray-800 placeholder-gray-500 focus:outline-none shadow-lg';
 
 
-          modeLabel.textContent = '站内检索';
+          modeLabel.textContent =
+            '站内检索';
 
 
-          if (input.value.trim()) {
+          if (
+            input.value.trim()
+          ) {
 
-            const results = searchInternal(
-              input.value
+            const results =
+              searchInternal(
+                input.value
+              );
+
+            showResults(
+              results
             );
-
-            showResults(results);
           }
         }
 
@@ -763,9 +962,12 @@ const metadata = {
         'input',
         function () {
 
-          if (mode === 'internal') {
+          if (
+            mode === 'internal'
+          ) {
 
-            const query = this.value.trim();
+            const query =
+              this.value.trim();
 
 
             if (!query) {
@@ -776,9 +978,14 @@ const metadata = {
             }
 
 
-            const results = searchInternal(query);
+            const results =
+              searchInternal(
+                query
+              );
 
-            showResults(results);
+            showResults(
+              results
+            );
 
           } else {
 
@@ -805,7 +1012,9 @@ const metadata = {
               : 'external';
 
 
-          updateMode(newMode);
+          updateMode(
+            newMode
+          );
         }
       );
 
@@ -829,7 +1038,9 @@ const metadata = {
       );
 
 
-      updateMode('external');
+      updateMode(
+        'external'
+      );
 
       loadSearchData();
     }
@@ -840,7 +1051,11 @@ const metadata = {
       /*
        * 只有首页存在 Hero 才创建搜索框。
        */
-      const hero = document.querySelector('[data-home-hero]');
+
+      const hero =
+        document.querySelector(
+          '[data-home-hero]'
+        );
 
       if (!hero) {
         return;
@@ -851,7 +1066,11 @@ const metadata = {
        * 搜索框现在属于 body 的固定层，
        * 不再插入 Hero 内部。
        */
-      const existing = document.querySelector('.search-wrapper');
+
+      const existing =
+        document.querySelector(
+          '.search-wrapper'
+        );
 
       if (existing) {
 
@@ -867,6 +1086,7 @@ const metadata = {
        * 这样 fixed 的定位参照整个视口，
        * 不会受到 Hero 高度和滚动位置影响。
        */
+
       document.body.insertAdjacentHTML(
         'beforeend',
         SEARCH_HTML
@@ -883,7 +1103,11 @@ const metadata = {
     /*
      * 初次加载。
      */
-    if (document.readyState === 'complete') {
+
+    if (
+      document.readyState ===
+      'complete'
+    ) {
 
       setTimeout(
         injectSearch,
@@ -902,7 +1126,9 @@ const metadata = {
           );
 
         },
-        { once: true }
+        {
+          once: true
+        }
       );
 
     }
@@ -911,6 +1137,7 @@ const metadata = {
     /*
      * Astro ClientRouter 页面切换后重新检查。
      */
+
     document.addEventListener(
       'astro:after-swap',
       function () {
@@ -923,6 +1150,194 @@ const metadata = {
       }
     );
   </script>
-  
+
+
+  <!-- =====================================================
+       「了解更多」平滑向下滚动
+  ====================================================== -->
+
+  <script>
+    (function () {
+
+      function initSmoothFeatureScroll() {
+
+        const links =
+          document.querySelectorAll(
+            'a[href="#features"]'
+          );
+
+
+        if (!links.length) {
+          return;
+        }
+
+
+        links.forEach((link) => {
+
+          /*
+           * 防止 Astro 页面切换后
+           * 重复绑定点击事件。
+           */
+
+          if (
+            link.dataset
+              .smoothScrollInitialized ===
+            'true'
+          ) {
+            return;
+          }
+
+
+          link.dataset
+            .smoothScrollInitialized =
+            'true';
+
+
+          link.addEventListener(
+            'click',
+            function (event) {
+
+              const target =
+                document.getElementById(
+                  'features'
+                );
+
+
+              if (!target) {
+                return;
+              }
+
+
+              /*
+               * 阻止浏览器默认的
+               * 瞬间锚点跳转。
+               */
+
+              event.preventDefault();
+
+
+              /*
+               * 获取固定 Header 高度。
+               *
+               * 这样滚动结束后，
+               * 「新方向·新发展」不会被 Header 挡住。
+               */
+
+              const header =
+                document.getElementById(
+                  'header'
+                );
+
+
+              const headerHeight =
+                header
+                  ? header.getBoundingClientRect()
+                      .height
+                  : 0;
+
+
+              /*
+               * 目标元素距离整个页面顶部的位置。
+               */
+
+              const targetTop =
+                target.getBoundingClientRect()
+                    .top +
+                window.scrollY -
+                headerHeight -
+                12;
+
+
+              /*
+               * 平滑向下滚动。
+               *
+               * 使用浏览器原生 smooth，
+               * 手机和电脑版都会有自然的减速效果。
+               */
+
+              const reduceMotion =
+                window.matchMedia(
+                  '(prefers-reduced-motion: reduce)'
+                ).matches;
+
+
+              window.scrollTo({
+                top: Math.max(
+                  0,
+                  targetTop
+                ),
+
+                behavior:
+                  reduceMotion
+                    ? 'auto'
+                    : 'smooth',
+              });
+
+
+              /*
+               * 更新地址栏中的 #features，
+               * 但不再次触发浏览器默认跳转。
+               */
+
+              try {
+
+                window.history.replaceState(
+                  null,
+                  '',
+                  '#features'
+                );
+
+              } catch (e) {}
+
+            }
+          );
+
+        });
+
+      }
+
+
+      /*
+       * 初次加载。
+       */
+
+      if (
+        document.readyState ===
+        'loading'
+      ) {
+
+        document.addEventListener(
+          'DOMContentLoaded',
+          initSmoothFeatureScroll,
+          {
+            once: true
+          }
+        );
+
+      } else {
+
+        initSmoothFeatureScroll();
+
+      }
+
+
+      /*
+       * Astro 页面切换后重新初始化。
+       */
+
+      document.addEventListener(
+        'astro:after-swap',
+        function () {
+
+          setTimeout(
+            initSmoothFeatureScroll,
+            50
+          );
+
+        }
+      );
+
+    })();
+  </script>
 
 </Layout>
