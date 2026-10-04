@@ -129,7 +129,9 @@ const {
       }
 
 
-      /* 手机主菜单 */
+      /* =====================================================
+         手机主菜单
+         ===================================================== */
 
       .hsdc-mobile-nav {
         display: block !important;
@@ -139,21 +141,24 @@ const {
         opacity: 0;
         overflow: hidden;
 
-        transform: translateY(-8px);
+        transform: translateY(-6px);
 
         visibility: hidden;
         pointer-events: none;
 
+        will-change: max-height, opacity, transform;
+
         transition:
-          max-height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-          opacity 0.22s ease,
-          transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-          visibility 0s linear 0.38s;
+          max-height 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.30s ease,
+          transform 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s linear 0.52s;
       }
 
       /*
        * 唯一根据移动导航自身状态决定展开。
-       * 不再使用 :has(.expanded)。
+       * 不使用 :has(.expanded)，避免和 ToggleMenu /
+       * BasicScripts.astro 的状态逻辑互相干扰。
        */
       header#header .hsdc-mobile-nav.expanded,
       header#header .hsdc-mobile-nav[data-expanded="true"] {
@@ -168,36 +173,35 @@ const {
 
         overflow-y: auto;
 
+        will-change: max-height, opacity, transform;
+
         transition:
-          max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-          opacity 0.25s ease,
-          transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+          max-height 0.56s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.32s ease,
+          transform 0.56s cubic-bezier(0.22, 1, 0.36, 1),
           visibility 0s linear 0s;
       }
 
 
       /* =====================================================
-         汉堡“三”定位
+         汉堡“三” / “X”
+
+         两种状态使用完全相同的按钮中心。
+         不对按钮本体进行 translateX / translateY。
+
+         “三” → “X”只发生在线条自身，
+         不让整个按钮发生横向位移。
          ===================================================== */
 
-      /*
-       * X 的位置保持原样。
-       * 只有未展开状态的“三”向下 2px。
-       *
-       * transform 不影响按钮本身占位，
-       * 因此不会导致 Header 高度变化。
-       */
-
-      header#header [data-aw-toggle-menu]:not(.expanded) {
-        transform: translateY(2px);
-      }
-
-      header#header [data-aw-toggle-menu].expanded {
+      header#header [data-aw-toggle-menu] {
         transform: none;
+        will-change: transform;
       }
 
 
-      /* 手机首页 */
+      /* =====================================================
+         手机首页
+         ===================================================== */
 
       .hsdc-mobile-home {
         display: flex;
@@ -214,9 +218,9 @@ const {
         border-radius: 10px;
 
         transition:
-          transform 160ms ease,
-          opacity 160ms ease,
-          background-color 180ms ease;
+          transform 180ms ease,
+          opacity 180ms ease,
+          background-color 200ms ease;
       }
 
       .hsdc-mobile-home:active {
@@ -225,7 +229,9 @@ const {
       }
 
 
-      /* 一级菜单 */
+      /* =====================================================
+         一级菜单
+         ===================================================== */
 
       .hsdc-mobile-group {
         width: 100%;
@@ -252,9 +258,9 @@ const {
         cursor: pointer;
 
         transition:
-          transform 160ms ease,
-          opacity 160ms ease,
-          background-color 180ms ease;
+          transform 180ms ease,
+          opacity 180ms ease,
+          background-color 200ms ease;
       }
 
       .hsdc-mobile-group-button:active {
@@ -263,7 +269,9 @@ const {
       }
 
 
-      /* 一级菜单箭头 */
+      /* =====================================================
+         一级菜单箭头
+         ===================================================== */
 
       .hsdc-mobile-group-chevron {
         display: inline-flex;
@@ -279,8 +287,8 @@ const {
         transform: rotate(0deg);
 
         transition:
-          transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
-          opacity 180ms ease;
+          transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 200ms ease;
       }
 
       .hsdc-mobile-group.is-open
@@ -309,10 +317,12 @@ const {
 
         transform: translateY(-5px);
 
+        will-change: max-height, opacity, transform;
+
         transition:
-          max-height 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-          opacity 0.22s ease,
-          transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+          max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.28s ease,
+          transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       .hsdc-mobile-group.is-open
@@ -344,7 +354,7 @@ const {
         transition:
           transform 180ms ease,
           opacity 180ms ease,
-          background-color 180ms ease;
+          background-color 200ms ease;
       }
 
       .hsdc-mobile-submenu a:active {
@@ -450,7 +460,7 @@ const {
 
       .hsdc-chevron {
         transition:
-          transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+          transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
           opacity 180ms ease;
       }
 
@@ -594,18 +604,27 @@ const {
       .hsdc-desktop-group-button,
       .hsdc-chevron,
       .hsdc-desktop-dropdown,
-      .hsdc-desktop-dropdown a {
+      .hsdc-desktop-dropdown a,
+      header#header [data-aw-toggle-menu] {
         transition: none !important;
       }
     }
   </style>
-<div class="absolute inset-0" style="background: transparent !important;"></div>
+
+  <div
+    class="absolute inset-0"
+    style="background: transparent !important;"
+  ></div>
+
 
   <!-- =========================
        移动端 Header
   ========================== -->
+
   <div class="hsdc-mobile-header relative text-default py-1.5 px-3 w-full">
-    <div class="flex items-center justify-between w-full">
+
+    <div class="flex items-center w-full">
+
       <a
         class="hsdc-brand"
         href={getHomePermalink()}
@@ -614,10 +633,12 @@ const {
         <Logo />
       </a>
 
-      <div class="flex items-center translate-x-1">
+      <div class="ml-auto flex items-center shrink-0">
         <ToggleMenu />
       </div>
+
     </div>
+
 
     <nav
       class="hsdc-mobile-nav"
@@ -633,6 +654,7 @@ const {
       {
         groups?.map((group) => (
           <div class="hsdc-mobile-group">
+
             <button
               type="button"
               class="hsdc-mobile-group-button"
@@ -665,16 +687,19 @@ const {
                 ))
               }
             </div>
+
           </div>
         ))
       }
     </nav>
+
   </div>
 
 
   <!-- =========================
        桌面端 / 平板端 Header
   ========================== -->
+
   <div
     class:list={[
       'hsdc-desktop-header',
@@ -687,9 +712,11 @@ const {
       'py-3',
     ]}
   >
+
     <div class="flex items-center w-full min-h-[64px]">
 
       <!-- Logo -->
+
       <a
         class="hsdc-brand flex items-center shrink-0"
         href={getHomePermalink()}
@@ -700,10 +727,12 @@ const {
 
 
       <!-- 桌面导航 -->
+
       <nav
         class="hsdc-desktop-nav"
         aria-label="主导航"
       >
+
         <a
           class="hsdc-home-link"
           href={getHomePermalink()}
@@ -717,6 +746,7 @@ const {
               class="hsdc-desktop-group"
               data-group-index={index}
             >
+
               <button
                 type="button"
                 class="hsdc-desktop-group-button"
@@ -741,6 +771,7 @@ const {
                 </svg>
               </button>
 
+
               <div
                 class="hsdc-desktop-dropdown"
                 role="menu"
@@ -762,14 +793,18 @@ const {
                   ))
                 }
               </div>
+
             </div>
           ))
         }
+
       </nav>
 
 
       <!-- 右侧 -->
+
       <div class="hsdc-header-right flex items-center ml-4 shrink-0">
+
         {
           showToggleTheme && (
             <ToggleTheme />
@@ -792,9 +827,11 @@ const {
             </a>
           ))
         }
+
       </div>
 
     </div>
+
   </div>
 
 
@@ -803,6 +840,7 @@ const {
       let controller: AbortController | null = null;
 
       const initHeader = () => {
+
         controller?.abort();
 
         controller = new AbortController();
@@ -828,7 +866,9 @@ const {
 
 
         const closeDesktopGroups = () => {
+
           desktopGroups.forEach((group) => {
+
             group.classList.remove('is-open');
 
             const button =
@@ -840,17 +880,22 @@ const {
               'aria-expanded',
               'false'
             );
+
           });
+
         };
 
 
         const toggleDesktopGroup = (
           currentGroup: HTMLElement
         ) => {
+
           const wasOpen =
             currentGroup.classList.contains('is-open');
 
+
           desktopGroups.forEach((group) => {
+
             group.classList.remove('is-open');
 
             const button =
@@ -862,9 +907,12 @@ const {
               'aria-expanded',
               'false'
             );
+
           });
 
+
           if (!wasOpen) {
+
             currentGroup.classList.add('is-open');
 
             const button =
@@ -876,11 +924,14 @@ const {
               'aria-expanded',
               'true'
             );
+
           }
+
         };
 
 
         desktopGroups.forEach((group) => {
+
           const button =
             group.querySelector<HTMLButtonElement>(
               '.hsdc-desktop-group-button'
@@ -888,38 +939,50 @@ const {
 
           if (!button) return;
 
+
           button.addEventListener(
             'click',
             (event) => {
+
               event.preventDefault();
               event.stopPropagation();
 
               toggleDesktopGroup(group);
+
             },
             { signal }
           );
+
         });
 
 
         document.addEventListener(
           'click',
           (event) => {
+
             const target =
               event.target as Node | null;
 
             if (!target) return;
 
+
             if (!header.contains(target)) {
+
               closeDesktopGroups();
+
               return;
             }
+
 
             if (
               target instanceof Element &&
               !target.closest('.hsdc-desktop-group')
             ) {
+
               closeDesktopGroups();
+
             }
+
           },
           { signal }
         );
@@ -928,9 +991,11 @@ const {
         document.addEventListener(
           'keydown',
           (event) => {
+
             if (event.key === 'Escape') {
               closeDesktopGroups();
             }
+
           },
           { signal }
         );
@@ -951,7 +1016,9 @@ const {
         const closeMobileGroups = (
           immediate = false
         ) => {
+
           mobileGroups.forEach((group) => {
+
             const button =
               group.querySelector<HTMLButtonElement>(
                 '.hsdc-mobile-group-button'
@@ -962,6 +1029,7 @@ const {
                 '.hsdc-mobile-submenu'
               );
 
+
             group.classList.remove('is-open');
 
             button?.setAttribute(
@@ -969,7 +1037,9 @@ const {
               'false'
             );
 
+
             if (!submenu) return;
+
 
             if (immediate) {
               submenu.style.transition = 'none';
@@ -977,29 +1047,36 @@ const {
               submenu.style.transition = '';
             }
 
+
             submenu.style.maxHeight = '0px';
+
             submenu.style.opacity = '0';
+
             submenu.style.transform =
               'translateY(-5px)';
 
+
             if (immediate) {
+
               /*
                * 强制浏览器完成一次布局，
                * 然后恢复 transition。
-               *
-               * 这样不会把下一次展开动画一起吃掉。
                */
               void submenu.offsetHeight;
 
               submenu.style.transition = '';
+
             }
+
           });
+
         };
 
 
         const openMobileGroup = (
           currentGroup: HTMLElement
         ) => {
+
           const button =
             currentGroup.querySelector<HTMLButtonElement>(
               '.hsdc-mobile-group-button'
@@ -1010,7 +1087,9 @@ const {
               '.hsdc-mobile-submenu'
             );
 
+
           if (!button || !submenu) return;
+
 
           const isOpen =
             currentGroup.classList.contains('is-open');
@@ -1019,8 +1098,11 @@ const {
           /*
            * 先关闭其它二级菜单。
            */
+
           mobileGroups.forEach((group) => {
+
             if (group === currentGroup) return;
+
 
             const otherButton =
               group.querySelector<HTMLButtonElement>(
@@ -1032,6 +1114,7 @@ const {
                 '.hsdc-mobile-submenu'
               );
 
+
             group.classList.remove('is-open');
 
             otherButton?.setAttribute(
@@ -1039,7 +1122,9 @@ const {
               'false'
             );
 
+
             if (otherSubmenu) {
+
               otherSubmenu.style.maxHeight =
                 '0px';
 
@@ -1048,14 +1133,18 @@ const {
 
               otherSubmenu.style.transform =
                 'translateY(-5px)';
+
             }
+
           });
 
 
           /*
            * 当前菜单原本打开 → 收回。
            */
+
           if (isOpen) {
+
             currentGroup.classList.remove(
               'is-open'
             );
@@ -1075,12 +1164,14 @@ const {
               'translateY(-5px)';
 
             return;
+
           }
 
 
           /*
            * 当前菜单展开。
            */
+
           currentGroup.classList.add(
             'is-open'
           );
@@ -1090,6 +1181,7 @@ const {
             'true'
           );
 
+
           submenu.style.maxHeight =
             `${submenu.scrollHeight}px`;
 
@@ -1098,10 +1190,12 @@ const {
 
           submenu.style.transform =
             'translateY(0)';
+
         };
 
 
         mobileGroups.forEach((group) => {
+
           const button =
             group.querySelector<HTMLButtonElement>(
               '.hsdc-mobile-group-button'
@@ -1109,27 +1203,32 @@ const {
 
           if (!button) return;
 
+
           button.addEventListener(
             'click',
             (event) => {
+
               event.preventDefault();
               event.stopPropagation();
 
               openMobileGroup(group);
+
             },
             { signal }
           );
+
         });
 
 
         /* =====================================================
-           关键修复
-           
-           Header 不再接管 ToggleMenu 的 expanded 状态。
+           ToggleMenu
+
+           Header 不负责修改 expanded。
            BasicScripts.astro 是唯一负责：
+
              三 ↔ X
              主菜单展开 ↔ 收回
-           
+
            Header 这里只负责清理二级菜单。
         ===================================================== */
 
@@ -1138,29 +1237,37 @@ const {
             '[data-aw-toggle-menu]'
           );
 
+
         if (toggleMenu) {
+
           toggleMenu.addEventListener(
             'click',
             () => {
+
               /*
                * 不修改 expanded。
                *
                * 这里只在菜单正在收回时清掉二级菜单，
                * 防止 X → 收回过程中二级菜单重新参与布局。
                */
+
               if (
                 toggleMenu.classList.contains(
                   'expanded'
                 )
               ) {
+
                 closeMobileGroups(true);
+
               }
+
             },
             {
               signal,
               capture: true,
             }
           );
+
         }
 
 
@@ -1173,6 +1280,92 @@ const {
             '.hsdc-mobile-submenu a'
           )
           .forEach((link) => {
+
+            link.addEventListener(
+              'click',
+              () => {
+
+                closeMobileGroups(true);
+
+              },
+              { signal }
+            );
+
+          });
+
+
+        /* =====================================================
+           初始化
+        ===================================================== */
+
+        closeDesktopGroups();
+
+        closeMobileGroups(true);
+
+
+        /* =====================================================
+           横竖屏 / 尺寸切换
+        ===================================================== */
+
+        const mediaQuery =
+          window.matchMedia(
+            '(min-width: 768px)'
+          );
+
+
+        const handleMediaChange = () => {
+
+          if (mediaQuery.matches) {
+
+            closeMobileGroups(true);
+
+            closeDesktopGroups();
+
+          } else {
+
+            closeDesktopGroups();
+
+          }
+
+        };
+
+
+        mediaQuery.addEventListener(
+          'change',
+          handleMediaChange,
+          { signal }
+        );
+
+      };
+
+
+      initHeader();
+
+
+      /* =======================================================
+         Astro 页面切换后重新绑定
+      ======================================================= */
+
+      document.addEventListener(
+        'astro:after-swap',
+        () => {
+          initHeader();
+        }
+      );
+
+    })();
+  </script>
+</header>
+/* =====================================================
+           二级菜单链接
+        ===================================================== */
+
+        header
+          .querySelectorAll<HTMLAnchorElement>(
+            '.hsdc-mobile-submenu a'
+          )
+          .forEach((link) => {
+
             link.addEventListener(
               'click',
               () => {
@@ -1180,6 +1373,7 @@ const {
               },
               { signal }
             );
+
           });
 
 
@@ -1201,12 +1395,18 @@ const {
           );
 
         const handleMediaChange = () => {
+
           if (mediaQuery.matches) {
+
             closeMobileGroups(true);
             closeDesktopGroups();
+
           } else {
+
             closeDesktopGroups();
+
           }
+
         };
 
         mediaQuery.addEventListener(
@@ -1214,8 +1414,13 @@ const {
           handleMediaChange,
           { signal }
         );
+
       };
 
+
+      /* =======================================================
+         首次初始化
+      ======================================================= */
 
       initHeader();
 
@@ -1230,6 +1435,7 @@ const {
           initHeader();
         }
       );
+
     })();
   </script>
 </header>
