@@ -52,7 +52,7 @@ const {
 >
   <style>
     /* =========================================================
-       Header 基础
+       Base
     ========================================================= */
 
     header#header {
@@ -70,19 +70,18 @@ const {
     header#header .dark\\:bg-gray-900,
     header#header .bg-gray-100,
     header#header .bg-gray-50,
-    header#header [class*="bg-"] {
+    header#header [class*='bg-'] {
       background: transparent !important;
     }
 
     /* =========================================================
-       Logo
+       Brand
     ========================================================= */
 
     .hsdc-brand {
       display: flex;
       align-items: center;
       flex-shrink: 0;
-
       text-decoration: none;
 
       transition:
@@ -96,19 +95,18 @@ const {
     }
 
     /* =========================================================
-       默认状态
+       Mobile base
     ========================================================= */
 
     .hsdc-mobile-header {
       display: flex;
       flex-direction: column;
-
       width: 100%;
     }
 
     .hsdc-mobile-bar {
       position: relative;
-      z-index: 20;
+      z-index: 30;
 
       display: flex;
       align-items: center;
@@ -126,9 +124,10 @@ const {
 
     @media (max-width: 767px) {
       header#header {
+        overflow: visible;
+
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
-        overflow: visible;
       }
 
       .hsdc-mobile-header {
@@ -138,28 +137,25 @@ const {
       }
 
       .hsdc-mobile-bar {
-        display: flex;
-        align-items: center;
-        width: 100%;
         min-height: 64px;
         box-sizing: border-box;
-        position: relative;
-        z-index: 30;
       }
 
       .hsdc-desktop-header {
         display: none !important;
       }
 
+      /* -------------------------------------------------------
+         Fullscreen mobile navigation
+      ------------------------------------------------------- */
+
       .hsdc-mobile-nav {
         position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
+        inset: 0;
 
         width: 100%;
         height: 100dvh;
+
         box-sizing: border-box;
 
         padding-top: var(
@@ -179,7 +175,6 @@ const {
 
         display: flex !important;
         flex-direction: column;
-        flex: none;
 
         overflow-x: hidden;
         overflow-y: auto;
@@ -188,11 +183,12 @@ const {
         visibility: hidden;
         pointer-events: none;
 
-        transform: translate3d(
-          0,
-          -14px,
-          0
-        );
+        transform:
+          translate3d(
+            0,
+            -14px,
+            0
+          );
 
         will-change:
           opacity,
@@ -211,17 +207,18 @@ const {
           visibility 0s linear 420ms;
       }
 
-      header#header .hsdc-mobile-nav.expanded,
-      header#header .hsdc-mobile-nav[data-expanded="true"] {
+      .hsdc-mobile-nav.expanded,
+      .hsdc-mobile-nav[data-expanded='true'] {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
 
-        transform: translate3d(
-          0,
-          0,
-          0
-        );
+        transform:
+          translate3d(
+            0,
+            0,
+            0
+          );
 
         transition:
           opacity 240ms ease,
@@ -235,27 +232,35 @@ const {
       }
 
       header#header [data-aw-toggle-menu] {
+        position: relative;
+        z-index: 100;
+
         transform: none !important;
         will-change: auto;
-        position: relative;
-        z-index: 40;
       }
 
-      /* =====================================================
-         Mobile 首页
-      ===================================================== */
+      /* -------------------------------------------------------
+         Home
+      ------------------------------------------------------- */
 
       .hsdc-mobile-home {
         display: flex;
         align-items: center;
+
         width: 100%;
         min-height: 48px;
+
         box-sizing: border-box;
-        padding: 13px 16px;
+
+        padding:
+          13px 16px;
+
         margin-bottom: 4px;
+
+        border-radius: 10px;
+
         font-size: 1.05rem;
         font-weight: 500;
-        border-radius: 10px;
 
         transition:
           transform 180ms ease,
@@ -268,9 +273,9 @@ const {
         opacity: 0.72;
       }
 
-      /* =====================================================
-         Mobile 一级菜单
-      ===================================================== */
+      /* -------------------------------------------------------
+         Mobile groups
+      ------------------------------------------------------- */
 
       .hsdc-mobile-group {
         width: 100%;
@@ -286,14 +291,17 @@ const {
         min-height: 48px;
 
         box-sizing: border-box;
-        padding: 13px 16px;
+
+        padding:
+          13px 16px;
 
         border: 0;
         outline: none;
 
+        color: inherit;
+
         font-size: 1.05rem;
         font-weight: 500;
-        color: inherit;
 
         cursor: pointer;
         text-align: left;
@@ -316,6 +324,7 @@ const {
 
         width: 22px;
         height: 22px;
+
         flex: 0 0 22px;
 
         font-size: 25px;
@@ -338,9 +347,9 @@ const {
         transform: rotate(90deg);
       }
 
-      /* =====================================================
-         Mobile 二级菜单
-      ===================================================== */
+      /* -------------------------------------------------------
+         Mobile submenu
+      ------------------------------------------------------- */
 
       .hsdc-mobile-submenu {
         display: flex;
@@ -349,8 +358,8 @@ const {
         width: 100%;
         max-height: 0;
 
-        padding-left: 12px;
-        padding-right: 12px;
+        padding:
+          0 12px;
 
         box-sizing: border-box;
 
@@ -358,11 +367,12 @@ const {
         overflow: hidden;
         pointer-events: none;
 
-        transform: translate3d(
-          0,
-          -5px,
-          0
-        );
+        transform:
+          translate3d(
+            0,
+            -5px,
+            0
+          );
 
         will-change:
           max-height,
@@ -390,11 +400,12 @@ const {
         opacity: 1;
         pointer-events: auto;
 
-        transform: translate3d(
-          0,
-          0,
-          0
-        );
+        transform:
+          translate3d(
+            0,
+            0,
+            0
+          );
       }
 
       .hsdc-mobile-submenu a {
@@ -406,12 +417,14 @@ const {
 
         box-sizing: border-box;
 
-        padding: 9px 16px;
-
-        font-size: 0.96rem;
-        color: inherit;
+        padding:
+          9px 16px;
 
         border-radius: 10px;
+
+        color: inherit;
+
+        font-size: 0.96rem;
 
         transition:
           transform 180ms ease,
@@ -424,64 +437,121 @@ const {
         opacity: 0.72;
       }
 
-      /* =====================================================
-         Mobile 日间 / 夜间模式
+      /* -------------------------------------------------------
+         Mobile theme button
 
          注意：
-         主题按钮不再放在可滚动的 hsdc-mobile-nav 内部。
-         实际 DOM 会在 nav 外部，因此这里使用 fixed。
-      ===================================================== */
+         这个按钮故意位于 nav 外部。
+         nav 自己有 overflow-y:auto，
+         因此不能把主题按钮放进 nav。
+      ------------------------------------------------------- */
 
       .hsdc-mobile-theme {
-        position: fixed;
+        position: fixed !important;
 
-        right: 20px;
-        bottom: max(
-          22px,
-          env(safe-area-inset-bottom)
-        );
+        top: auto !important;
+        left: auto !important;
 
-        z-index: 100;
+        right: 20px !important;
+
+        bottom:
+          calc(
+            24px +
+            env(safe-area-inset-bottom)
+          ) !important;
+
+        z-index: 1000 !important;
 
         display: flex;
+
         align-items: center;
         justify-content: center;
 
-        width: 44px;
-        height: 44px;
-
-        border-radius: 50%;
+        width: 46px;
+        height: 46px;
 
         box-sizing: border-box;
 
-        background: rgba(
-          255,
-          255,
-          255,
-          0.16
-        ) !important;
+        border-radius: 50%;
 
-        border: 1px solid rgba(
-          255,
-          255,
-          255,
-          0.28
-        );
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
 
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        transform:
+          translate3d(
+            0,
+            12px,
+            0
+          )
+          scale(0.92);
 
-        box-shadow:
-          0 6px 24px rgba(
-            0,
-            0,
-            0,
-            0.12
+        background:
+          rgba(
+            255,
+            255,
+            255,
+            0.16
+          ) !important;
+
+        border:
+          1px solid
+          rgba(
+            255,
+            255,
+            255,
+            0.28
           );
 
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+
+        box-shadow:
+          0 8px 28px
+            rgba(
+              0,
+              0,
+              0,
+              0.16
+            );
+
         transition:
-          transform 180ms ease,
-          opacity 180ms ease;
+          opacity 220ms ease,
+          visibility 0s linear 220ms,
+          transform 280ms cubic-bezier(
+            0.22,
+            1,
+            0.36,
+            1
+          );
+      }
+
+      /*
+       * 只有移动菜单真正打开时才显示。
+       */
+      header#header.expanded
+        .hsdc-mobile-theme {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+
+        transform:
+          translate3d(
+            0,
+            0,
+            0
+          )
+          scale(1);
+
+        transition:
+          opacity 220ms ease,
+          visibility 0s linear 0s,
+          transform 280ms cubic-bezier(
+            0.22,
+            1,
+            0.36,
+            1
+          );
       }
 
       .hsdc-mobile-theme button {
@@ -508,9 +578,20 @@ const {
       }
 
       .hsdc-mobile-theme:active {
-        transform: scale(0.92);
+        transform:
+          translate3d(
+            0,
+            0,
+            0
+          )
+          scale(0.92);
+
         opacity: 0.72;
       }
+
+      /* -------------------------------------------------------
+         Mobile scrollbar
+      ------------------------------------------------------- */
 
       .hsdc-mobile-nav::-webkit-scrollbar {
         width: 4px;
@@ -521,12 +602,13 @@ const {
       }
 
       .hsdc-mobile-nav::-webkit-scrollbar-thumb {
-        background: rgba(
-          100,
-          116,
-          139,
-          0.25
-        );
+        background:
+          rgba(
+            100,
+            116,
+            139,
+            0.25
+          );
 
         border-radius: 999px;
       }
@@ -556,7 +638,8 @@ const {
 
         flex: 0 0 auto;
 
-        margin: 0 1rem;
+        margin:
+          0 1rem;
       }
 
       .hsdc-home-link,
@@ -593,25 +676,29 @@ const {
       @media (hover: hover) and (pointer: fine) {
         .hsdc-home-link:hover,
         .hsdc-desktop-group-button:hover {
-          background: rgba(
-            255,
-            255,
-            255,
-            0.1
-          ) !important;
+          background:
+            rgba(
+              255,
+              255,
+              255,
+              0.1
+            ) !important;
 
-          transform: translateY(-1px);
+          transform:
+            translateY(-1px);
         }
 
-        .dark .hsdc-home-link:hover,
+        .dark
+          .hsdc-home-link:hover,
         .dark
           .hsdc-desktop-group-button:hover {
-          background: rgba(
-            255,
-            255,
-            255,
-            0.06
-          ) !important;
+          background:
+            rgba(
+              255,
+              255,
+              255,
+              0.06
+            ) !important;
         }
       }
 
@@ -637,38 +724,45 @@ const {
 
       .hsdc-desktop-group.is-open
         .hsdc-chevron {
-        transform: rotate(180deg);
+        transform:
+          rotate(180deg);
       }
 
       .hsdc-desktop-group.is-open
         .hsdc-desktop-group-button {
-        background: rgba(
-          255,
-          255,
-          255,
-          0.1
-        ) !important;
+        background:
+          rgba(
+            255,
+            255,
+            255,
+            0.1
+          ) !important;
       }
 
       .dark
         .hsdc-desktop-group.is-open
         .hsdc-desktop-group-button {
-        background: rgba(
-          255,
-          255,
-          255,
-          0.06
-        ) !important;
+        background:
+          rgba(
+            255,
+            255,
+            255,
+            0.06
+          ) !important;
       }
 
-      /* =====================================================
-         Desktop 下拉菜单
-      ===================================================== */
+      /* -------------------------------------------------------
+         Desktop dropdown
+      ------------------------------------------------------- */
 
       .hsdc-desktop-dropdown {
         position: absolute;
 
-        top: calc(100% + 7px);
+        top:
+          calc(
+            100% + 7px
+          );
+
         left: 50%;
 
         min-width: 178px;
@@ -686,12 +780,13 @@ const {
 
         border-radius: 12px;
 
-        background: rgba(
-          255,
-          255,
-          255,
-          0.94
-        ) !important;
+        background:
+          rgba(
+            255,
+            255,
+            255,
+            0.94
+          ) !important;
 
         box-shadow:
           0 16px 40px
@@ -717,10 +812,14 @@ const {
         pointer-events: none;
 
         transform:
-          translate(-50%, -7px)
+          translate(
+            -50%,
+            -7px
+          )
           scale(0.97);
 
-        transform-origin: top center;
+        transform-origin:
+          top center;
 
         transition:
           opacity 180ms ease,
@@ -735,19 +834,21 @@ const {
 
       .dark
         .hsdc-desktop-dropdown {
-        background: rgba(
-          25,
-          25,
-          28,
-          0.94
-        ) !important;
+        background:
+          rgba(
+            25,
+            25,
+            28,
+            0.94
+          ) !important;
 
-        border-color: rgba(
-          255,
-          255,
-          255,
-          0.1
-        );
+        border-color:
+          rgba(
+            255,
+            255,
+            255,
+            0.1
+          );
 
         box-shadow:
           0 18px 45px
@@ -773,7 +874,10 @@ const {
         pointer-events: auto;
 
         transform:
-          translate(-50%, 0)
+          translate(
+            -50%,
+            0
+          )
           scale(1);
 
         transition:
@@ -811,25 +915,28 @@ const {
 
       @media (hover: hover) and (pointer: fine) {
         .hsdc-desktop-dropdown a:hover {
-          background: rgba(
-            100,
-            116,
-            139,
-            0.09
-          ) !important;
+          background:
+            rgba(
+              100,
+              116,
+              139,
+              0.09
+            ) !important;
 
-          transform: translateX(2px);
+          transform:
+            translateX(2px);
         }
 
         .dark
           .hsdc-desktop-dropdown
           a:hover {
-          background: rgba(
-            255,
-            255,
-            255,
-            0.08
-          ) !important;
+          background:
+            rgba(
+              255,
+              255,
+              255,
+              0.08
+            ) !important;
         }
       }
 
@@ -837,6 +944,10 @@ const {
         transform: scale(0.975);
         opacity: 0.72;
       }
+
+      /* -------------------------------------------------------
+         Right side
+      ------------------------------------------------------- */
 
       .hsdc-header-right {
         display: flex;
@@ -848,7 +959,7 @@ const {
     }
 
     /* =========================================================
-       Reduced Motion
+       Reduced motion
     ========================================================= */
 
     @media (prefers-reduced-motion: reduce) {
@@ -858,7 +969,7 @@ const {
       .hsdc-mobile-group-chevron,
       .hsdc-mobile-submenu,
       .hsdc-mobile-submenu a,
-      .hsdc-mobile-theme > *,
+      .hsdc-mobile-theme,
       .hsdc-desktop-group-button,
       .hsdc-chevron,
       .hsdc-desktop-dropdown,
@@ -868,6 +979,10 @@ const {
       }
     }
   </style>
+
+  <!-- =======================================================
+       Transparent overlay
+  ======================================================== -->
 
   <div
     class="absolute inset-0"
@@ -890,7 +1005,9 @@ const {
         <Logo />
       </a>
 
-      <div class="ml-auto flex items-center shrink-0">
+      <div
+        class="ml-auto flex items-center shrink-0"
+      >
         <ToggleMenu />
       </div>
     </div>
@@ -915,7 +1032,9 @@ const {
               class="hsdc-mobile-group-button"
               aria-expanded="false"
             >
-              <span>{group.text}</span>
+              <span>
+                {group.text}
+              </span>
 
               <span
                 class="hsdc-mobile-group-chevron"
@@ -925,21 +1044,28 @@ const {
               </span>
             </button>
 
-            <div class="hsdc-mobile-submenu">
+            <div
+              class="hsdc-mobile-submenu"
+            >
               {
-                group.links?.map((item) => (
-                  <a
-                    href={item.href}
-                    target={item.target}
-                    rel={
-                      item.target === '_blank'
-                        ? 'noopener noreferrer'
-                        : undefined
-                    }
-                  >
-                    {item.text}
-                  </a>
-                ))
+                group.links?.map(
+                  (item) => (
+                    <a
+                      href={item.href}
+                      target={
+                        item.target
+                      }
+                      rel={
+                        item.target ===
+                        '_blank'
+                          ? 'noopener noreferrer'
+                          : undefined
+                      }
+                    >
+                      {item.text}
+                    </a>
+                  )
+                )
               }
             </div>
           </div>
@@ -947,21 +1073,22 @@ const {
       }
     </nav>
 
-    <!-- =====================================================
-         Mobile Theme Toggle
-         
-         必须放在 nav 外面：
-         .hsdc-mobile-nav 本身是 overflow-y:auto，
-         如果放在里面，按钮会被滚动区域裁切。
-    ====================================================== -->
+    <!--
+      主题按钮必须在 nav 外部。
+      nav 有 overflow-y:auto，
+      放进去会出现按钮被裁切的问题。
+    -->
 
     {
       showToggleTheme && (
-        <div class="hsdc-mobile-theme">
+        <div
+          class="hsdc-mobile-theme"
+        >
           <ToggleTheme />
         </div>
       )
-    }  </div>
+    }
+  </div>
 
   <!-- =======================================================
        Desktop / Tablet Header
@@ -979,7 +1106,9 @@ const {
       'py-3',
     ]}
   >
-    <div class="flex items-center w-full min-h-[64px]">
+    <div
+      class="flex items-center w-full min-h-[64px]"
+    >
       <a
         class="hsdc-brand flex items-center shrink-0"
         href={getHomePermalink()}
@@ -1000,62 +1129,77 @@ const {
         </a>
 
         {
-          groups?.map((group, index) => (
-            <div
-              class="hsdc-desktop-group"
-              data-group-index={index}
-            >
-              <button
-                type="button"
-                class="hsdc-desktop-group-button"
-                aria-expanded="false"
-                aria-haspopup="true"
-              >
-                <span>{group.text}</span>
-
-                <svg
-                  class="hsdc-chevron"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="m6 9 6 6 6-6"></path>
-                </svg>
-              </button>
-
+          groups?.map(
+            (group, index) => (
               <div
-                class="hsdc-desktop-dropdown"
-                role="menu"
+                class="hsdc-desktop-group"
+                data-group-index={index}
               >
-                {
-                  group.links?.map((item) => (
-                    <a
-                      href={item.href}
-                      target={item.target}
-                      rel={
-                        item.target === '_blank'
-                          ? 'noopener noreferrer'
-                          : undefined
-                      }
-                      role="menuitem"
-                    >
-                      {item.text}
-                    </a>
-                  ))
-                }
+                <button
+                  type="button"
+                  class="hsdc-desktop-group-button"
+                  aria-expanded="false"
+                  aria-haspopup="true"
+                >
+                  <span>
+                    {group.text}
+                  </span>
+
+                  <svg
+                    class="hsdc-chevron"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg>
+                </button>
+
+                <div
+                  class="hsdc-desktop-dropdown"
+                  role="menu"
+                >
+                  {
+                    group.links?.map(
+                      (item) => (
+                        <a
+                          href={
+                            item.href
+                          }
+                          target={
+                            item.target
+                          }
+                          rel={
+                            item.target ===
+                            '_blank'
+                              ? 'noopener noreferrer'
+                              : undefined
+                          }
+                          role="menuitem"
+                        >
+                          {
+                            item.text
+                          }
+                        </a>
+                      )
+                    )
+                  }
+                </div>
               </div>
-            </div>
-          ))
+            )
+          )
         }
       </nav>
 
-      <div class="hsdc-header-right flex items-center ml-4 shrink-0">
+      <div
+        class="hsdc-header-right flex items-center ml-4 shrink-0"
+      >
         {
           showToggleTheme && (
             <ToggleTheme />
@@ -1063,20 +1207,29 @@ const {
         }
 
         {
-          actions?.map((action) => (
-            <a
-              href={action.href}
-              target={action.target}
-              rel={
-                action.target === '_blank'
-                  ? 'noopener noreferrer'
-                  : undefined
-              }
-              class="hsdc-action"
-            >
-              {action.text}
-            </a>
-          ))
+          actions?.map(
+            (action) => (
+              <a
+                href={
+                  action.href
+                }
+                target={
+                  action.target
+                }
+                rel={
+                  action.target ===
+                  '_blank'
+                    ? 'noopener noreferrer'
+                    : undefined
+                }
+                class="hsdc-action"
+              >
+                {
+                  action.text
+                }
+              </a>
+            )
+          )
         }
       </div>
     </div>
@@ -1084,251 +1237,381 @@ const {
 
   <script>
     (() => {
-      let controller: AbortController | null =
+      let controller:
+        AbortController | null =
         null;
 
       let closeTimer:
-        | ReturnType<typeof setTimeout>
+        | ReturnType<
+            typeof setTimeout
+          >
         | null = null;
 
-      const initHeader = () => {
-        controller?.abort();
+      const initHeader =
+        () => {
+          controller?.abort();
 
-        controller =
-          new AbortController();
+          controller =
+            new AbortController();
 
-        const { signal } = controller;
+          const { signal } =
+            controller;
 
-        const header =
-          document.querySelector<HTMLElement>(
-            '#header'
+          const header =
+            document.querySelector<HTMLElement>(
+              '#header'
+            );
+
+          if (!header) {
+            return;
+          }
+
+          const mobileBar =
+            header.querySelector<HTMLElement>(
+              '.hsdc-mobile-bar'
+            );
+
+          const mobileNav =
+            header.querySelector<HTMLElement>(
+              '.hsdc-mobile-nav'
+            );
+
+          const toggleMenu =
+            header.querySelector<HTMLElement>(
+              '[data-aw-toggle-menu]'
+            );
+
+          /* =================================================
+             Mobile header height
+          ================================================= */
+
+          const syncMobileHeaderHeight =
+            () => {
+              if (!mobileBar) {
+                return;
+              }
+
+              const height =
+                mobileBar.getBoundingClientRect()
+                  .height;
+
+              if (height > 0) {
+                header.style.setProperty(
+                  '--hsdc-mobile-header-height',
+                  `${height}px`
+                );
+              }
+            };
+
+          syncMobileHeaderHeight();
+
+          window.addEventListener(
+            'resize',
+            syncMobileHeaderHeight,
+            { signal }
           );
 
-        if (!header) return;
+          /* =================================================
+             Desktop groups
+          ================================================= */
 
-        const mobileBar =
-          header.querySelector<HTMLElement>(
-            '.hsdc-mobile-bar'
-          );
+          const desktopGroups =
+            Array.from(
+              header.querySelectorAll<HTMLElement>(
+                '.hsdc-desktop-group'
+              )
+            );
 
-        const mobileNav =
-          header.querySelector<HTMLElement>(
-            '.hsdc-mobile-nav'
-          );
+          const closeDesktopGroups =
+            () => {
+              desktopGroups.forEach(
+                (group) => {
+                  group.classList.remove(
+                    'is-open'
+                  );
 
-        const toggleMenu =
-          header.querySelector<HTMLElement>(
-            '[data-aw-toggle-menu]'
-          );
+                  const button =
+                    group.querySelector<HTMLButtonElement>(
+                      '.hsdc-desktop-group-button'
+                    );
 
-        const syncMobileHeaderHeight =
-          () => {
-            if (!mobileBar) return;
-
-            const height =
-              mobileBar.getBoundingClientRect()
-                .height;
-
-            if (height > 0) {
-              header.style.setProperty(
-                '--hsdc-mobile-header-height',
-                `${height}px`
+                  button?.setAttribute(
+                    'aria-expanded',
+                    'false'
+                  );
+                }
               );
-            }
-          };
+            };
 
-        syncMobileHeaderHeight();
+          const toggleDesktopGroup =
+            (
+              currentGroup: HTMLElement
+            ) => {
+              const wasOpen =
+                currentGroup.classList.contains(
+                  'is-open'
+                );
 
-        window.addEventListener(
-          'resize',
-          syncMobileHeaderHeight,
-          { signal }
-        );
+              desktopGroups.forEach(
+                (group) => {
+                  group.classList.remove(
+                    'is-open'
+                  );
 
-        /* =====================================================
-           Desktop
-        ===================================================== */
+                  const button =
+                    group.querySelector<HTMLButtonElement>(
+                      '.hsdc-desktop-group-button'
+                    );
 
-        const desktopGroups =
-          Array.from(
-            header.querySelectorAll<HTMLElement>(
-              '.hsdc-desktop-group'
-            )
-          );
+                  button?.setAttribute(
+                    'aria-expanded',
+                    'false'
+                  );
+                }
+              );
 
-        const closeDesktopGroups =
-          () => {
-            desktopGroups.forEach(
-              (group) => {
-                group.classList.remove(
+              if (!wasOpen) {
+                currentGroup.classList.add(
                   'is-open'
                 );
 
                 const button =
-                  group.querySelector<HTMLButtonElement>(
+                  currentGroup.querySelector<HTMLButtonElement>(
                     '.hsdc-desktop-group-button'
                   );
 
                 button?.setAttribute(
                   'aria-expanded',
-                  'false'
+                  'true'
                 );
               }
-            );
-          };
+            };
 
-        const toggleDesktopGroup =
-          (
-            currentGroup: HTMLElement
-          ) => {
-            const wasOpen =
-              currentGroup.classList.contains(
-                'is-open'
-              );
-
-            desktopGroups.forEach(
-              (group) => {
-                group.classList.remove(
-                  'is-open'
-                );
-
-                const button =
-                  group.querySelector<HTMLButtonElement>(
-                    '.hsdc-desktop-group-button'
-                  );
-
-                button?.setAttribute(
-                  'aria-expanded',
-                  'false'
-                );
-              }
-            );
-
-            if (!wasOpen) {
-              currentGroup.classList.add(
-                'is-open'
-              );
-
+          desktopGroups.forEach(
+            (group) => {
               const button =
-                currentGroup.querySelector<HTMLButtonElement>(
+                group.querySelector<HTMLButtonElement>(
                   '.hsdc-desktop-group-button'
                 );
 
-              button?.setAttribute(
-                'aria-expanded',
-                'true'
+              if (!button) {
+                return;
+              }
+
+              button.addEventListener(
+                'click',
+                (event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+
+                  toggleDesktopGroup(
+                    group
+                  );
+                },
+                { signal }
               );
             }
-          };
-
-        desktopGroups.forEach(
-          (group) => {
-            const button =
-              group.querySelector<HTMLButtonElement>(
-                '.hsdc-desktop-group-button'
-              );
-
-            if (!button) return;
-
-            button.addEventListener(
-              'click',
-              (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-
-                toggleDesktopGroup(
-                  group
-                );
-              },
-              { signal }
-            );
-          }
-        );
-
-        document.addEventListener(
-          'click',
-          (event) => {
-            const target =
-              event.target as Node | null;
-
-            if (!target) return;
-
-            if (
-              !header.contains(target)
-            ) {
-              closeDesktopGroups();
-              return;
-            }
-
-            if (
-              target instanceof Element &&
-              !target.closest(
-                '.hsdc-desktop-group'
-              )
-            ) {
-              closeDesktopGroups();
-            }
-          },
-          { signal }
-        );
-
-        document.addEventListener(
-          'keydown',
-          (event) => {
-            if (
-              event.key === 'Escape'
-            ) {
-              closeDesktopGroups();
-            }
-          },
-          { signal }
-        );
-
-        /* =====================================================
-           Mobile 二级菜单
-        ===================================================== */
-
-        const mobileGroups =
-          Array.from(
-            header.querySelectorAll<HTMLElement>(
-              '.hsdc-mobile-group'
-            )
           );
 
-        const closeMobileGroups =
-          (
-            immediate = false
-          ) => {
-            mobileGroups.forEach(
-              (group) => {
-                const button =
-                  group.querySelector<HTMLButtonElement>(
-                    '.hsdc-mobile-group-button'
+          /* =================================================
+             Desktop outside click
+          ================================================= */
+
+          document.addEventListener(
+            'click',
+            (event) => {
+              const target =
+                event.target as Node | null;
+
+              if (!target) {
+                return;
+              }
+
+              if (
+                !header.contains(
+                  target
+                )
+              ) {
+                closeDesktopGroups();
+                return;
+              }
+
+              if (
+                target instanceof
+                  Element &&
+                !target.closest(
+                  '.hsdc-desktop-group'
+                )
+              ) {
+                closeDesktopGroups();
+              }
+            },
+            { signal }
+          );
+
+          /* =================================================
+             Escape
+          ================================================= */
+
+          document.addEventListener(
+            'keydown',
+            (event) => {
+              if (
+                event.key ===
+                'Escape'
+              ) {
+                closeDesktopGroups();
+              }
+            },
+            { signal }
+          );
+
+          /* =================================================
+             Mobile groups
+          ================================================= */
+
+          const mobileGroups =
+            Array.from(
+              header.querySelectorAll<HTMLElement>(
+                '.hsdc-mobile-group'
+              )
+            );
+
+          const closeMobileGroups =
+            (
+              immediate = false
+            ) => {
+              mobileGroups.forEach(
+                (group) => {
+                  const button =
+                    group.querySelector<HTMLButtonElement>(
+                      '.hsdc-mobile-group-button'
+                    );
+
+                  const submenu =
+                    group.querySelector<HTMLElement>(
+                      '.hsdc-mobile-submenu'
+                    );
+
+                  group.classList.remove(
+                    'is-open'
                   );
 
-                const submenu =
-                  group.querySelector<HTMLElement>(
-                    '.hsdc-mobile-submenu'
+                  button?.setAttribute(
+                    'aria-expanded',
+                    'false'
                   );
 
-                group.classList.remove(
+                  if (!submenu) {
+                    return;
+                  }
+
+                  submenu.style.transition =
+                    immediate
+                      ? 'none'
+                      : '';
+
+                  submenu.style.maxHeight =
+                    '0px';
+
+                  submenu.style.opacity =
+                    '0';
+
+                  submenu.style.transform =
+                    'translate3d(0, -5px, 0)';
+
+                  if (immediate) {
+                    void submenu.offsetHeight;
+
+                    submenu.style.transition =
+                      '';
+                  }
+                }
+              );
+            };
+
+          const openMobileGroup =
+            (
+              currentGroup: HTMLElement
+            ) => {
+              const button =
+                currentGroup.querySelector<HTMLButtonElement>(
+                  '.hsdc-mobile-group-button'
+                );
+
+              const submenu =
+                currentGroup.querySelector<HTMLElement>(
+                  '.hsdc-mobile-submenu'
+                );
+
+              if (
+                !button ||
+                !submenu
+              ) {
+                return;
+              }
+
+              const isOpen =
+                currentGroup.classList.contains(
                   'is-open'
                 );
 
-                button?.setAttribute(
+              /* close other groups */
+
+              mobileGroups.forEach(
+                (group) => {
+                  if (
+                    group ===
+                    currentGroup
+                  ) {
+                    return;
+                  }
+
+                  const otherButton =
+                    group.querySelector<HTMLButtonElement>(
+                      '.hsdc-mobile-group-button'
+                    );
+
+                  const otherSubmenu =
+                    group.querySelector<HTMLElement>(
+                      '.hsdc-mobile-submenu'
+                    );
+
+                  group.classList.remove(
+                    'is-open'
+                  );
+
+                  otherButton?.setAttribute(
+                    'aria-expanded',
+                    'false'
+                  );
+
+                  if (
+                    otherSubmenu
+                  ) {
+                    otherSubmenu.style.maxHeight =
+                      '0px';
+
+                    otherSubmenu.style.opacity =
+                      '0';
+
+                    otherSubmenu.style.transform =
+                      'translate3d(0, -5px, 0)';
+                  }
+                }
+              );
+
+              /* close current */
+
+              if (isOpen) {
+                currentGroup.classList.remove(
+                  'is-open'
+                );
+
+                button.setAttribute(
                   'aria-expanded',
                   'false'
                 );
-
-                if (!submenu) return;
-
-                if (immediate) {
-                  submenu.style.transition =
-                    'none';
-                } else {
-                  submenu.style.transition =
-                    '';
-                }
 
                 submenu.style.maxHeight =
                   '0px';
@@ -1339,230 +1622,180 @@ const {
                 submenu.style.transform =
                   'translate3d(0, -5px, 0)';
 
-                if (immediate) {
-                  void submenu.offsetHeight;
-
-                  submenu.style.transition =
-                    '';
-                }
+                return;
               }
-            );
-          };
 
-        const openMobileGroup =
-          (
-            currentGroup: HTMLElement
-          ) => {
-            const button =
-              currentGroup.querySelector<HTMLButtonElement>(
-                '.hsdc-mobile-group-button'
-              );
+              /* open current */
 
-            const submenu =
-              currentGroup.querySelector<HTMLElement>(
-                '.hsdc-mobile-submenu'
-              );
-
-            if (
-              !button ||
-              !submenu
-            ) {
-              return;
-            }
-
-            const isOpen =
-              currentGroup.classList.contains(
-                'is-open'
-              );
-
-            mobileGroups.forEach(
-              (group) => {
-                if (
-                  group ===
-                  currentGroup
-                ) {
-                  return;
-                }
-
-                const otherButton =
-                  group.querySelector<HTMLButtonElement>(
-                    '.hsdc-mobile-group-button'
-                  );
-
-                const otherSubmenu =
-                  group.querySelector<HTMLElement>(
-                    '.hsdc-mobile-submenu'
-                  );
-
-                group.classList.remove(
-                  'is-open'
-                );
-
-                otherButton?.setAttribute(
-                  'aria-expanded',
-                  'false'
-                );
-
-                if (
-                  otherSubmenu
-                ) {
-                  otherSubmenu.style.maxHeight =
-                    '0px';
-
-                  otherSubmenu.style.opacity =
-                    '0';
-
-                  otherSubmenu.style.transform =
-                    'translate3d(0, -5px, 0)';
-                }
-              }
-            );
-
-            if (isOpen) {
-              currentGroup.classList.remove(
+              currentGroup.classList.add(
                 'is-open'
               );
 
               button.setAttribute(
                 'aria-expanded',
-                'false'
+                'true'
               );
 
               submenu.style.maxHeight =
-                '0px';
+                `${submenu.scrollHeight}px`;
 
               submenu.style.opacity =
-                '0';
+                '1';
 
               submenu.style.transform =
-                'translate3d(0, -5px, 0)';
+                'translate3d(0, 0, 0)';
+            };
 
-              return;
-            }
-
-            currentGroup.classList.add(
-              'is-open'
-            );
-
-            button.setAttribute(
-              'aria-expanded',
-              'true'
-            );
-
-            submenu.style.maxHeight =
-              `${submenu.scrollHeight}px`;
-
-            submenu.style.opacity =
-              '1';
-
-            submenu.style.transform =
-              'translate3d(0, 0, 0)';
-          };
-
-        mobileGroups.forEach(
-          (group) => {
-            const button =
-              group.querySelector<HTMLButtonElement>(
-                '.hsdc-mobile-group-button'
-              );
-
-            if (!button) return;
-
-            button.addEventListener(
-              'click',
-              (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-
-                openMobileGroup(
-                  group
+          mobileGroups.forEach(
+            (group) => {
+              const button =
+                group.querySelector<HTMLButtonElement>(
+                  '.hsdc-mobile-group-button'
                 );
-              },
-              { signal }
-            );
-          }
-        );
 
-        /* =====================================================
-           Mobile 主菜单
-        ===================================================== */
+              if (!button) {
+                return;
+              }
 
-        const clearCloseTimer =
-          () => {
-            if (
-              closeTimer !== null
-            ) {
-              window.clearTimeout(
-                closeTimer
+              button.addEventListener(
+                'click',
+                (event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+
+                  openMobileGroup(
+                    group
+                  );
+                },
+                { signal }
+              );
+            }
+          );
+
+          /* =================================================
+             Mobile menu state
+          ================================================= */
+
+          const clearCloseTimer =
+            () => {
+              if (
+                closeTimer !==
+                null
+              ) {
+                window.clearTimeout(
+                  closeTimer
+                );
+
+                closeTimer = null;
+              }
+            };
+
+          const setMobileHeaderOpen =
+            () => {
+              clearCloseTimer();
+
+              if (!mobileNav) {
+                return;
+              }
+
+              /*
+               * expanded 放在 header 上。
+               * 主题按钮就是根据这个状态显示。
+               */
+              header.classList.add(
+                'h-screen',
+                'expanded',
+                'bg-page'
               );
 
-              closeTimer = null;
-            }
-          };
+              document.body.classList.add(
+                'overflow-hidden'
+              );
 
-        const setMobileHeaderOpen =
-          () => {
-            clearCloseTimer();
+              toggleMenu?.classList.add(
+                'expanded'
+              );
 
-            if (!mobileNav) return;
+              toggleMenu?.setAttribute(
+                'aria-expanded',
+                'true'
+              );
 
-            header.classList.add(
-              'h-screen',
-              'expanded',
-              'bg-page'
-            );
+              mobileNav.classList.add(
+                'expanded'
+              );
 
-            document.body.classList.add(
-              'overflow-hidden'
-            );
+              mobileNav.setAttribute(
+                'data-expanded',
+                'true'
+              );
 
-            toggleMenu?.classList.add(
-              'expanded'
-            );
+              syncMobileHeaderHeight();
 
-            toggleMenu?.setAttribute(
-              'aria-expanded',
-              'true'
-            );
+              closeDesktopGroups();
+            };
 
-            mobileNav.classList.add(
-              'expanded'
-            );
+          const finishMobileHeaderClose =
+            () => {
+              clearCloseTimer();
 
-            mobileNav.setAttribute(
-              'data-expanded',
-              'true'
-            );
+              header.classList.remove(
+                'h-screen',
+                'expanded',
+                'bg-page'
+              );
 
-            syncMobileHeaderHeight();
+              document.body.classList.remove(
+                'overflow-hidden'
+              );
 
-            closeDesktopGroups();
-          };
+              toggleMenu?.classList.remove(
+                'expanded'
+              );
 
-        const finishMobileHeaderClose =
-          () => {
-            clearCloseTimer();
+              toggleMenu?.setAttribute(
+                'aria-expanded',
+                'false'
+              );
 
-            header.classList.remove(
-              'h-screen',
-              'expanded',
-              'bg-page'
-            );
+              if (mobileNav) {
+                mobileNav.classList.remove(
+                  'expanded'
+                );
 
-            document.body.classList.remove(
-              'overflow-hidden'
-            );
+                mobileNav.setAttribute(
+                  'data-expanded',
+                  'false'
+                );
+              }
 
-            toggleMenu?.classList.remove(
-              'expanded'
-            );
+              closeMobileGroups(
+                true
+              );
+            };
 
-            toggleMenu?.setAttribute(
-              'aria-expanded',
-              'false'
-            );
+          const setMobileHeaderClosing =
+            () => {
+              clearCloseTimer();
 
-            if (mobileNav) {
+              if (!mobileNav) {
+                finishMobileHeaderClose();
+                return;
+              }
+
+              toggleMenu?.classList.remove(
+                'expanded'
+              );
+
+              toggleMenu?.setAttribute(
+                'aria-expanded',
+                'false'
+              );
+
+              closeMobileGroups(
+                true
+              );
+
               mobileNav.classList.remove(
                 'expanded'
               );
@@ -1571,35 +1804,150 @@ const {
                 'data-expanded',
                 'false'
               );
-            }
 
-            closeMobileGroups(
-              true
-            );
-          };
+              closeTimer =
+                window.setTimeout(
+                  () => {
+                    finishMobileHeaderClose();
+                  },
+                  480
+                );
+            };
 
-        const setMobileHeaderClosing =
-          () => {
-            clearCloseTimer();
+          /* =================================================
+             Mobile transition
+          ================================================= */
 
-            if (!mobileNav) {
+          mobileNav?.addEventListener(
+            'transitionend',
+            (event) => {
+              if (
+                !(
+                  event instanceof
+                  TransitionEvent
+                )
+              ) {
+                return;
+              }
+
+              if (
+                event.propertyName !==
+                  'opacity' &&
+                event.propertyName !==
+                  'transform'
+              ) {
+                return;
+              }
+
+              if (
+                mobileNav.classList.contains(
+                  'expanded'
+                )
+              ) {
+                return;
+              }
+
               finishMobileHeaderClose();
-              return;
-            }
+            },
+            { signal }
+          );
 
-            toggleMenu?.classList.remove(
-              'expanded'
+          /* =================================================
+             Hamburger
+          ================================================= */
+
+          if (toggleMenu) {
+            toggleMenu.addEventListener(
+              'click',
+              (event) => {
+                event.preventDefault();
+
+                event.stopImmediatePropagation();
+
+                const expanded =
+                  toggleMenu.classList.contains(
+                    'expanded'
+                  );
+
+                if (expanded) {
+                  setMobileHeaderClosing();
+                } else {
+                  setMobileHeaderOpen();
+                }
+              },
+              {
+                signal,
+                capture: true,
+              }
+            );
+          }
+
+          /* =================================================
+             Mobile links
+          ================================================= */
+
+          header
+            .querySelectorAll<HTMLAnchorElement>(
+              '.hsdc-mobile-submenu a'
+            )
+            .forEach(
+              (link) => {
+                link.addEventListener(
+                  'click',
+                  () => {
+                    clearCloseTimer();
+                    finishMobileHeaderClose();
+                  },
+                  { signal }
+                );
+              }
             );
 
-            toggleMenu?.setAttribute(
-              'aria-expanded',
-              'false'
+          header
+            .querySelectorAll<HTMLAnchorElement>(
+              '.hsdc-mobile-home'
+            )
+            .forEach(
+              (link) => {
+                link.addEventListener(
+                  'click',
+                  () => {
+                    clearCloseTimer();
+                    finishMobileHeaderClose();
+                  },
+                  { signal }
+                );
+              }
             );
 
-            closeMobileGroups(
-              true
-            );
+          /* =================================================
+             Initial state
+          ================================================= */
 
+          closeDesktopGroups();
+
+          clearCloseTimer();
+
+          header.classList.remove(
+            'h-screen',
+            'expanded',
+            'bg-page'
+          );
+
+          document.body.classList.remove(
+            'overflow-hidden'
+          );
+
+          toggleMenu?.classList.remove(
+            'expanded'
+          );
+
+          toggleMenu?.setAttribute(
+            'aria-expanded',
+            'false'
+          );
+
+          if (mobileNav) {
             mobileNav.classList.remove(
               'expanded'
             );
@@ -1608,188 +1956,52 @@ const {
               'data-expanded',
               'false'
             );
+          }
 
-            closeTimer =
-              window.setTimeout(
-                () => {
-                  finishMobileHeaderClose();
-                },
-                480
-              );
-          };
+          closeMobileGroups(
+            true
+          );
 
-        mobileNav?.addEventListener(
-          'transitionend',
-          (event) => {
-            if (
-              !(
-                event instanceof
-                TransitionEvent
-              )
-            ) {
-              return;
-            }
+          /* =================================================
+             Breakpoint
+          ================================================= */
 
-            if (
-              event.propertyName !==
-                'opacity' &&
-              event.propertyName !==
-                'transform'
-            ) {
-              return;
-            }
+          const mediaQuery =
+            window.matchMedia(
+              '(min-width: 768px)'
+            );
 
-            if (
-              mobileNav.classList.contains(
-                'expanded'
-              )
-            ) {
-              return;
-            }
+          const handleMediaChange =
+            () => {
+              clearCloseTimer();
 
-            finishMobileHeaderClose();
-          },
-          { signal }
-        );
-
-        /* =====================================================
-           ToggleMenu
-        ===================================================== */
-
-        if (toggleMenu) {
-          toggleMenu.addEventListener(
-            'click',
-            (event) => {
-              event.preventDefault();
-
-              event.stopImmediatePropagation();
-
-              const expanded =
-                toggleMenu.classList.contains(
-                  'expanded'
-                );
-
-              if (expanded) {
-                setMobileHeaderClosing();
+              if (
+                mediaQuery.matches
+              ) {
+                finishMobileHeaderClose();
+                closeDesktopGroups();
               } else {
-                setMobileHeaderOpen();
+                closeDesktopGroups();
+                syncMobileHeaderHeight();
               }
-            },
-            {
-              signal,
-              capture: true,
-            }
+            };
+
+          mediaQuery.addEventListener(
+            'change',
+            handleMediaChange,
+            { signal }
           );
-        }
+        };
 
-        /* =====================================================
-           Mobile links
-        ===================================================== */
-
-        header
-          .querySelectorAll<HTMLAnchorElement>(
-            '.hsdc-mobile-submenu a'
-          )
-          .forEach((link) => {
-            link.addEventListener(
-              'click',
-              () => {
-                clearCloseTimer();
-                finishMobileHeaderClose();
-              },
-              { signal }
-            );
-          });
-
-        header
-          .querySelectorAll<HTMLAnchorElement>(
-            '.hsdc-mobile-home'
-          )
-          .forEach((link) => {
-            link.addEventListener(
-              'click',
-              () => {
-                clearCloseTimer();
-                finishMobileHeaderClose();
-              },
-              { signal }
-            );
-          });
-
-        /* =====================================================
-           初始状态
-        ===================================================== */
-
-        closeDesktopGroups();
-
-        clearCloseTimer();
-
-        header.classList.remove(
-          'h-screen',
-          'expanded',
-          'bg-page'
-        );
-
-        document.body.classList.remove(
-          'overflow-hidden'
-        );
-
-        toggleMenu?.classList.remove(
-          'expanded'
-        );
-
-        toggleMenu?.setAttribute(
-          'aria-expanded',
-          'false'
-        );
-
-        if (mobileNav) {
-          mobileNav.classList.remove(
-            'expanded'
-          );
-
-          mobileNav.setAttribute(
-            'data-expanded',
-            'false'
-          );
-        }
-
-        closeMobileGroups(
-          true
-        );
-
-        /* =====================================================
-           Breakpoint
-        ===================================================== */
-
-        const mediaQuery =
-          window.matchMedia(
-            '(min-width: 768px)'
-          );
-
-        const handleMediaChange =
-          () => {
-            clearCloseTimer();
-
-            if (
-              mediaQuery.matches
-            ) {
-              finishMobileHeaderClose();
-              closeDesktopGroups();
-            } else {
-              closeDesktopGroups();
-              syncMobileHeaderHeight();
-            }
-          };
-
-        mediaQuery.addEventListener(
-          'change',
-          handleMediaChange,
-          { signal }
-        );
-      };
+      /* =====================================================
+         Initial
+      ===================================================== */
 
       initHeader();
+
+      /* =====================================================
+         Astro View Transition
+      ===================================================== */
 
       document.addEventListener(
         'astro:after-swap',
