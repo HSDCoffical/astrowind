@@ -1,341 +1,700 @@
 ---
+import { Icon } from 'astro-icon/components';
+import Logo from '~/components/Logo.astro';
+import ToggleTheme from '~/components/common/ToggleTheme.astro';
+import ToggleMenu from '~/components/common/ToggleMenu.astro';
 import Button from '~/components/ui/Button.astro';
 
-import type { Hero as Props } from '~/types';
+import { getHomePermalink } from '~/utils/permalinks';
+import { trimSlash, getAsset } from '~/utils/permalinks';
+import type { CallToAction } from '~/types';
+
+interface Link {
+  text?: string;
+  href?: string;
+  ariaLabel?: string;
+  icon?: string;
+}
+
+interface MenuLink extends Link {
+  links?: Array<MenuLink>;
+}
+
+export interface Props {
+  id?: string;
+  links?: Array<MenuLink>;
+  actions?: Array<CallToAction>;
+  isSticky?: boolean;
+  isDark?: boolean;
+  isFullWidth?: boolean;
+  showToggleTheme?: boolean;
+  showRssFeed?: boolean;
+  position?: string;
+}
 
 const {
-  title = await Astro.slots.render('title'),
-  subtitle = await Astro.slots.render('subtitle'),
-  tagline,
-
-  content = await Astro.slots.render('content'),
-  actions = await Astro.slots.render('actions'),
-  image = await Astro.slots.render('image'),
-
-  id,
-  bg = await Astro.slots.render('bg'),
+  id = 'header',
+  links = [],
+  actions = [],
+  isSticky = false,
+  isDark = false,
+  isFullWidth = false,
+  showToggleTheme = false,
+  showRssFeed = false,
+  position = 'center',
 } = Astro.props;
 
-// 提取图片 URL
-let imageUrl = '';
-
-if (image) {
-  if (typeof image === 'object' && image.src) {
-    imageUrl = image.src;
-  } else if (typeof image === 'string') {
-    imageUrl = image;
-  }
-}
+const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 ---
 
-<section
-  data-home-hero
-  class="relative not-prose min-h-screen md:min-h-[100dvh] flex items-center pointer-events-none bg-black overflow-x-clip"
-  style="margin-top: 0;"
-  {...id ? { id } : {}}
+<header
+  id={id}
+  data-aw-sticky-header={isSticky ? true : undefined}
+  class="fixed top-0 left-0 right-0 z-40 w-full hsdc-header"
+  style="
+    background: rgb(0 0 0 / 40%) !important;
+    border-bottom: 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  "
 >
+  <style>
+    /* =========================================================
+       Header 基础
+    ========================================================= */
+
+    header#header {
+      /*
+       * 与 Hero 的 bg-black/40 保持一致。
+       * Header 本身就是顶部半透明黑色层。
+       */
+      background: rgb(0 0 0 / 40%) !important;
+
+      /*
+       * 彻底移除原来的浅色横线。
+       */
+      border-bottom: 0 !important;
+
+      /*
+       * 不使用毛玻璃，避免 Header 与 Hero
+       * 在连接处产生明显的亮线/色差。
+       */
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+
+      transition:
+        background-color 280ms ease,
+        border-color 280ms ease,
+        box-shadow 280ms ease;
+    }
+
+
+    /*
+     * Header 内部所有容器保持透明。
+     *
+     * 注意：
+     * 这里不能让内部元素重新出现白色背景，
+     * 否则会把半透明黑色遮罩切断。
+     */
+
+    header#header * {
+      background: transparent !important;
+    }
+
+
+    header#header .bg-white,
+    header#header .dark\:bg-gray-900,
+    header#header .bg-gray-100,
+    header#header .bg-gray-50,
+    header#header [class*="bg-"] {
+      background: transparent !important;
+    }
+
+
+    /* =========================================================
+       桌面端 Hover
+    ========================================================= */
+
+    @media (hover: hover) and (pointer: fine) {
+
+      header#header button:hover,
+      header#header a:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+      }
+
+
+      .dark header#header button:hover,
+      .dark header#header a:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+      }
+
+
+      header#header nav > ul > li > a,
+      header#header nav > ul > li > button {
+        transition:
+          color 180ms ease,
+          transform 180ms ease,
+          background-color 180ms ease;
+      }
+
+
+      header#header nav > ul > li > a:hover,
+      header#header nav > ul > li > button:hover {
+        transform: translateY(-1px);
+      }
+    }
+
+
+    /* =========================================================
+       Logo
+    ========================================================= */
+
+    header#header a[href="/"] {
+      transition:
+        transform 220ms ease,
+        opacity 220ms ease;
+    }
+
+
+    @media (hover: hover) and (pointer: fine) {
+
+      header#header a[href="/"]:hover {
+        transform: translateY(-1px);
+        opacity: 0.92;
+      }
+
+    }
+
+
+    /* =========================================================
+       手机端保持同样的半透明黑色
+    ========================================================= */
+
+    @media (max-width: 768px) {
+
+      header#header {
+        background: rgb(0 0 0 / 40%) !important;
+
+        border-bottom: 0 !important;
+
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+    }
+
+
+    /* =========================================================
+       手机端菜单动画
+    ========================================================= */
+
+    @media (max-width: 767px) {
+
+      header#header nav {
+        display: block !important;
+
+        width: 100%;
+
+        max-height: 0;
+
+        opacity: 0;
+
+        overflow: hidden;
+
+        transform: translateY(-8px);
+
+        visibility: hidden;
+
+        pointer-events: none;
+
+        transition:
+          max-height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.22s ease,
+          transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s linear 0.38s;
+      }
+
+
+      header#header nav.expanded,
+      header#header nav[data-expanded="true"],
+      header#header:has(.expanded) nav {
+
+        max-height: calc(100vh - 72px);
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+        visibility: visible;
+
+        pointer-events: auto;
+
+        overflow-y: auto;
+
+        transition:
+          max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.25s ease,
+          transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s linear 0s;
+      }
+
+
+      /* =====================================================
+         菜单列表
+      ====================================================== */
+
+      header#header nav > ul {
+        padding-top: 8px;
+        padding-bottom: 12px;
+      }
+
+
+      /* =====================================================
+         菜单项目初始状态
+      ====================================================== */
+
+      header#header nav > ul > li {
+
+        opacity: 0;
+
+        transform: translateY(-8px);
+
+        transition:
+          opacity 0.24s ease,
+          transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+
+      /* =====================================================
+         菜单打开
+      ====================================================== */
+
+      header#header:has(nav.expanded) nav > ul > li,
+      header#header:has(.expanded) nav > ul > li {
+
+        opacity: 1;
+
+        transform: translateY(0);
+      }
+
+
+      /* =====================================================
+         菜单依次进入
+      ====================================================== */
+
+      header#header:has(.expanded) nav > ul > li:nth-child(1) {
+        transition-delay: 0.04s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(2) {
+        transition-delay: 0.08s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(3) {
+        transition-delay: 0.12s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(4) {
+        transition-delay: 0.16s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(5) {
+        transition-delay: 0.20s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(6) {
+        transition-delay: 0.24s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(7) {
+        transition-delay: 0.28s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(8) {
+        transition-delay: 0.32s;
+      }
+
+
+      /* =====================================================
+         关闭菜单
+      ====================================================== */
+
+      header#header nav:not(.expanded) > ul > li {
+        transition-delay: 0s;
+      }
+
+
+      /* =====================================================
+         手机菜单文字
+      ====================================================== */
+
+      header#header nav > ul > li > a,
+      header#header nav > ul > li > button {
+
+        width: 100%;
+
+        box-sizing: border-box;
+
+        padding-top: 13px;
+        padding-bottom: 13px;
+
+        transition:
+          transform 160ms ease,
+          opacity 160ms ease;
+      }
+
+
+      /*
+       * 手指按下反馈
+       */
+
+      header#header nav > ul > li > a:active,
+      header#header nav > ul > li > button:active {
+
+        transform: scale(0.975);
+
+        opacity: 0.72;
+      }
+
+
+      /* =====================================================
+         手机菜单滚动条
+      ====================================================== */
+
+      header#header nav::-webkit-scrollbar {
+        width: 4px;
+      }
+
+
+      header#header nav::-webkit-scrollbar-track {
+        background: transparent !important;
+      }
+
+
+      header#header nav::-webkit-scrollbar-thumb {
+
+        background: rgba(100, 116, 139, 0.25);
+
+        border-radius: 999px;
+      }
+
+    }
+
+
+    /* =========================================================
+       手机主题按钮
+    ========================================================= */
+
+    .menu-theme-item {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 0.5rem;
+
+      padding: 0.75rem 1rem;
+
+      margin-top: 0.5rem;
+
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+
+    .dark .menu-theme-item {
+
+      border-top-color: rgba(255, 255, 255, 0.08);
+
+      color: #aaa;
+    }
+
+
+    @media (min-width: 768px) {
+
+      .menu-theme-item {
+        display: none !important;
+      }
+
+    }
+
+
+    /* =========================================================
+       Header 与 Hero 连接处
+    ========================================================= */
+
+    /*
+     * 防止任何浏览器默认边框、
+     * Tailwind border class 或主题样式重新产生横线。
+     */
+
+    header#header,
+    header#header::before,
+    header#header::after {
+
+      border-bottom: 0 !important;
+
+      box-shadow: none;
+    }
+
+
+    /*
+     * Header 底层背景层必须保持透明，
+     * 由 Header 本身统一提供 40% 黑色覆盖。
+     */
+
+    header#header > div.absolute {
+
+      background: transparent !important;
+
+      pointer-events: none;
+    }
+
+
+    /* =========================================================
+       减少动态效果
+    ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      header#header,
+      header#header nav,
+      header#header nav > ul > li,
+      header#header nav > ul > li > a,
+      header#header nav > ul > li > button {
+
+        transition: none !important;
+      }
+
+    }
+  </style>
+
+
   <!-- =====================================================
-       Hero 背景
-  ====================================================== -->
-
-  {imageUrl && (
-    <div
-      class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat hsdc-hero-background pointer-events-none"
-      style={`background-image: url('${imageUrl}');`}
-      aria-hidden="true"
-    ></div>
-  )}
-
-  <!-- =====================================================
-       黑色遮罩
-       保留原来的半透明黑色覆盖
-  ====================================================== -->
-
-  {imageUrl && (
-    <div
-      class="absolute inset-0 w-full h-full bg-black/40 hsdc-hero-overlay pointer-events-none"
-      aria-hidden="true"
-    ></div>
-  )}
-
-  <!-- =====================================================
-       背景插槽
+       Header 背景
   ====================================================== -->
 
   <div
     class="absolute inset-0 pointer-events-none"
-    aria-hidden="true"
-  >
-    <slot name="bg">
-      {bg ? <Fragment set:html={bg} /> : null}
-    </slot>
-  </div>
+    style="background: transparent !important;"
+  ></div>
 
-  <!-- =====================================================
-       Hero 内容
-  ====================================================== -->
 
   <div
-    class="relative max-w-7xl mx-auto px-4 sm:px-6 z-10 w-full pointer-events-auto hsdc-hero-content"
+    class:list={[
+      'relative text-default py-1.5 px-3 md:px-6 mx-auto w-full',
+      {
+        'md:flex md:justify-between': position !== 'center',
+      },
+      {
+        'md:grid md:grid-cols-3 md:items-center': position === 'center',
+      },
+      {
+        'max-w-7xl': !isFullWidth,
+      },
+    ]}
   >
+
+    <!-- =====================================================
+         Logo + 菜单按钮
+    ===================================================== -->
+
     <div
-      class="pt-0"
-      style="padding-top: 0;"
-    ></div>
+      class:list={[
+        {
+          'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right',
+        },
+        'flex justify-between',
+      ]}
+    >
 
-    <div class="pt-12 pb-28 md:py-20">
+      <a
+        class="flex items-center"
+        href={getHomePermalink()}
+      >
+        <Logo />
+      </a>
 
-      <div class="text-center pb-10 md:pb-16 max-w-5xl mx-auto">
 
-        <!-- =================================================
-             Tagline
-        ================================================== -->
+      <div class="flex items-center md:hidden">
+        <ToggleMenu />
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         导航菜单
+    ====================================================== -->
+
+    <nav
+      class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
+      aria-label="Main navigation"
+    >
+
+      <ul
+        class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
+      >
 
         {
-          tagline && (
-            <p
-              class="text-base text-secondary dark:text-blue-200 font-bold tracking-wide uppercase intersect-once intersect-quarter motion-safe:opacity-0 motion-safe:intersect:animate-fade hsdc-hero-item hsdc-hero-item-1"
-              set:html={tagline}
-            />
-          )
+          links.map(({ text, href, links }) => (
+            <li class={links?.length ? 'dropdown' : ''}>
+
+              {
+                links?.length ? (
+                  <>
+                    <button
+                      type="button"
+                      class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
+                    >
+                      {text}
+
+                      <Icon
+                        name="tabler:chevron-down"
+                        class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline"
+                      />
+                    </button>
+
+
+                    <ul
+                      class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl"
+                    >
+                      {
+                        links.map(
+                          ({
+                            text: text2,
+                            href: href2,
+                          }) => (
+                            <li>
+                              <a
+                                class:list={[
+                                  'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
+                                  {
+                                    'aw-link-active':
+                                      href2 === currentPath,
+                                  },
+                                ]}
+                                href={href2}
+                              >
+                                {text2}
+                              </a>
+                            </li>
+                          )
+                        )
+                      }
+                    </ul>
+                  </>
+                ) : (
+                  <a
+                    class:list={[
+                      'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
+                      {
+                        'aw-link-active':
+                          href === currentPath,
+                      },
+                    ]}
+                    href={href}
+                  >
+                    {text}
+                  </a>
+                )
+              }
+
+            </li>
+          ))
         }
 
 
-        <!-- =================================================
-             标题
-        ================================================== -->
+        <!-- ===================================================
+             手机主题切换
+        ==================================================== -->
 
+        <li class="menu-theme-item">
+
+          <ToggleTheme iconClass="w-5 h-5" />
+
+          <span class="text-sm">
+            切换主题
+          </span>
+
+        </li>
+
+      </ul>
+
+    </nav>
+
+
+    <!-- =====================================================
+         桌面端右侧功能
+    ====================================================== -->
+
+    <div
+      class:list={[
         {
-          title && (
-            <h1
-              class="text-5xl md:text-6xl font-bold leading-tighter tracking-tighter md:tracking-normal mb-4 font-heading text-white drop-shadow-lg intersect-once intersect-quarter motion-safe:opacity-0 motion-safe:intersect:animate-fade hsdc-hero-item hsdc-hero-item-2"
-              set:html={title}
-            />
-          )
-        }
+          'ml-auto rtl:ml-0 rtl:mr-auto':
+            position === 'left',
+        },
+        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
+      ]}
+    >
 
+      <div
+        class="items-center flex justify-between w-full md:w-auto"
+      >
 
-        <div class="max-w-3xl mx-auto">
-
-          <!-- ===============================================
-               Subtitle
-          ================================================ -->
+        <div class="flex">
 
           {
-            subtitle && (
-              <p
-                class="text-xl text-white/90 mb-6 dark:text-slate-200 intersect-once intersect-quarter motion-safe:opacity-0 motion-safe:intersect:animate-fade hsdc-hero-item hsdc-hero-item-3"
-                set:html={subtitle}
+            showToggleTheme && (
+              <ToggleTheme
+                iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block"
               />
             )
           }
 
 
-          <!-- ===============================================
-               Actions
-          ================================================ -->
-
           {
-            actions && (
-              <div
-                class="max-w-xs sm:max-w-md m-auto flex flex-nowrap flex-col sm:flex-row sm:justify-center gap-4 intersect-once intersect-quarter motion-safe:opacity-0 motion-safe:intersect:animate-fade hsdc-hero-item hsdc-hero-item-4"
+            showRssFeed && (
+              <a
+                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
+                aria-label="RSS Feed"
+                href={getAsset('/rss.xml')}
               >
-                {
-                  Array.isArray(actions) ? (
-                    actions.map((action) => (
-                      <div class="flex w-full sm:w-auto">
-                        <Button
-                          {...(action || {})}
-                          class="w-full sm:mb-0 hsdc-hero-button"
-                        />
-                      </div>
-                    ))
-                  ) : (
-                    <Fragment set:html={actions} />
-                  )
-                }
-              </div>
+                <Icon
+                  name="tabler:rss"
+                  class="w-5 h-5"
+                />
+              </a>
             )
           }
 
         </div>
 
 
-        <!-- =================================================
-             Content
-        ================================================== -->
+        {
+          actions?.length ? (
+            <span class="ml-4 rtl:ml-0 rtl:mr-4">
 
-        {content && (
-          <div class="hsdc-hero-extra">
-            <Fragment set:html={content} />
-          </div>
-        )}
+              {
+                actions.map((btnProps) => (
+                  <Button
+                    {...btnProps}
+                    class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto"
+                  />
+                ))
+              }
+
+            </span>
+          ) : (
+            ''
+          )
+        }
 
       </div>
 
     </div>
+
   </div>
-</section>
 
-
-<style>
-  /* =========================================================
-     Hero 背景
-     ========================================================= */
-
-  .hsdc-hero-background {
-    transform: scale(1.02);
-    transform-origin: center center;
-    will-change: transform;
-    animation: hsdcHeroZoom 18s ease-in-out infinite alternate;
-  }
-
-
-  /* =========================================================
-     Hero 黑色遮罩
-     ========================================================= */
-
-  .hsdc-hero-overlay {
-    transition: opacity 500ms ease;
-  }
-
-
-  /* =========================================================
-     Hero 内容
-     ========================================================= */
-
-  .hsdc-hero-item {
-    will-change: opacity, transform;
-  }
-
-
-  /*
-   * 不直接给 Hero 内容做持续动画。
-   * 只在进入视口时使用已有 Intersection 动画。
-   */
-
-  .hsdc-hero-item-1 {
-    animation-delay: 0ms;
-  }
-
-  .hsdc-hero-item-2 {
-    animation-delay: 90ms;
-  }
-
-  .hsdc-hero-item-3 {
-    animation-delay: 170ms;
-  }
-
-  .hsdc-hero-item-4 {
-    animation-delay: 260ms;
-  }
-
-
-  /* =========================================================
-     Hero 按钮
-     ========================================================= */
-
-  .hsdc-hero-button {
-    transition:
-      transform 220ms ease,
-      box-shadow 220ms ease,
-      filter 220ms ease;
-  }
-
-
-  @media (hover: hover) and (pointer: fine) {
-    .hsdc-hero-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgb(0 0 0 / 20%);
-      filter: brightness(1.03);
-    }
-  }
-
-
-  /* =========================================================
-     Hero 背景动画
-     ========================================================= */
-
-  @keyframes hsdcHeroZoom {
-    0% {
-      transform: scale(1.02);
-    }
-
-    100% {
-      transform: scale(1.055);
-    }
-  }
-
-
-  /* =========================================================
-     手机端
-     ========================================================= */
-
-  @media (max-width: 767px) {
-    section[data-home-hero] {
-      margin-top: 0 !important;
-      min-height: 100svh !important;
-
-      /*
-       * 防止手机浏览器横向回弹时把 Hero
-       * 拉出一个空白区域。
-       *
-       * 使用 clip 而不是 hidden，
-       * 避免创建新的滚动容器。
-       */
-      overflow-x: clip !important;
-    }
-
-
-    /*
-     * 手机端背景不做明显持续缩放。
-     * 保留非常轻微的视觉变化。
-     */
-
-    .hsdc-hero-background {
-      animation-duration: 28s;
-      transform: scale(1.015);
-    }
-
-
-    /*
-     * 手机按钮按下反馈
-     */
-
-    .hsdc-hero-button:active {
-      transform: scale(0.975);
-    }
-  }
-
-
-  /* =========================================================
-     桌面端
-     ========================================================= */
-
-  @media (min-width: 768px) {
-    section[data-home-hero] {
-      margin-top: -76px !important;
-      overflow-x: clip !important;
-    }
-
-    section[data-home-hero] > div.relative.max-w-7xl {
-      padding-top: 76px !important;
-    }
-  }
-
-
-  /* =========================================================
-     减少动态效果
-     ========================================================= */
-
-  @media (prefers-reduced-motion: reduce) {
-    .hsdc-hero-background {
-      animation: none !important;
-      transform: none !important;
-    }
-
-    .hsdc-hero-button {
-      transition: none !important;
-    }
-  }
-</style>
+</header>
