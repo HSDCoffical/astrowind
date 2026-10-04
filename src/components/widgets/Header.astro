@@ -707,16 +707,12 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     <div class="flex items-center justify-between w-full">
 
       <a
-        class="hsdc-brand"
-        href={getHomePermalink()}
-        aria-label="返回首页"
-      >
-        <Logo />
-
-        <span class="hsdc-brand-name">
-          凉宫数据开放平台
-        </span>
-      </a>
+  class="hsdc-brand"
+  href={getHomePermalink()}
+  aria-label="返回首页"
+>
+  <Logo />
+</a>
 
       <div class="flex items-center">
         <ToggleMenu />
