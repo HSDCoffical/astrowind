@@ -1,6 +1,5 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
-import { getPermalink } from '~/utils/permalinks';
 
 const metadata = {
   title: '人员介绍 | 凉宫数据',
@@ -13,8 +12,6 @@ const metadata = {
 //
 // 后续增加人员时，只需要在这里继续增加对象即可。
 // 不需要修改下面的页面结构。
-//
-// avatar 使用 GitHub Raw 地址。
 // =====================================================
 
 const people = [
@@ -22,8 +19,6 @@ const people = [
     name: '雪乡',
     position: '建设者',
     department: '凉宫数据',
-    avatar:
-      'https://raw.githubusercontent.com/HSDCoffical/astrowind/main/DataImage/IMG_20261004_143015.jpg',
     description:
       '负责凉宫数据整体建设、产品规划与互联网项目开发，持续探索技术与产品之间更自然的连接。',
   },
@@ -70,22 +65,6 @@ const people = [
                 ]}
               >
 
-                <!-- 人物照片 -->
-
-                <div class="team-photo-wrapper">
-                  <div class="team-photo">
-
-                    <img
-                      src={person.avatar}
-                      alt={`${person.name} - ${person.position}`}
-                      loading={index === 0 ? 'eager' : 'lazy'}
-                      decoding="async"
-                    />
-
-                  </div>
-                </div>
-
-
                 <!-- 人物信息 -->
 
                 <div class="team-info">
@@ -123,8 +102,11 @@ const people = [
       </div>
     </section>
 
+  </main>
+</Layout>
 
-    <!-- =================================================
+
+<style>
   /* =========================================================
      页面基础
   ========================================================= */
@@ -181,25 +163,6 @@ const people = [
   }
 
 
-  .team-hero p {
-    margin: 32px 0 0;
-
-    max-width: 650px;
-
-    font-size: clamp(
-      20px,
-      3vw,
-      30px
-    );
-
-    line-height: 1.45;
-
-    letter-spacing: -0.02em;
-
-    color: #6e6e73;
-  }
-
-
   /* =========================================================
      人员区域
   ========================================================= */
@@ -234,108 +197,9 @@ const people = [
 
 
   .team-person {
-    display: grid;
-
-    grid-template-columns:
-      minmax(0, 1.15fr)
-      minmax(340px, 0.85fr);
-
-    align-items: center;
-
-    gap: 90px;
-  }
-
-
-  .team-person-reverse {
-    grid-template-columns:
-      minmax(340px, 0.85fr)
-      minmax(0, 1.15fr);
-  }
-
-
-  .team-person-reverse .team-photo-wrapper {
-    order: 2;
-  }
-
-
-  .team-person-reverse .team-info {
-    order: 1;
-  }
-
-
-  /* =========================================================
-     人物图片
-  ========================================================= */
-
-  .team-photo-wrapper {
-    position: relative;
-  }
-
-
-  .team-photo {
-    position: relative;
-
-    overflow: hidden;
-
-    width: 100%;
-
-    aspect-ratio: 4 / 5;
-
-    background: #f5f5f7;
-
-    border-radius: 30px;
-
-    box-shadow:
-      0 25px 70px
-      rgb(0 0 0 / 12%);
-  }
-
-
-  .team-photo::after {
-    content: '';
-
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    background:
-      linear-gradient(
-        180deg,
-        rgb(255 255 255 / 0%) 65%,
-        rgb(0 0 0 / 8%) 100%
-      );
-  }
-
-
-  .team-photo img {
-    width: 100%;
-    height: 100%;
-
     display: block;
 
-    object-fit: cover;
-
-    object-position: center;
-
-    transition:
-      transform 700ms
-      cubic-bezier(
-        0.22,
-        1,
-        0.36,
-        1
-      );
-  }
-
-
-  @media (hover: hover) and (pointer: fine) {
-
-    .team-photo:hover img {
-      transform: scale(1.035);
-    }
-
+    width: 100%;
   }
 
 
@@ -344,7 +208,7 @@ const people = [
   ========================================================= */
 
   .team-info {
-    max-width: 470px;
+    max-width: 650px;
   }
 
 
@@ -422,90 +286,6 @@ const people = [
 
 
   /* =========================================================
-     底部
-  ========================================================= */
-
-  .team-closing {
-    padding:
-      150px
-      24px
-      170px;
-
-    background: #f5f5f7;
-  }
-
-
-  .team-closing-inner {
-    width: min(1200px, 100%);
-    margin: 0 auto;
-  }
-
-
-  .team-closing p {
-    margin: 0 0 24px;
-
-    font-size: 15px;
-
-    font-weight: 600;
-
-    letter-spacing: 0.08em;
-
-    color: #86868b;
-  }
-
-
-  .team-closing h2 {
-    margin: 0;
-
-    font-size: clamp(
-      42px,
-      7vw,
-      76px
-    );
-
-    line-height: 1.08;
-
-    letter-spacing: -0.05em;
-
-    font-weight: 700;
-  }
-
-
-  /* =========================================================
-     平板
-  ========================================================= */
-
-  @media (max-width: 900px) {
-
-    .team-person,
-    .team-person-reverse {
-      grid-template-columns: 1fr;
-
-      gap: 50px;
-    }
-
-
-    .team-person-reverse .team-photo-wrapper,
-    .team-person-reverse .team-info {
-      order: initial;
-    }
-
-
-    .team-info {
-      max-width: 650px;
-    }
-
-
-    .team-photo {
-      aspect-ratio: 16 / 11;
-
-      border-radius: 24px;
-    }
-
-  }
-
-
-  /* =========================================================
      手机
   ========================================================= */
 
@@ -528,13 +308,6 @@ const people = [
     }
 
 
-    .team-hero p {
-      margin-top: 24px;
-
-      font-size: 20px;
-    }
-
-
     .team-section {
       padding:
         80px
@@ -545,13 +318,6 @@ const people = [
 
     .team-list {
       gap: 90px;
-    }
-
-
-    .team-photo {
-      aspect-ratio: 4 / 5;
-
-      border-radius: 22px;
     }
 
 
@@ -571,19 +337,6 @@ const people = [
       line-height: 1.75;
     }
 
-
-    .team-closing {
-      padding:
-        90px
-        22px
-        110px;
-    }
-
-
-    .team-closing h2 {
-      font-size: 44px;
-    }
-
   }
 
 
@@ -593,8 +346,8 @@ const people = [
 
   @media (prefers-reduced-motion: reduce) {
 
-    .team-photo img {
-      transition: none;
+    .team-page {
+      scroll-behavior: auto;
     }
 
   }
