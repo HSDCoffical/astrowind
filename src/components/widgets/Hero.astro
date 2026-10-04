@@ -1,693 +1,165 @@
 ---
-import { Icon } from 'astro-icon/components';
-import Logo from '~/components/Logo.astro';
-import ToggleTheme from '~/components/common/ToggleTheme.astro';
-import ToggleMenu from '~/components/common/ToggleMenu.astro';
 import Button from '~/components/ui/Button.astro';
 
-import { getHomePermalink } from '~/utils/permalinks';
-import { trimSlash, getAsset } from '~/utils/permalinks';
-import type { CallToAction } from '~/types';
-
-interface Link {
-  text?: string;
-  href?: string;
-  ariaLabel?: string;
-  icon?: string;
-}
-
-interface MenuLink extends Link {
-  links?: Array<MenuLink>;
-}
-
-export interface Props {
-  id?: string;
-  links?: Array<MenuLink>;
-  actions?: Array<CallToAction>;
-  isSticky?: boolean;
-  isDark?: boolean;
-  isFullWidth?: boolean;
-  showToggleTheme?: boolean;
-  showRssFeed?: boolean;
-  position?: string;
-}
+import type { Hero as Props } from '~/types';
 
 const {
-  id = 'header',
-  links = [],
-  actions = [],
-  isSticky = false,
-  isDark = false,
-  isFullWidth = false,
-  showToggleTheme = false,
-  showRssFeed = false,
-  position = 'center',
+  title = await Astro.slots.render('title'),
+  subtitle = await Astro.slots.render('subtitle'),
+  tagline,
+  content = await Astro.slots.render('content'),
+  actions = await Astro.slots.render('actions'),
+  image = await Astro.slots.render('image'),
+  id,
+  bg = await Astro.slots.render('bg'),
 } = Astro.props;
 
-const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
+let imageUrl = '';
+
+if (image) {
+  if (typeof image === 'object' && image.src) {
+    imageUrl = image.src;
+  } else if (typeof image === 'string') {
+    imageUrl = image;
+  }
+}
 ---
 
-<header
-  id={id}
-  data-aw-sticky-header={isSticky ? true : undefined}
-  class="fixed top-0 left-0 right-0 z-40 w-full hsdc-header"
-  style="
-    background: rgb(0 0 0 / 40%) !important;
-    border-bottom: 0 !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  "
+<section
+  data-home-hero
+  class="relative not-prose min-h-screen md:min-h-[100dvh] flex items-center pointer-events-none bg-black overflow-hidden"
+  {...id ? { id } : {}}
 >
-  <style>
-    /* =========================================================
-       Header 基础
-    ========================================================= */
-
-    header#header {
-      /*
-       * 与 Hero 的 bg-black/40 保持一致。
-       * Header 本身就是顶部半透明黑色层。
-       */
-      background: rgb(0 0 0 / 40%) !important;
-
-      /*
-       * 彻底移除原来的浅色横线。
-       */
-      border-bottom: 0 !important;
-
-      /*
-       * 不使用毛玻璃，避免 Header 与 Hero
-       * 在连接处产生明显的亮线/色差。
-       */
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-
-      transition:
-        background-color 280ms ease,
-        border-color 280ms ease,
-        box-shadow 280ms ease;
-    }
-
-
-    /*
-     * Header 内部所有容器保持透明。
-     *
-     * 注意：
-     * 这里不能让内部元素重新出现白色背景，
-     * 否则会把半透明黑色遮罩切断。
-     */
-
-    header#header * {
-      background: transparent !important;
-    }
-
-
-    header#header .bg-white,
-    header#header .dark\:bg-gray-900,
-    header#header .bg-gray-100,
-    header#header .bg-gray-50,
-    header#header [class*="bg-"] {
-      background: transparent !important;
-    }
-
-
-    /* =========================================================
-       桌面端 Hover
-    ========================================================= */
-
-    @media (hover: hover) and (pointer: fine) {
-
-      header#header button:hover,
-      header#header a:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-      }
-
-
-      .dark header#header button:hover,
-      .dark header#header a:hover {
-        background: rgba(255, 255, 255, 0.05) !important;
-      }
-
-
-      header#header nav > ul > li > a,
-      header#header nav > ul > li > button {
-        transition:
-          color 180ms ease,
-          transform 180ms ease,
-          background-color 180ms ease;
-      }
-
-
-      header#header nav > ul > li > a:hover,
-      header#header nav > ul > li > button:hover {
-        transform: translateY(-1px);
-      }
-    }
-
-
-    /* =========================================================
-       Logo
-    ========================================================= */
-
-    header#header a[href="/"] {
-      transition:
-        transform 220ms ease,
-        opacity 220ms ease;
-    }
-
-
-    @media (hover: hover) and (pointer: fine) {
-
-      header#header a[href="/"]:hover {
-        transform: translateY(-1px);
-        opacity: 0.92;
-      }
-
-    }
-
-
-    /* =========================================================
-       手机端保持同样的半透明黑色
-    ========================================================= */
-
-    @media (max-width: 768px) {
-
-      header#header {
-        background: rgb(0 0 0 / 40%) !important;
-
-        border-bottom: 0 !important;
-
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-      }
-
-    }
-
-
-    /* =========================================================
-       手机端菜单动画
-    ========================================================= */
-
-    @media (max-width: 767px) {
-
-      header#header nav {
-        display: block !important;
-
-        width: 100%;
-
-        max-height: 0;
-
-        opacity: 0;
-
-        overflow: hidden;
-
-        transform: translateY(-8px);
-
-        visibility: hidden;
-
-        pointer-events: none;
-
-        transition:
-          max-height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-          opacity 0.22s ease,
-          transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-          visibility 0s linear 0.38s;
-      }
-
-
-      header#header nav.expanded,
-      header#header nav[data-expanded="true"],
-      header#header:has(.expanded) nav {
-
-        max-height: calc(100vh - 72px);
-
-        opacity: 1;
-
-        transform: translateY(0);
-
-        visibility: visible;
-
-        pointer-events: auto;
-
-        overflow-y: auto;
-
-        transition:
-          max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-          opacity 0.25s ease,
-          transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-          visibility 0s linear 0s;
-      }
-
-
-      /* =====================================================
-         菜单列表
-      ====================================================== */
-
-      header#header nav > ul {
-        padding-top: 8px;
-        padding-bottom: 12px;
-      }
-
-
-      /* =====================================================
-         菜单项目初始状态
-      ====================================================== */
-
-      header#header nav > ul > li {
-
-        opacity: 0;
-
-        transform: translateY(-8px);
-
-        transition:
-          opacity 0.24s ease,
-          transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-
-
-      /* =====================================================
-         菜单打开
-      ====================================================== */
-
-      header#header:has(nav.expanded) nav > ul > li,
-      header#header:has(.expanded) nav > ul > li {
-
-        opacity: 1;
-
-        transform: translateY(0);
-      }
-
-
-      /* =====================================================
-         菜单依次进入
-      ====================================================== */
-
-      header#header:has(.expanded) nav > ul > li:nth-child(1) {
-        transition-delay: 0.04s;
-      }
-
-      header#header:has(.expanded) nav > ul > li:nth-child(2) {
-        transition-delay: 0.08s;
-      }
-
-      header#header:has(.expanded) nav > ul > li:nth-child(3) {
-        transition-delay: 0.12s;
-      }
-
-      header#header:has(.expanded) nav > ul > li:nth-child(4) {
-        transition-delay: 0.16s;
-      }
-
-      header#header:has(.expanded) nav > ul > li:nth-child(5) {
-        transition-delay: 0.20s;
-      }
-
-      header#header:has(.expanded) nav > ul > li:nth-child(6) {
-        transition-delay: 0.24s;
-      }
-
-      header#header:has(.expanded) nav > ul > li:nth-child(7) {
-        transition-delay: 0.28s;
-      }
-
-      header#header:has(.expanded) nav > ul > li:nth-child(8) {
-        transition-delay: 0.32s;
-      }
-
-
-      /* =====================================================
-         关闭菜单
-      ====================================================== */
-
-      header#header nav:not(.expanded) > ul > li {
-        transition-delay: 0s;
-      }
-
-
-      /* =====================================================
-         手机菜单文字
-      ====================================================== */
-
-      header#header nav > ul > li > a,
-      header#header nav > ul > li > button {
-
-        width: 100%;
-
-        box-sizing: border-box;
-
-        padding-top: 13px;
-        padding-bottom: 13px;
-
-        transition:
-          transform 160ms ease,
-          opacity 160ms ease;
-      }
-
-
-      /*
-       * 手指按下反馈
-       */
-
-      header#header nav > ul > li > a:active,
-      header#header nav > ul > li > button:active {
-
-        transform: scale(0.975);
-
-        opacity: 0.72;
-      }
-
-
-      /* =====================================================
-         手机菜单滚动条
-      ====================================================== */
-
-      header#header nav::-webkit-scrollbar {
-        width: 4px;
-      }
-
-
-      header#header nav::-webkit-scrollbar-track {
-        background: transparent !important;
-      }
-
-
-      header#header nav::-webkit-scrollbar-thumb {
-
-        background: rgba(100, 116, 139, 0.25);
-
-        border-radius: 999px;
-      }
-
-    }
-
-
-    /* =========================================================
-       手机主题按钮
-    ========================================================= */
-
-    .menu-theme-item {
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 0.5rem;
-
-      padding: 0.75rem 1rem;
-
-      margin-top: 0.5rem;
-
-      border-top: 1px solid rgba(255, 255, 255, 0.12);
-
-      color: rgba(255, 255, 255, 0.78);
-    }
-
-
-    .dark .menu-theme-item {
-
-      border-top-color: rgba(255, 255, 255, 0.08);
-
-      color: #aaa;
-    }
-
-
-    @media (min-width: 768px) {
-
-      .menu-theme-item {
-        display: none !important;
-      }
-
-    }
-
-
-    /* =========================================================
-       Header 与 Hero 连接处
-    ========================================================= */
-
-    /*
-     * 防止任何浏览器默认边框、
-     * Tailwind border class 或主题样式重新产生横线。
-     */
-
-    header#header,
-    header#header::before,
-    header#header::after {
-
-      border-bottom: 0 !important;
-
-      box-shadow: none;
-    }
-
-
-    /*
-     * Header 底层背景层必须保持透明，
-     * 由 Header 本身统一提供 40% 黑色覆盖。
-     */
-
-    header#header > div.absolute {
-
-      background: transparent !important;
-
-      pointer-events: none;
-    }
-
-
-    /* =========================================================
-       减少动态效果
-    ========================================================= */
-
-    @media (prefers-reduced-motion: reduce) {
-
-      header#header,
-      header#header nav,
-      header#header nav > ul > li,
-      header#header nav > ul > li > a,
-      header#header nav > ul > li > button {
-
-        transition: none !important;
-      }
-
-    }
-  </style>
+  <!-- =====================================================
+       Hero 背景图片
+  ====================================================== -->
+
+  {imageUrl && (
+    <div
+      class="absolute inset-0 w-full h-full bg-cover bg-center hsdc-hero-image"
+      style={`background-image: url('${imageUrl}');`}
+      aria-hidden="true"
+    ></div>
+  )}
 
 
   <!-- =====================================================
-       Header 背景
+       Hero 半透明黑色覆盖层
+       
+       注意：
+       这里必须完整覆盖整个 Hero，
+       包括背景图片。
+  ====================================================== -->
+
+  {imageUrl && (
+    <div
+      class="absolute inset-0 w-full h-full bg-black/40 hsdc-hero-overlay"
+      aria-hidden="true"
+    ></div>
+  )}
+
+
+  <!-- =====================================================
+       自定义背景插槽
   ====================================================== -->
 
   <div
     class="absolute inset-0 pointer-events-none"
-    style="background: transparent !important;"
-  ></div>
+    aria-hidden="true"
+  >
+    <slot name="bg">
+      {bg ? <Fragment set:html={bg} /> : null}
+    </slot>
+  </div>
 
+
+  <!-- =====================================================
+       Hero 内容
+  ====================================================== -->
 
   <div
-    class:list={[
-      'relative text-default py-1.5 px-3 md:px-6 mx-auto w-full',
-      {
-        'md:flex md:justify-between': position !== 'center',
-      },
-      {
-        'md:grid md:grid-cols-3 md:items-center': position === 'center',
-      },
-      {
-        'max-w-7xl': !isFullWidth,
-      },
-    ]}
+    class="relative max-w-7xl mx-auto px-4 sm:px-6 z-10 w-full pointer-events-auto"
   >
 
-    <!-- =====================================================
-         Logo + 菜单按钮
-    ===================================================== -->
+    <div class="pt-12 pb-28 md:py-20">
 
-    <div
-      class:list={[
-        {
-          'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right',
-        },
-        'flex justify-between',
-      ]}
-    >
-
-      <a
-        class="flex items-center"
-        href={getHomePermalink()}
-      >
-        <Logo />
-      </a>
-
-
-      <div class="flex items-center md:hidden">
-        <ToggleMenu />
-      </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         导航菜单
-    ====================================================== -->
-
-    <nav
-      class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
-      aria-label="Main navigation"
-    >
-
-      <ul
-        class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
+      <div
+        class="text-center pb-10 md:pb-16 max-w-5xl mx-auto hsdc-hero-content"
       >
 
+        <!-- =================================================
+             Tagline
+        ================================================== -->
+
         {
-          links.map(({ text, href, links }) => (
-            <li class={links?.length ? 'dropdown' : ''}>
-
-              {
-                links?.length ? (
-                  <>
-                    <button
-                      type="button"
-                      class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
-                    >
-                      {text}
-
-                      <Icon
-                        name="tabler:chevron-down"
-                        class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline"
-                      />
-                    </button>
-
-
-                    <ul
-                      class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl"
-                    >
-                      {
-                        links.map(
-                          ({
-                            text: text2,
-                            href: href2,
-                          }) => (
-                            <li>
-                              <a
-                                class:list={[
-                                  'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
-                                  {
-                                    'aw-link-active':
-                                      href2 === currentPath,
-                                  },
-                                ]}
-                                href={href2}
-                              >
-                                {text2}
-                              </a>
-                            </li>
-                          )
-                        )
-                      }
-                    </ul>
-                  </>
-                ) : (
-                  <a
-                    class:list={[
-                      'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
-                      {
-                        'aw-link-active':
-                          href === currentPath,
-                      },
-                    ]}
-                    href={href}
-                  >
-                    {text}
-                  </a>
-                )
-              }
-
-            </li>
-          ))
+          tagline && (
+            <div
+              class="mb-4 text-base sm:text-lg md:text-xl font-semibold text-primary hsdc-hero-tagline"
+            >
+              {tagline}
+            </div>
+          )
         }
 
 
-        <!-- ===================================================
-             手机主题切换
-        ==================================================== -->
+        <!-- =================================================
+             标题
+        ================================================== -->
 
-        <li class="menu-theme-item">
-
-          <ToggleTheme iconClass="w-5 h-5" />
-
-          <span class="text-sm">
-            切换主题
-          </span>
-
-        </li>
-
-      </ul>
-
-    </nav>
-
-
-    <!-- =====================================================
-         桌面端右侧功能
-    ====================================================== -->
-
-    <div
-      class:list={[
         {
-          'ml-auto rtl:ml-0 rtl:mr-auto':
-            position === 'left',
-        },
-        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
-      ]}
-    >
+          title && (
+            <h1
+              class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white hsdc-hero-title"
+            >
+              <Fragment set:html={title} />
+            </h1>
+          )
+        }
 
-      <div
-        class="items-center flex justify-between w-full md:w-auto"
-      >
 
-        <div class="flex">
+        <!-- =================================================
+             副标题
+        ================================================== -->
+
+        <div class="max-w-3xl mx-auto">
 
           {
-            showToggleTheme && (
-              <ToggleTheme
-                iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block"
-              />
+            subtitle && (
+              <div
+                class="mt-6 text-xl sm:text-2xl md:text-3xl text-white/90 hsdc-hero-subtitle"
+              >
+                <Fragment set:html={subtitle} />
+              </div>
             )
           }
 
 
+          <!-- =================================================
+               操作按钮
+          ================================================== -->
+
           {
-            showRssFeed && (
-              <a
-                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
-                aria-label="RSS Feed"
-                href={getAsset('/rss.xml')}
+            actions && (
+              <div
+                class="mt-8 flex flex-wrap justify-center gap-4 hsdc-hero-actions"
               >
-                <Icon
-                  name="tabler:rss"
-                  class="w-5 h-5"
-                />
-              </a>
+                <Fragment set:html={actions} />
+              </div>
             )
           }
 
         </div>
 
 
+        <!-- =================================================
+             内容
+        ================================================== -->
+
         {
-          actions?.length ? (
-            <span class="ml-4 rtl:ml-0 rtl:mr-4">
-
-              {
-                actions.map((btnProps) => (
-                  <Button
-                    {...btnProps}
-                    class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto"
-                  />
-                ))
-              }
-
-            </span>
-          ) : (
-            ''
+          content && (
+            <div class="mt-8 hsdc-hero-extra">
+              <Fragment set:html={content} />
+            </div>
           )
         }
 
@@ -697,4 +169,302 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
   </div>
 
-</header>
+</section>
+
+
+<style>
+  /* =========================================================
+     Hero 基础
+  ========================================================= */
+
+  section[data-home-hero] {
+    isolation: isolate;
+  }
+
+
+  /* =========================================================
+     Hero 背景
+  ========================================================= */
+
+  .hsdc-hero-image {
+    z-index: 0;
+
+    transform: scale(1.015);
+
+    will-change: transform;
+
+    animation: hsdcHeroKenBurns 24s ease-in-out infinite alternate;
+  }
+
+
+  /* =========================================================
+     Hero 黑色遮罩
+  ========================================================= */
+
+  .hsdc-hero-overlay {
+    z-index: 1;
+
+    background: rgb(0 0 0 / 40%) !important;
+
+    pointer-events: none;
+  }
+
+
+  /* =========================================================
+     Hero 内容
+  ========================================================= */
+
+  .hsdc-hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+
+  /* =========================================================
+     Hero 入场动画
+  ========================================================= */
+
+  .hsdc-hero-tagline,
+  .hsdc-hero-title,
+  .hsdc-hero-subtitle,
+  .hsdc-hero-actions,
+  .hsdc-hero-extra {
+    opacity: 0;
+
+    transform: translate3d(0, 24px, 0);
+
+    animation:
+      hsdcHeroFadeUp
+      0.8s
+      cubic-bezier(0.22, 1, 0.36, 1)
+      forwards;
+  }
+
+
+  .hsdc-hero-tagline {
+    animation-delay: 80ms;
+  }
+
+
+  .hsdc-hero-title {
+    animation-delay: 160ms;
+  }
+
+
+  .hsdc-hero-subtitle {
+    animation-delay: 260ms;
+  }
+
+
+  .hsdc-hero-actions {
+    animation-delay: 360ms;
+  }
+
+
+  .hsdc-hero-extra {
+    animation-delay: 440ms;
+  }
+
+
+  /* =========================================================
+     Hero 按钮
+  ========================================================= */
+
+  .hsdc-hero-actions :global(a),
+  .hsdc-hero-actions :global(button) {
+    transition:
+      transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 220ms ease,
+      filter 220ms ease;
+  }
+
+
+  @media (hover: hover) and (pointer: fine) {
+
+    .hsdc-hero-actions :global(a:hover),
+    .hsdc-hero-actions :global(button:hover) {
+      transform: translateY(-3px);
+
+      box-shadow:
+        0 12px 30px rgb(0 0 0 / 18%);
+
+      filter: brightness(1.03);
+    }
+
+  }
+
+
+  /* =========================================================
+     手机按钮按压
+  ========================================================= */
+
+  @media (max-width: 767px) {
+
+    .hsdc-hero-actions :global(a:active),
+    .hsdc-hero-actions :global(button:active) {
+      transform: scale(0.975);
+    }
+
+  }
+
+
+  /* =========================================================
+     Ken Burns
+  ========================================================= */
+
+  @keyframes hsdcHeroKenBurns {
+
+    from {
+      transform: scale(1.015);
+    }
+
+    to {
+      transform: scale(1.055);
+    }
+
+  }
+
+
+  /* =========================================================
+     Fade Up
+  ========================================================= */
+
+  @keyframes hsdcHeroFadeUp {
+
+    from {
+      opacity: 0;
+
+      transform: translate3d(0, 24px, 0);
+    }
+
+    to {
+      opacity: 1;
+
+      transform: translate3d(0, 0, 0);
+    }
+
+  }
+
+
+  /* =========================================================
+     手机端
+     
+     手机不要让背景持续明显放大，
+     防止视觉抖动以及图片边缘出现空隙。
+  ========================================================= */
+
+  @media (max-width: 767px) {
+
+    section[data-home-hero] {
+      margin-top: 0 !important;
+
+      min-height: 100svh !important;
+    }
+
+
+    .hsdc-hero-image {
+      transform: scale(1.02);
+
+      animation:
+        hsdcHeroMobileKenBurns
+        36s
+        ease-in-out
+        infinite
+        alternate;
+    }
+
+
+    @keyframes hsdcHeroMobileKenBurns {
+
+      from {
+        transform: scale(1.02);
+      }
+
+      to {
+        transform: scale(1.035);
+      }
+
+    }
+
+
+    .hsdc-hero-content {
+      padding-top: 1rem;
+    }
+
+
+    .hsdc-hero-title {
+      font-size: clamp(
+        3rem,
+        13vw,
+        5rem
+      );
+
+      line-height: 1.08;
+    }
+
+
+    .hsdc-hero-subtitle {
+      font-size: clamp(
+        1.25rem,
+        5.5vw,
+        2rem
+      );
+
+      line-height: 1.5;
+    }
+
+  }
+
+
+  /* =========================================================
+     桌面端
+  ========================================================= */
+
+  @media (min-width: 768px) {
+
+    section[data-home-hero] {
+      margin-top: -76px !important;
+    }
+
+
+    section[data-home-hero]
+      > div.relative.max-w-7xl {
+      padding-top: 76px !important;
+    }
+
+  }
+
+
+  /* =========================================================
+     减少动态效果
+  ========================================================= */
+
+  @media (prefers-reduced-motion: reduce) {
+
+    .hsdc-hero-image {
+      animation: none !important;
+
+      transform: scale(1.02);
+    }
+
+
+    .hsdc-hero-tagline,
+    .hsdc-hero-title,
+    .hsdc-hero-subtitle,
+    .hsdc-hero-actions,
+    .hsdc-hero-extra {
+      opacity: 1 !important;
+
+      transform: none !important;
+
+      animation: none !important;
+    }
+
+
+    .hsdc-hero-actions :global(a),
+    .hsdc-hero-actions :global(button) {
+      transition: none !important;
+    }
+
+  }
+</style>
