@@ -80,7 +80,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 
     /* =========================================================
-       Logo
+       Logo / 品牌
     ========================================================= */
 
     .hsdc-brand {
@@ -88,6 +88,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       align-items: center;
       flex-shrink: 0;
       text-decoration: none;
+
       transition:
         transform 220ms ease,
         opacity 220ms ease;
@@ -100,15 +101,17 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
     .hsdc-brand-name {
       margin-left: 0.65rem;
+
       font-size: 0.95rem;
       font-weight: 600;
       letter-spacing: 0.01em;
+
       white-space: nowrap;
     }
 
 
     /* =========================================================
-       手机端整体
+       手机 / 桌面端基础显示
     ========================================================= */
 
     .hsdc-mobile-header {
@@ -121,7 +124,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 
     /* =========================================================
-       手机菜单
+       手机端
     ========================================================= */
 
     @media (max-width: 767px) {
@@ -139,13 +142,22 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: none !important;
       }
 
+
+      /* =====================================================
+         手机主菜单
+      ====================================================== */
+
       .hsdc-mobile-nav {
         display: block !important;
+
         width: 100%;
         max-height: 0;
+
         opacity: 0;
         overflow: hidden;
+
         transform: translateY(-8px);
+
         visibility: hidden;
         pointer-events: none;
 
@@ -160,10 +172,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       header#header .hsdc-mobile-nav[data-expanded="true"],
       header#header:has(.expanded) .hsdc-mobile-nav {
         max-height: calc(100vh - 72px);
+
         opacity: 1;
+
         transform: translateY(0);
+
         visibility: visible;
         pointer-events: auto;
+
         overflow-y: auto;
 
         transition:
@@ -185,6 +201,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
       .hsdc-mobile-group-item {
         opacity: 0;
+
         transform: translateY(-8px);
 
         transition:
@@ -211,7 +228,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 
       /* =====================================================
-         details / summary
+         手机 details / summary
       ====================================================== */
 
       .hsdc-mobile-group {
@@ -231,6 +248,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: flex;
         align-items: center;
         justify-content: space-between;
+
         width: 100%;
         box-sizing: border-box;
 
@@ -266,14 +284,16 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 
       /* =====================================================
-         二级菜单动画
+         手机二级菜单
       ====================================================== */
 
       .hsdc-mobile-submenu {
         display: grid;
+
         grid-template-rows: 0fr;
 
         opacity: 0;
+
         transform: translateY(-4px);
 
         transition:
@@ -284,7 +304,9 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
       .hsdc-mobile-group[open] .hsdc-mobile-submenu {
         grid-template-rows: 1fr;
+
         opacity: 1;
+
         transform: translateY(0);
       }
 
@@ -306,6 +328,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         padding: 10px 16px;
 
         font-size: 0.96rem;
+
         color: inherit;
 
         border-radius: 10px;
@@ -339,6 +362,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         margin-top: 0.5rem;
 
         border-top: 1px solid rgba(0, 0, 0, 0.06);
+
         color: #666;
       }
 
@@ -399,6 +423,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       .hsdc-desktop-groups {
         display: flex;
         align-items: center;
+
         gap: 2px;
       }
 
@@ -415,15 +440,18 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: flex;
         align-items: center;
         justify-content: center;
+
         gap: 0.28rem;
 
         min-height: 42px;
+
         padding: 0.55rem 0.85rem;
 
         border: 0;
         border-radius: 10px;
 
         color: inherit;
+
         font-size: 0.9375rem;
         font-weight: 500;
 
@@ -437,8 +465,10 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
 
       @media (hover: hover) and (pointer: fine) {
+
         .hsdc-desktop-group-trigger:hover {
           background: rgba(255, 255, 255, 0.1) !important;
+
           transform: translateY(-1px);
         }
 
@@ -507,6 +537,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         -webkit-backdrop-filter: blur(18px);
 
         opacity: 0;
+
         visibility: hidden;
         pointer-events: none;
 
@@ -535,6 +566,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       .hsdc-desktop-group.is-open
       .hsdc-desktop-dropdown {
         opacity: 1;
+
         visibility: visible;
         pointer-events: auto;
 
@@ -558,6 +590,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         align-items: center;
 
         min-height: 38px;
+
         padding: 0.45rem 0.8rem;
 
         border-radius: 8px;
@@ -574,8 +607,10 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       }
 
       @media (hover: hover) and (pointer: fine) {
+
         .hsdc-desktop-dropdown a:hover {
           background: rgba(100, 116, 139, 0.09) !important;
+
           transform: translateX(2px);
         }
 
@@ -586,6 +621,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
       .hsdc-desktop-dropdown a:active {
         transform: scale(0.975);
+
         opacity: 0.72;
       }
 
@@ -600,6 +636,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
       .hsdc-desktop-search-space {
         flex: 1 1 auto;
+
         min-width: 80px;
       }
 
@@ -622,6 +659,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
       ====================================================== */
 
       @media (prefers-reduced-motion: reduce) {
+
         .hsdc-desktop-group-trigger,
         .hsdc-desktop-chevron,
         .hsdc-desktop-dropdown,
@@ -680,7 +718,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         </span>
       </a>
 
-
       <div class="flex items-center">
         <ToggleMenu />
       </div>
@@ -712,7 +749,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
                     class="hsdc-mobile-group-chevron"
                   />
                 </summary>
-
 
                 <div class="hsdc-mobile-submenu">
                   <div class="hsdc-mobile-submenu-inner">
@@ -827,7 +863,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
               </button>
 
 
-              <!-- Windows 式小菜单 -->
+              <!-- Windows 式二级菜单 -->
 
               <div
                 class="hsdc-desktop-dropdown"
@@ -875,7 +911,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           )
         }
 
-
         {
           showRssFeed && (
             <a
@@ -890,7 +925,6 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
             </a>
           )
         }
-
 
         {
           actions?.length ? (
@@ -926,48 +960,107 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
       if (!header) return;
 
+      /*
+       * 防止 Astro 页面切换 / Header 重复初始化。
+       *
+       * 如果这个 Header 的脚本被执行两次，
+       * 原来的代码会给同一个按钮绑定两个 click listener：
+       *
+       * 第一个 listener：打开
+       * 第二个 listener：关闭
+       *
+       * 最终就会出现“第一次点击菜单立即收回”的问题。
+       */
+      if (header.dataset.hsdcNavigationInitialized === 'true') {
+        return;
+      }
+
+      header.dataset.hsdcNavigationInitialized = 'true';
+
+
       const groups = Array.from(
         header.querySelectorAll('.hsdc-desktop-group')
       );
+
+
+      /* =====================================================
+         关闭所有一级菜单
+      ====================================================== */
 
       const closeAllGroups = () => {
         groups.forEach((group) => {
           group.classList.remove('is-open');
 
           const button =
-            group.querySelector('.hsdc-desktop-group-trigger');
+            group.querySelector(
+              '.hsdc-desktop-group-trigger'
+            );
 
-          button?.setAttribute('aria-expanded', 'false');
+          button?.setAttribute(
+            'aria-expanded',
+            'false'
+          );
         });
       };
 
+
+      /* =====================================================
+         一级菜单点击
+      ====================================================== */
+
       groups.forEach((group) => {
+
         const button =
-          group.querySelector('.hsdc-desktop-group-trigger');
+          group.querySelector(
+            '.hsdc-desktop-group-trigger'
+          );
 
         if (!button) return;
 
+
         button.addEventListener('click', (event) => {
+
+          event.preventDefault();
           event.stopPropagation();
+
 
           const wasOpen =
             group.classList.contains('is-open');
 
+
+          /*
+           * 当前已经打开：
+           * 再点击一次 → 关闭
+           */
+          if (wasOpen) {
+            closeAllGroups();
+            return;
+          }
+
+
+          /*
+           * 当前没有打开：
+           * 先关闭其他菜单
+           * 再打开当前菜单
+           */
           closeAllGroups();
 
-          if (!wasOpen) {
-            group.classList.add('is-open');
-            button.setAttribute('aria-expanded', 'true');
-          }
+          group.classList.add('is-open');
+
+          button.setAttribute(
+            'aria-expanded',
+            'true'
+          );
         });
       });
 
 
-      /*
-       * 点击页面其他位置关闭
-       */
+      /* =====================================================
+         点击页面其他位置关闭
+      ====================================================== */
 
-      document.addEventListener('click', (event) => {
+      const handleDocumentClick = (event) => {
+
         const target = event.target;
 
         if (
@@ -978,28 +1071,42 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         }
 
         closeAllGroups();
-      });
+      };
+
+      document.addEventListener(
+        'click',
+        handleDocumentClick
+      );
 
 
-      /*
-       * ESC 关闭
-       */
+      /* =====================================================
+         ESC 关闭
+      ====================================================== */
 
-      document.addEventListener('keydown', (event) => {
+      const handleKeyDown = (event) => {
+
         if (event.key === 'Escape') {
           closeAllGroups();
         }
-      });
+      };
+
+      document.addEventListener(
+        'keydown',
+        handleKeyDown
+      );
 
 
-      /*
-       * 从桌面端切换到手机端时清理状态
-       */
+      /* =====================================================
+         桌面 → 手机
+      ====================================================== */
 
       const mediaQuery =
-        window.matchMedia('(min-width: 768px)');
+        window.matchMedia(
+          '(min-width: 768px)'
+        );
 
       const handleViewportChange = () => {
+
         if (!mediaQuery.matches) {
           closeAllGroups();
         }
@@ -1012,14 +1119,22 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     };
 
 
+    /*
+     * 初始化
+     */
+
     if (document.readyState === 'loading') {
+
       document.addEventListener(
         'DOMContentLoaded',
         initDesktopNavigation,
         { once: true }
       );
+
     } else {
+
       initDesktopNavigation();
+
     }
   </script>
 
