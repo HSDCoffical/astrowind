@@ -1,859 +1,594 @@
 ---
 import { Icon } from 'astro-icon/components';
 import Logo from '~/components/Logo.astro';
-import ToggleMenu from '~/components/common/ToggleMenu.astro';
 import ToggleTheme from '~/components/common/ToggleTheme.astro';
+import ToggleMenu from '~/components/common/ToggleMenu.astro';
+import Button from '~/components/ui/Button.astro';
+
 import { getHomePermalink } from '~/utils/permalinks';
+import { trimSlash, getAsset } from '~/utils/permalinks';
+import type { CallToAction } from '~/types';
+
+interface Link {
+  text?: string;
+  href?: string;
+  ariaLabel?: string;
+  icon?: string;
+}
+
+interface MenuLink extends Link {
+  links?: Array<MenuLink>;
+}
 
 export interface Props {
-  links?: Array<{
-    text?: string;
-    href?: string;
-    links?: Array<{
-      text?: string;
-      href?: string;
-      links?: Array<{
-        text?: string;
-        href?: string;
-      }>;
-    }>;
-  }>;
-  actions?: Array<{
-    text?: string;
-    href?: string;
-    icon?: string;
-  }>;
+  id?: string;
+  links?: Array<MenuLink>;
+  actions?: Array<CallToAction>;
   isSticky?: boolean;
   isDark?: boolean;
+  isFullWidth?: boolean;
   showToggleTheme?: boolean;
   showRssFeed?: boolean;
-  position?: 'left' | 'center' | 'right';
-  isFullWidth?: boolean;
+  position?: string;
 }
 
 const {
+  id = 'header',
   links = [],
   actions = [],
   isSticky = false,
   isDark = false,
-  showToggleTheme = true,
-  showRssFeed = false,
-  position = 'right',
   isFullWidth = false,
+  showToggleTheme = false,
+  showRssFeed = false,
+  position = 'center',
 } = Astro.props;
 
-const desktopFirstLinks = links.slice(0, 3);
-const desktopSecondLinks = links.slice(3);
+const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 ---
 
 <header
-  id="header"
-  class:list={[
-    'fixed top-0 z-40 w-full',
-    {
-      'sticky top-0': isSticky,
-    },
-  ]}
+  id={id}
+  data-aw-sticky-header={isSticky ? true : undefined}
+  class="fixed top-0 left-0 right-0 z-40 w-full border-b border-gray-200/30 dark:border-gray-700/30 hsdc-header"
+  style="background: transparent !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important;"
 >
-  <!-- ========================================================= -->
-  <!-- 手机端：独立保留原来的 Header，不参与电脑端布局 -->
-  <!-- ========================================================= -->
+  <style>
+    /* =========================================================
+       Header 基础
+    ========================================================= */
 
-  <div class="hsdc-mobile-header md:hidden">
+    header#header {
+      transition:
+        background-color 280ms ease,
+        border-color 280ms ease,
+        box-shadow 280ms ease;
+    }
+
+
+    header#header * {
+      background: transparent !important;
+    }
+
+
+    header#header .bg-white,
+    header#header .dark\:bg-gray-900,
+    header#header .bg-gray-100,
+    header#header .bg-gray-50,
+    header#header [class*="bg-"] {
+      background: transparent !important;
+    }
+
+
+    /* =========================================================
+       桌面端 Hover
+    ========================================================= */
+
+    @media (hover: hover) and (pointer: fine) {
+      header#header button:hover,
+      header#header a:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+      }
+
+      .dark header#header button:hover,
+      .dark header#header a:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+      }
+
+      header#header nav > ul > li > a,
+      header#header nav > ul > li > button {
+        transition:
+          color 180ms ease,
+          transform 180ms ease,
+          background-color 180ms ease;
+      }
+
+      header#header nav > ul > li > a:hover,
+      header#header nav > ul > li > button:hover {
+        transform: translateY(-1px);
+      }
+    }
+
+
+    /* =========================================================
+       Logo
+    ========================================================= */
+
+    header#header a[href="/"] {
+      transition:
+        transform 220ms ease,
+        opacity 220ms ease;
+    }
+
+
+    @media (hover: hover) and (pointer: fine) {
+      header#header a[href="/"]:hover {
+        transform: translateY(-1px);
+        opacity: 0.92;
+      }
+    }
+
+
+    /* =========================================================
+       手机端禁用毛玻璃
+    ========================================================= */
+
+    @media (max-width: 768px) {
+      header#header {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+    }
+
+
+    /* =========================================================
+       手机端菜单动画
+    ========================================================= */
+
+    @media (max-width: 767px) {
+
+      header#header nav {
+        display: block !important;
+
+        width: 100%;
+
+        max-height: 0;
+
+        opacity: 0;
+
+        overflow: hidden;
+
+        transform: translateY(-8px);
+
+        visibility: hidden;
+
+        pointer-events: none;
+
+        transition:
+          max-height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.22s ease,
+          transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s linear 0.38s;
+      }
+
+
+      header#header nav.expanded,
+      header#header nav[data-expanded="true"],
+      header#header:has(.expanded) nav {
+        max-height: calc(100vh - 72px);
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+        visibility: visible;
+
+        pointer-events: auto;
+
+        overflow-y: auto;
+
+        transition:
+          max-height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.25s ease,
+          transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s linear 0s;
+      }
+
+
+      /* =====================================================
+         菜单列表
+      ====================================================== */
+
+      header#header nav > ul {
+        padding-top: 8px;
+        padding-bottom: 12px;
+      }
+
+
+      /* =====================================================
+         菜单项目初始状态
+      ====================================================== */
+
+      header#header nav > ul > li {
+        opacity: 0;
+
+        transform: translateY(-8px);
+
+        transition:
+          opacity 0.24s ease,
+          transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+
+      /* =====================================================
+         菜单打开
+      ====================================================== */
+
+      header#header:has(nav.expanded) nav > ul > li,
+      header#header:has(.expanded) nav > ul > li {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+
+      /* =====================================================
+         菜单依次进入
+      ====================================================== */
+
+      header#header:has(.expanded) nav > ul > li:nth-child(1) {
+        transition-delay: 0.04s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(2) {
+        transition-delay: 0.08s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(3) {
+        transition-delay: 0.12s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(4) {
+        transition-delay: 0.16s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(5) {
+        transition-delay: 0.20s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(6) {
+        transition-delay: 0.24s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(7) {
+        transition-delay: 0.28s;
+      }
+
+      header#header:has(.expanded) nav > ul > li:nth-child(8) {
+        transition-delay: 0.32s;
+      }
+
+
+      /* =====================================================
+         关闭菜单
+      ====================================================== */
+
+      header#header nav:not(.expanded) > ul > li {
+        transition-delay: 0s;
+      }
+
+
+      /* =====================================================
+         手机菜单文字
+      ====================================================== */
+
+      header#header nav > ul > li > a,
+      header#header nav > ul > li > button {
+        width: 100%;
+
+        box-sizing: border-box;
+
+        padding-top: 13px;
+        padding-bottom: 13px;
+
+        transition:
+          transform 160ms ease,
+          opacity 160ms ease;
+      }
+
+
+      /*
+       * 手指按下反馈
+       */
+
+      header#header nav > ul > li > a:active,
+      header#header nav > ul > li > button:active {
+        transform: scale(0.975);
+        opacity: 0.72;
+      }
+
+
+      /* =====================================================
+         手机菜单滚动条
+      ====================================================== */
+
+      header#header nav::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      header#header nav::-webkit-scrollbar-track {
+        background: transparent !important;
+      }
+
+      header#header nav::-webkit-scrollbar-thumb {
+        background: rgba(100, 116, 139, 0.25);
+        border-radius: 999px;
+      }
+    }
+
+
+    /* =========================================================
+       手机主题按钮
+    ========================================================= */
+
+    .menu-theme-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      margin-top: 0.5rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      color: #666;
+    }
+
+    .dark .menu-theme-item {
+      border-top-color: rgba(255, 255, 255, 0.06);
+      color: #aaa;
+    }
+
+
+    @media (min-width: 768px) {
+      .menu-theme-item {
+        display: none !important;
+      }
+    }
+
+
+    /* =========================================================
+       减少动态效果
+    ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+      header#header,
+      header#header nav,
+      header#header nav > ul > li,
+      header#header nav > ul > li > a,
+      header#header nav > ul > li > button {
+        transition: none !important;
+      }
+    }
+  </style>
+
+
+  <!-- =====================================================
+       Header 背景
+  ====================================================== -->
+
+  <div
+    class="absolute inset-0"
+    style="background: transparent !important;"
+  ></div>
+
+
+  <div
+    class:list={[
+      'relative text-default py-1.5 px-3 md:px-6 mx-auto w-full',
+      {
+        'md:flex md:justify-between': position !== 'center',
+      },
+      {
+        'md:grid md:grid-cols-3 md:items-center': position === 'center',
+      },
+      {
+        'max-w-7xl': !isFullWidth,
+      },
+    ]}
+  >
+
+    <!-- =====================================================
+         Logo + 菜单按钮
+    ====================================================== -->
+
     <div
       class:list={[
-        'relative text-default py-1.5 px-3',
-        'mx-auto w-full',
         {
-          'max-w-7xl': !isFullWidth,
+          'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right',
         },
+        'flex justify-between',
       ]}
     >
-      <div class="flex items-center justify-between">
-        <!-- 手机端 Logo + 品牌名称 -->
-        <div class="flex items-center min-w-0">
-          <a
-            class="flex items-center shrink-0"
-            href={getHomePermalink()}
-            aria-label="凉宫数据"
-          >
-            <Logo />
-          </a>
 
-          <span class="hsdc-mobile-brand-name">
-            凉宫数据开放平台
-          </span>
-        </div>
+      <a
+        class="flex items-center"
+        href={getHomePermalink()}
+      >
+        <Logo />
+      </a>
 
-        <!-- 手机端原来的菜单按钮 -->
-        <div class="flex items-center">
-          <ToggleMenu />
-        </div>
+
+      <div class="flex items-center md:hidden">
+        <ToggleMenu />
       </div>
 
-      <!-- 手机端导航 -->
-      <nav
-        id="hsdc-mobile-nav"
-        aria-label="手机端主导航"
+    </div>
+
+
+    <!-- =====================================================
+         导航菜单
+    ====================================================== -->
+
+    <nav
+      class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
+      aria-label="Main navigation"
+    >
+
+      <ul
+        class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
       >
-        <ul class="flex flex-col gap-1 py-3">
-          {
-            links.map(({ text, href, links: childLinks }) => (
-              <li>
-                {childLinks && childLinks.length > 0 ? (
-                  <details>
-                    <summary class="hsdc-mobile-nav-link">
+
+        {
+          links.map(({ text, href, links }) => (
+            <li class={links?.length ? 'dropdown' : ''}>
+
+              {
+                links?.length ? (
+                  <>
+                    <button
+                      type="button"
+                      class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
+                    >
                       {text}
+
                       <Icon
                         name="tabler:chevron-down"
-                        class="h-4 w-4 shrink-0"
+                        class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline"
                       />
-                    </summary>
+                    </button>
 
-                    <ul class="pl-4 pt-1">
-                      {childLinks.map((child) => (
-                        <li>
-                          <a
-                            href={child.href}
-                            class="hsdc-mobile-nav-link"
-                          >
-                            {child.text}
-                          </a>
-                        </li>
-                      ))}
+
+                    <ul
+                      class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl"
+                    >
+                      {
+                        links.map(
+                          ({
+                            text: text2,
+                            href: href2,
+                          }) => (
+                            <li>
+                              <a
+                                class:list={[
+                                  'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
+                                  {
+                                    'aw-link-active':
+                                      href2 === currentPath,
+                                  },
+                                ]}
+                                href={href2}
+                              >
+                                {text2}
+                              </a>
+                            </li>
+                          )
+                        )
+                      }
                     </ul>
-                  </details>
+                  </>
                 ) : (
                   <a
+                    class:list={[
+                      'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
+                      {
+                        'aw-link-active':
+                          href === currentPath,
+                      },
+                    ]}
                     href={href}
-                    class="hsdc-mobile-nav-link"
                   >
                     {text}
                   </a>
-                )}
-              </li>
-            ))
-          }
+                )
+              }
+
+            </li>
+          ))
+        }
+
+
+        <!-- ===================================================
+             手机主题切换
+        ==================================================== -->
+
+        <li class="menu-theme-item">
+          <ToggleTheme iconClass="w-5 h-5" />
+
+          <span class="text-sm">
+            切换主题
+          </span>
+        </li>
+
+      </ul>
+
+    </nav>
+
+
+    <!-- =====================================================
+         桌面端右侧功能
+    ====================================================== -->
+
+    <div
+      class:list={[
+        {
+          'ml-auto rtl:ml-0 rtl:mr-auto':
+            position === 'left',
+        },
+        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
+      ]}
+    >
+
+      <div
+        class="items-center flex justify-between w-full md:w-auto"
+      >
+
+        <div class="flex">
 
           {
             showToggleTheme && (
-              <li class="hsdc-mobile-theme">
-                <ToggleTheme />
-              </li>
+              <ToggleTheme
+                iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block"
+              />
             )
           }
+
 
           {
             showRssFeed && (
-              <li>
-                <a
-                  href="/rss.xml"
-                  class="hsdc-mobile-nav-link"
-                >
-                  RSS
-                </a>
-              </li>
+              <a
+                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
+                aria-label="RSS Feed"
+                href={getAsset('/rss.xml')}
+              >
+                <Icon
+                  name="tabler:rss"
+                  class="w-5 h-5"
+                />
+              </a>
             )
           }
 
-          {
-            actions.map((action) => (
-              <li>
-                <a
-                  href={action.href}
-                  class="hsdc-mobile-nav-link"
-                >
-                  {action.icon && (
-                    <Icon
-                      name={action.icon}
-                      class="h-4 w-4"
-                    />
-                  )}
-                  {action.text}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-    </div>
-  </div>
-
-  <!-- ========================================================= -->
-  <!-- 电脑端：完全独立的一套 Header -->
-  <!-- ========================================================= -->
-
-  <div class="hsdc-desktop-header hidden md:block">
-    <div
-      class:list={[
-        'hsdc-desktop-inner',
-        {
-          'max-w-7xl': !isFullWidth,
-        },
-      ]}
-    >
-      <!-- Logo + 品牌 -->
-      <div class="hsdc-desktop-brand">
-        <a
-          href={getHomePermalink()}
-          class="hsdc-desktop-logo"
-          aria-label="凉宫数据"
-        >
-          <Logo />
-        </a>
-
-        <span class="hsdc-desktop-brand-name">
-          凉宫数据开放平台
-        </span>
-      </div>
-
-      <!-- 搜索框预留区域 -->
-      <div
-        class="hsdc-desktop-search-placeholder"
-        aria-hidden="true"
-      ></div>
-
-      <!-- ===================================================== -->
-      <!-- 电脑端导航 -->
-      <!-- ===================================================== -->
-
-      <div class="hsdc-desktop-navigation">
-        <!-- 第一页 -->
-        <div
-          id="hsdc-desktop-page-one"
-          class="hsdc-nav-page is-active"
-        >
-          {
-            desktopFirstLinks.map(({ text, href }) => (
-              <a
-                href={href}
-                class="hsdc-desktop-nav-link"
-              >
-                {text}
-              </a>
-            ))
-          }
         </div>
 
-        <!-- 第二页 -->
-        <div
-          id="hsdc-desktop-page-two"
-          class="hsdc-nav-page"
-          aria-hidden="true"
-        >
-          {
-            desktopSecondLinks.map(({ text, href }) => (
-              <a
-                href={href}
-                class="hsdc-desktop-nav-link"
-              >
-                {text}
-              </a>
-            ))
-          }
-        </div>
-      </div>
-
-      <!-- ===================================================== -->
-      <!-- 左右切换 + 主题 -->
-      <!-- ===================================================== -->
-
-      <div class="hsdc-desktop-actions">
-        <button
-          id="hsdc-desktop-nav-switch"
-          type="button"
-          class="hsdc-nav-switch"
-          aria-label="切换导航"
-          aria-expanded="false"
-        >
-          <Icon
-            id="hsdc-arrow-right"
-            name="tabler:chevron-right"
-            class="h-5 w-5"
-          />
-
-          <Icon
-            id="hsdc-arrow-left"
-            name="tabler:chevron-left"
-            class="hsdc-arrow-hidden h-5 w-5"
-          />
-        </button>
 
         {
-          showToggleTheme && (
-            <div class="hsdc-desktop-theme">
-              <ToggleTheme />
-            </div>
+          actions?.length ? (
+            <span class="ml-4 rtl:ml-0 rtl:mr-4">
+              {
+                actions.map((btnProps) => (
+                  <Button
+                    {...btnProps}
+                    class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto"
+                  />
+                ))
+              }
+            </span>
+          ) : (
+            ''
           )
         }
 
-        {
-          showRssFeed && (
-            <a
-              href="/rss.xml"
-              class="hsdc-desktop-rss"
-              aria-label="RSS"
-            >
-              <Icon
-                name="tabler:rss"
-                class="h-5 w-5"
-              />
-            </a>
-          )
-        }
       </div>
+
     </div>
+
   </div>
+
 </header>
-
-<style>
-  /* ========================================================= */
-  /* 全局 Header 基础 */
-  /* ========================================================= */
-
-  header#header {
-    width: 100%;
-    background: transparent;
-  }
-
-  header#header * {
-    box-sizing: border-box;
-  }
-
-  /* ========================================================= */
-  /* 手机端 */
-  /* ========================================================= */
-
-  .hsdc-mobile-header {
-    width: 100%;
-    background: transparent;
-  }
-
-  .hsdc-mobile-brand-name {
-    margin-left: 10px;
-    white-space: nowrap;
-    font-size: 0.92rem;
-    font-weight: 600;
-    letter-spacing: -0.015em;
-    color: var(--aw-color-text-default, currentColor);
-  }
-
-  .hsdc-mobile-nav-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-
-    width: 100%;
-    min-height: 44px;
-
-    padding: 10px 12px;
-
-    border-radius: 12px;
-
-    color: inherit;
-    text-decoration: none;
-
-    transition:
-      background-color 0.2s ease,
-      transform 0.2s ease;
-  }
-
-  .hsdc-mobile-nav-link:hover {
-    background: rgba(127, 127, 127, 0.08);
-  }
-
-  .hsdc-mobile-nav-link:active {
-    transform: scale(0.98);
-  }
-
-  .hsdc-mobile-theme {
-    display: flex;
-    align-items: center;
-    min-height: 44px;
-    padding: 8px 12px;
-  }
-
-  /*
-   * 手机端菜单默认隐藏。
-   * ToggleMenu 原有逻辑会给 Header / nav 添加 expanded 状态。
-   */
-  @media (max-width: 767px) {
-    #hsdc-mobile-nav {
-      display: block !important;
-      width: 100%;
-
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-
-      transform: translateY(-8px);
-
-      visibility: hidden;
-      pointer-events: none;
-
-      transition:
-        max-height 0.35s ease,
-        opacity 0.25s ease,
-        transform 0.3s ease,
-        visibility 0.35s ease;
-    }
-
-    header#header:has(.expanded) #hsdc-mobile-nav,
-    header#header:has([aria-expanded='true']) #hsdc-mobile-nav,
-    #hsdc-mobile-nav.expanded,
-    #hsdc-mobile-nav[data-expanded='true'] {
-      max-height: calc(100vh - 72px);
-
-      opacity: 1;
-      overflow-y: auto;
-
-      transform: translateY(0);
-
-      visibility: visible;
-      pointer-events: auto;
-    }
-  }
-
-  /* ========================================================= */
-  /* 电脑端 Header */
-  /* ========================================================= */
-
-  .hsdc-desktop-header {
-    width: 100%;
-
-    background:
-      linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0.82),
-        rgba(255, 255, 255, 0.62)
-      );
-
-    border-bottom: 1px solid rgba(100, 116, 139, 0.08);
-
-    backdrop-filter: blur(18px) saturate(140%);
-    -webkit-backdrop-filter: blur(18px) saturate(140%);
-  }
-
-  .dark .hsdc-desktop-header {
-    background:
-      linear-gradient(
-        to bottom,
-        rgba(15, 23, 42, 0.78),
-        rgba(15, 23, 42, 0.58)
-      );
-
-    border-bottom-color: rgba(148, 163, 184, 0.08);
-  }
-
-  .hsdc-desktop-inner {
-    width: 100%;
-    min-height: 64px;
-
-    margin: 0 auto;
-    padding: 0 24px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 0;
-  }
-
-  /* ========================================================= */
-  /* Logo + 品牌 */
-  /* ========================================================= */
-
-  .hsdc-desktop-brand {
-    display: flex;
-    align-items: center;
-
-    flex: 0 0 auto;
-
-    white-space: nowrap;
-  }
-
-  .hsdc-desktop-logo {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-
-    text-decoration: none;
-  }
-
-  .hsdc-desktop-brand-name {
-    margin-left: 12px;
-
-    font-size: 0.95rem;
-    font-weight: 650;
-
-    letter-spacing: -0.02em;
-
-    color: var(--aw-color-text-default, currentColor);
-
-    white-space: nowrap;
-  }
-
-  /* ========================================================= */
-  /* 搜索框预留空间 */
-  /* ========================================================= */
-
-  .hsdc-desktop-search-placeholder {
-    /*
-     * 这里现在故意不放搜索框。
-     * 以后真正做站内搜索时，直接替换这个区域即可。
-     */
-    flex: 1 1 auto;
-
-    min-width: 40px;
-    max-width: 240px;
-
-    height: 40px;
-
-    margin-left: 28px;
-    margin-right: 24px;
-  }
-
-  /* ========================================================= */
-  /* 电脑端导航容器 */
-  /* ========================================================= */
-
-  .hsdc-desktop-navigation {
-    position: relative;
-
-    display: flex;
-    align-items: center;
-
-    flex: 0 0 auto;
-
-    min-width: 0;
-
-    height: 42px;
-  }
-
-  .hsdc-nav-page {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-
-    white-space: nowrap;
-
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-
-    transform: translateX(8px);
-
-    transition:
-      opacity 0.22s ease,
-      transform 0.28s ease,
-      visibility 0.22s ease;
-  }
-
-  .hsdc-nav-page.is-active {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-
-    transform: translateX(0);
-  }
-
-  #hsdc-desktop-page-two {
-    position: absolute;
-    right: 0;
-    top: 50%;
-
-    transform: translate(8px, -50%);
-  }
-
-  #hsdc-desktop-page-two.is-active {
-    transform: translate(0, -50%);
-  }
-
-  .hsdc-desktop-nav-link {
-    position: relative;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    min-height: 38px;
-
-    padding: 0 11px;
-
-    border-radius: 10px;
-
-    color: inherit;
-    text-decoration: none;
-
-    font-size: 0.86rem;
-    font-weight: 500;
-
-    white-space: nowrap;
-
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease,
-      transform 0.2s ease;
-  }
-
-  .hsdc-desktop-nav-link:hover {
-    background: rgba(127, 127, 127, 0.08);
-  }
-
-  .hsdc-desktop-nav-link:active {
-    transform: scale(0.96);
-  }
-
-  /* ========================================================= */
-  /* 右侧操作区 */
-  /* ========================================================= */
-
-  .hsdc-desktop-actions {
-    display: flex;
-    align-items: center;
-
-    flex: 0 0 auto;
-
-    margin-left: 7px;
-  }
-
-  .hsdc-nav-switch,
-  .hsdc-desktop-rss {
-    width: 38px;
-    height: 38px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;
-
-    border: 0;
-    border-radius: 10px;
-
-    background: transparent;
-
-    color: inherit;
-
-    cursor: pointer;
-
-    transition:
-      background-color 0.2s ease,
-      transform 0.2s ease;
-  }
-
-  .hsdc-nav-switch:hover,
-  .hsdc-desktop-rss:hover {
-    background: rgba(127, 127, 127, 0.08);
-  }
-
-  .hsdc-nav-switch:active,
-  .hsdc-desktop-rss:active {
-    transform: scale(0.88);
-  }
-
-  .hsdc-desktop-theme {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    margin-left: 3px;
-  }
-
-  .hsdc-arrow-hidden {
-    display: none;
-  }
-
-  /* ========================================================= */
-  /* 导航切换动画 */
-  /* ========================================================= */
-
-  .hsdc-nav-page.is-leaving {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-
-  .hsdc-nav-page.is-entering {
-    opacity: 0;
-    transform: translateX(8px);
-  }
-
-  /* ========================================================= */
-  /* 深色模式 */
-  /* ========================================================= */
-
-  .dark .hsdc-desktop-nav-link:hover,
-  .dark .hsdc-nav-switch:hover,
-  .dark .hsdc-desktop-rss:hover {
-    background: rgba(255, 255, 255, 0.07);
-  }
-
-  /* ========================================================= */
-  /* 桌面端较窄屏幕优化 */
-  /* ========================================================= */
-
-  @media (min-width: 768px) and (max-width: 1100px) {
-    .hsdc-desktop-inner {
-      padding-left: 16px;
-      padding-right: 16px;
-    }
-
-    .hsdc-desktop-brand-name {
-      font-size: 0.86rem;
-    }
-
-    .hsdc-desktop-search-placeholder {
-      min-width: 20px;
-      max-width: 100px;
-
-      margin-left: 16px;
-      margin-right: 12px;
-    }
-
-    .hsdc-desktop-nav-link {
-      padding-left: 7px;
-      padding-right: 7px;
-
-      font-size: 0.8rem;
-    }
-
-    .hsdc-nav-switch {
-      width: 34px;
-    }
-  }
-
-  /* ========================================================= */
-  /* 手机端绝不显示电脑端 */
-  /* ========================================================= */
-
-  @media (max-width: 767px) {
-    .hsdc-desktop-header {
-      display: none !important;
-    }
-
-    .hsdc-mobile-header {
-      display: block !important;
-    }
-  }
-
-  /* ========================================================= */
-  /* 电脑端绝不显示手机端 */
-  /* ========================================================= */
-
-  @media (min-width: 768px) {
-    .hsdc-mobile-header {
-      display: none !important;
-    }
-
-    .hsdc-desktop-header {
-      display: block !important;
-    }
-  }
-
-  /* ========================================================= */
-  /* 减少动态效果 */
-  /* ========================================================= */
-
-  @media (prefers-reduced-motion: reduce) {
-    .hsdc-nav-page,
-    .hsdc-nav-link,
-    .hsdc-nav-switch,
-    .hsdc-desktop-nav-link,
-    #hsdc-mobile-nav {
-      transition: none !important;
-    }
-  }
-</style>
-
-<script>
-  function initHSDCDesktopHeader() {
-    const switchButton = document.querySelector<HTMLButtonElement>(
-      '#hsdc-desktop-nav-switch'
-    );
-
-    const pageOne = document.querySelector<HTMLElement>(
-      '#hsdc-desktop-page-one'
-    );
-
-    const pageTwo = document.querySelector<HTMLElement>(
-      '#hsdc-desktop-page-two'
-    );
-
-    const arrowRight = document.querySelector<HTMLElement>(
-      '#hsdc-arrow-right'
-    );
-
-    const arrowLeft = document.querySelector<HTMLElement>(
-      '#hsdc-arrow-left'
-    );
-
-    if (
-      !switchButton ||
-      !pageOne ||
-      !pageTwo ||
-      !arrowRight ||
-      !arrowLeft
-    ) {
-      return;
-    }
-
-    /*
-     * 防止 Astro 页面切换 / 重复初始化时
-     * 绑定多个 click 事件。
-     */
-    if (switchButton.dataset.initialized === 'true') {
-      return;
-    }
-
-    switchButton.dataset.initialized = 'true';
-
-    let secondPage = false;
-
-    switchButton.addEventListener('click', () => {
-      secondPage = !secondPage;
-
-      if (secondPage) {
-        pageOne.classList.remove('is-active');
-        pageOne.classList.add('is-leaving');
-
-        pageTwo.classList.add('is-entering');
-
-        window.setTimeout(() => {
-          pageTwo.classList.add('is-active');
-          pageTwo.classList.remove('is-entering');
-
-          pageOne.classList.remove('is-leaving');
-        }, 90);
-
-        arrowRight.classList.add('hsdc-arrow-hidden');
-        arrowLeft.classList.remove('hsdc-arrow-hidden');
-
-        switchButton.setAttribute('aria-expanded', 'true');
-      } else {
-        pageTwo.classList.remove('is-active');
-        pageTwo.classList.add('is-leaving');
-
-        pageOne.classList.add('is-entering');
-
-        window.setTimeout(() => {
-          pageOne.classList.add('is-active');
-          pageOne.classList.remove('is-entering');
-
-          pageTwo.classList.remove('is-leaving');
-        }, 90);
-
-        arrowLeft.classList.add('hsdc-arrow-hidden');
-        arrowRight.classList.remove('hsdc-arrow-hidden');
-
-        switchButton.setAttribute('aria-expanded', 'false');
-      }
-    });
-  }
-
-  initHSDCDesktopHeader();
-
-  document.addEventListener(
-    'astro:after-swap',
-    initHSDCDesktopHeader
-  );
-</script>
