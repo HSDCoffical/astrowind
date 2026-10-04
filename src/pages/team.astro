@@ -1,723 +1,150 @@
 ---
-import Layout from '~/layouts/PageLayout.astro';
-import { getPermalink } from '~/utils/permalinks';
-
-const metadata = {
-  title: '人员介绍 | 凉宫数据',
-  description: '了解凉宫数据的团队成员与建设者。',
-};
-
-// =====================================================
-// 人员资料
-// =====================================================
-//
-// 后续增加人员时，只需要在这里继续增加对象即可。
-// 不需要修改下面的页面结构。
-//
-// avatar 使用 GitHub Raw 地址。
-// =====================================================
+import PageLayout from '~/layouts/PageLayout.astro';
 
 const people = [
   {
     name: '雪乡',
-    position: '中央行政管理员',
-    department: '凉宫数据',
-    description:
-      '负责凉宫数据整体建设、产品规划与互联网项目开发，持续探索技术与产品之间更自然的连接。',
+    position: '建设者',
   },
+
+  // 后续增加人员直接复制：
+  // {
+  //   name: '姓名',
+  //   position: '职位',
+  // },
 ];
+
+const metadata = {
+  title: '人员介绍 | 凉宫数据',
+  description: '凉宫数据人员介绍',
+};
 ---
 
-<Layout metadata={metadata}>
+<PageLayout metadata={metadata}>
   <main class="team-page">
+    <section class="team-container">
+      <header class="team-header">
+        <h1>人员介绍</h1>
+      </header>
 
-    <!-- =================================================
-         顶部 Hero
-    ================================================== -->
-
-    <section class="team-hero">
-      <div class="team-hero-inner">
-
-        <div class="team-eyebrow">
-          凉宫数据
-        </div>
-
-        <h1>
-          我们的团队
-        </h1>
-
-        <p>
-          每一个想法，都需要有人把它变成现实。
-        </p>
-
-      </div>
+      <section class="people-list" aria-label="人员列表">
+        {
+          people.map((person) => (
+            <article class="person">
+              <div class="person-info">
+                <h2>{person.name}</h2>
+                <p>{person.position}</p>
+              </div>
+            </article>
+          ))
+        }
+      </section>
     </section>
-
-
-    <!-- =================================================
-         人员介绍
-    ================================================== -->
-
-    <section class="team-section">
-      <div class="team-container">
-
-        <div class="team-section-heading">
-          <span>TEAM</span>
-
-          <h2>
-            认识我们
-          </h2>
-
-          <p>
-            从一个想法开始，持续建设属于我们的数字世界。
-          </p>
-        </div>
-
-
-        <!-- =================================================
-             人员列表
-        ================================================== -->
-
-        <div class="team-list">
-
-          {
-            people.map((person, index) => (
-              <article
-                class:list={[
-                  'team-person',
-                  index % 2 === 1 && 'team-person-reverse',
-                ]}
-              >
-
-                <!-- 人物照片 -->
-
-                <div class="team-photo-wrapper">
-                  <div class="team-photo">
-
-                    <img
-                      src={person.avatar}
-                      alt={`${person.name} - ${person.position}`}
-                      loading={index === 0 ? 'eager' : 'lazy'}
-                      decoding="async"
-                    />
-
-                  </div>
-                </div>
-
-
-                <!-- 人物信息 -->
-
-                <div class="team-info">
-
-                  <div class="team-number">
-                    {String(index + 1).padStart(2, '0')}
-                  </div>
-
-                  <div class="team-info-line"></div>
-
-                  <div class="team-department">
-                    {person.department}
-                  </div>
-
-                  <h3>
-                    {person.name}
-                  </h3>
-
-                  <div class="team-position">
-                    {person.position}
-                  </div>
-
-                  <p>
-                    {person.description}
-                  </p>
-
-                </div>
-
-              </article>
-            ))
-          }
-
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- =================================================
-         底部文字
-    ================================================== -->
-
-    <section class="team-closing">
-      <div class="team-closing-inner">
-
-        <p>
-          Innovation starts with people.
-        </p>
-
-        <h2>
-          因为有人建设，
-          <br />
-          所以未来才会到来。
-        </h2>
-
-      </div>
-    </section>
-
   </main>
-</Layout>
-
+</PageLayout>
 
 <style>
-  /* =========================================================
-     页面基础
-  ========================================================= */
-
   .team-page {
     min-height: 100vh;
     background: #fff;
     color: #111;
   }
 
-
-  /* =========================================================
-     顶部 Hero
-  ========================================================= */
-
-  .team-hero {
-    position: relative;
-    overflow: hidden;
-
-    padding:
-      150px
-      24px
-      110px;
-
-    background:
-      linear-gradient(
-        180deg,
-        #f5f5f7 0%,
-        #ffffff 100%
-      );
-  }
-
-
-  .team-hero-inner {
-    width: min(1200px, 100%);
-    margin: 0 auto;
-  }
-
-
-  .team-eyebrow {
-    margin-bottom: 20px;
-
-    font-size: 15px;
-    font-weight: 600;
-
-    letter-spacing: 0.08em;
-
-    color: #0071e3;
-  }
-
-
-  .team-hero h1 {
-    margin: 0;
-
-    font-size: clamp(
-      52px,
-      8vw,
-      96px
-    );
-
-    line-height: 0.98;
-
-    font-weight: 700;
-
-    letter-spacing: -0.055em;
-  }
-
-
-  .team-hero p {
-    margin: 32px 0 0;
-
-    max-width: 650px;
-
-    font-size: clamp(
-      20px,
-      3vw,
-      30px
-    );
-
-    line-height: 1.45;
-
-    letter-spacing: -0.02em;
-
-    color: #6e6e73;
-  }
-
-
-  /* =========================================================
-     人员区域
-  ========================================================= */
-
-  .team-section {
-    padding:
-      120px
-      24px
-      150px;
-
-    background: #fff;
-  }
-
-
   .team-container {
-    width: min(1200px, 100%);
+    width: min(1180px, calc(100% - 48px));
     margin: 0 auto;
+    padding: 150px 0 120px;
   }
 
-
-  /* =========================================================
-     区域标题
-  ========================================================= */
-
-  .team-section-heading {
-    margin-bottom: 90px;
+  .team-header {
+    padding-bottom: 64px;
   }
 
-
-  .team-section-heading span {
-    display: block;
-
-    margin-bottom: 14px;
-
-    font-size: 13px;
-
-    font-weight: 700;
-
-    letter-spacing: 0.16em;
-
-    color: #86868b;
-  }
-
-
-  .team-section-heading h2 {
+  .team-header h1 {
     margin: 0;
-
-    font-size: clamp(
-      40px,
-      6vw,
-      64px
-    );
-
-    line-height: 1;
-
-    font-weight: 700;
-
+    font-size: clamp(42px, 6vw, 76px);
+    line-height: 1.05;
+    font-weight: 600;
     letter-spacing: -0.045em;
   }
 
-
-  .team-section-heading p {
-    margin: 24px 0 0;
-
-    font-size: 20px;
-
-    color: #6e6e73;
+  .people-list {
+    border-top: 1px solid rgba(0, 0, 0, 0.14);
   }
 
+  .person {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.14);
+  }
 
-  /* =========================================================
-     人员布局
-  ========================================================= */
-
-  .team-list {
+  .person-info {
     display: flex;
-
-    flex-direction: column;
-
-    gap: 160px;
-  }
-
-
-  .team-person {
-    display: grid;
-
-    grid-template-columns:
-      minmax(0, 1.15fr)
-      minmax(340px, 0.85fr);
-
-    align-items: center;
-
-    gap: 90px;
-  }
-
-
-  .team-person-reverse {
-    grid-template-columns:
-      minmax(340px, 0.85fr)
-      minmax(0, 1.15fr);
-  }
-
-
-  .team-person-reverse .team-photo-wrapper {
-    order: 2;
-  }
-
-
-  .team-person-reverse .team-info {
-    order: 1;
-  }
-
-
-  /* =========================================================
-     人物图片
-  ========================================================= */
-
-  .team-photo-wrapper {
-    position: relative;
-  }
-
-
-  .team-photo {
-    position: relative;
-
-    overflow: hidden;
-
-    width: 100%;
-
-    aspect-ratio: 4 / 5;
-
-    background: #f5f5f7;
-
-    border-radius: 30px;
-
-    box-shadow:
-      0 25px 70px
-      rgb(0 0 0 / 12%);
-  }
-
-
-  .team-photo::after {
-    content: '';
-
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    background:
-      linear-gradient(
-        180deg,
-        rgb(255 255 255 / 0%) 65%,
-        rgb(0 0 0 / 8%) 100%
-      );
-  }
-
-
-  .team-photo img {
-    width: 100%;
-    height: 100%;
-
-    display: block;
-
-    object-fit: cover;
-
-    object-position: center;
-
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 34px 8px;
     transition:
-      transform 700ms
-      cubic-bezier(
-        0.22,
-        1,
-        0.36,
-        1
-      );
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.35s ease;
   }
 
+  .person h2 {
+    margin: 0;
+    font-size: clamp(28px, 3vw, 42px);
+    line-height: 1.15;
+    font-weight: 500;
+    letter-spacing: -0.035em;
+  }
+
+  .person p {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.55);
+    font-size: 18px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
 
   @media (hover: hover) and (pointer: fine) {
-
-    .team-photo:hover img {
-      transform: scale(1.035);
+    .person-info:hover {
+      transform: translateX(8px);
     }
 
+    .person-info:hover h2 {
+      opacity: 0.72;
+    }
   }
 
-
-  /* =========================================================
-     人物信息
-  ========================================================= */
-
-  .team-info {
-    max-width: 470px;
-  }
-
-
-  .team-number {
-    margin-bottom: 24px;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    color: #86868b;
-
-    letter-spacing: 0.08em;
-  }
-
-
-  .team-info-line {
-    width: 48px;
-    height: 2px;
-
-    margin-bottom: 32px;
-
-    background: #0071e3;
-  }
-
-
-  .team-department {
-    margin-bottom: 12px;
-
-    font-size: 16px;
-
-    font-weight: 600;
-
-    color: #0071e3;
-  }
-
-
-  .team-info h3 {
-    margin: 0;
-
-    font-size: clamp(
-      42px,
-      5vw,
-      64px
-    );
-
-    line-height: 1;
-
-    letter-spacing: -0.045em;
-
-    font-weight: 700;
-  }
-
-
-  .team-position {
-    margin-top: 18px;
-
-    font-size: 22px;
-
-    font-weight: 500;
-
-    color: #6e6e73;
-  }
-
-
-  .team-info p {
-    margin-top: 32px;
-
-    font-size: 18px;
-
-    line-height: 1.8;
-
-    color: #6e6e73;
-  }
-
-
-  /* =========================================================
-     底部
-  ========================================================= */
-
-  .team-closing {
-    padding:
-      150px
-      24px
-      170px;
-
-    background: #f5f5f7;
-  }
-
-
-  .team-closing-inner {
-    width: min(1200px, 100%);
-    margin: 0 auto;
-  }
-
-
-  .team-closing p {
-    margin: 0 0 24px;
-
-    font-size: 15px;
-
-    font-weight: 600;
-
-    letter-spacing: 0.08em;
-
-    color: #86868b;
-  }
-
-
-  .team-closing h2 {
-    margin: 0;
-
-    font-size: clamp(
-      42px,
-      7vw,
-      76px
-    );
-
-    line-height: 1.08;
-
-    letter-spacing: -0.05em;
-
-    font-weight: 700;
-  }
-
-
-  /* =========================================================
-     平板
-  ========================================================= */
-
-  @media (max-width: 900px) {
-
-    .team-person,
-    .team-person-reverse {
-      grid-template-columns: 1fr;
-
-      gap: 50px;
+  @media (max-width: 640px) {
+    .team-container {
+      width: min(100% - 32px, 1180px);
+      padding: 120px 0 80px;
     }
 
-
-    .team-person-reverse .team-photo-wrapper,
-    .team-person-reverse .team-info {
-      order: initial;
+    .team-header {
+      padding-bottom: 48px;
     }
 
-
-    .team-info {
-      max-width: 650px;
-    }
-
-
-    .team-photo {
-      aspect-ratio: 16 / 11;
-
-      border-radius: 24px;
-    }
-
-  }
-
-
-  /* =========================================================
-     手机
-  ========================================================= */
-
-  @media (max-width: 767px) {
-
-    .team-hero {
-      padding:
-        105px
-        22px
-        75px;
-    }
-
-
-    .team-hero h1 {
-      font-size: clamp(
-        48px,
-        14vw,
-        70px
-      );
-    }
-
-
-    .team-hero p {
-      margin-top: 24px;
-
-      font-size: 20px;
-    }
-
-
-    .team-section {
-      padding:
-        80px
-        22px
-        100px;
-    }
-
-
-    .team-section-heading {
-      margin-bottom: 55px;
-    }
-
-
-    .team-section-heading h2 {
-      font-size: 44px;
-    }
-
-
-    .team-section-heading p {
-      font-size: 18px;
-
-      line-height: 1.6;
-    }
-
-
-    .team-list {
-      gap: 90px;
-    }
-
-
-    .team-photo {
-      aspect-ratio: 4 / 5;
-
-      border-radius: 22px;
-    }
-
-
-    .team-info h3 {
+    .team-header h1 {
       font-size: 48px;
     }
 
-
-    .team-position {
-      font-size: 20px;
+    .person-info {
+      display: block;
+      padding: 28px 4px;
     }
 
-
-    .team-info p {
-      font-size: 17px;
-
-      line-height: 1.75;
+    .person h2 {
+      font-size: 30px;
     }
 
-
-    .team-closing {
-      padding:
-        90px
-        22px
-        110px;
+    .person p {
+      margin-top: 8px;
+      font-size: 16px;
     }
-
-
-    .team-closing h2 {
-      font-size: 44px;
-    }
-
   }
 
-
-  /* =========================================================
-     减少动态效果
-  ========================================================= */
-
   @media (prefers-reduced-motion: reduce) {
-
-    .team-photo img {
+    .person-info {
       transition: none;
     }
-
   }
 </style>
