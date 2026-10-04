@@ -158,9 +158,20 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           visibility 0s linear 0.38s;
       }
 
+      /*
+       * 手机主菜单唯一状态源：
+       *
+       * 只根据 mobile-nav 自身的 expanded 状态控制。
+       *
+       * 不再使用：
+       * header#header:has(.expanded)
+       *
+       * 避免关闭 X 时 Header / ToggleMenu / Nav
+       * 三套状态同时变化造成闪动。
+       */
+
       header#header .hsdc-mobile-nav.expanded,
-      header#header .hsdc-mobile-nav[data-expanded="true"],
-      header#header:has(.expanded) .hsdc-mobile-nav {
+      header#header .hsdc-mobile-nav[data-expanded="true"] {
         max-height: calc(100vh - 72px);
 
         opacity: 1;
@@ -177,6 +188,28 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           opacity 0.25s ease,
           transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
           visibility 0s linear 0s;
+      }
+
+
+      /* =====================================================
+         汉堡按钮“三”定位
+      ====================================================== */
+
+      /*
+       * 以展开后的 X 为定位基准。
+       *
+       * X 保持原位置；
+       * 未展开时的“三”仅做非常轻微的视觉下移。
+       *
+       * 不改变按钮占位高度。
+       */
+
+      header#header [data-aw-toggle-menu]:not(.expanded) {
+        transform: translateY(2px);
+      }
+
+      header#header [data-aw-toggle-menu].expanded {
+        transform: none;
       }
 
 
@@ -199,20 +232,38 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
-      header#header:has(.expanded) .hsdc-mobile-group-item {
+      /*
+       * 一级菜单项目只跟随手机主导航状态。
+       *
+       * 不再使用 header:has(.expanded)。
+       */
+
+      header#header .hsdc-mobile-nav.expanded
+      .hsdc-mobile-group-item,
+      header#header .hsdc-mobile-nav[data-expanded="true"]
+      .hsdc-mobile-group-item {
         opacity: 1;
         transform: translateY(0);
       }
 
-      header#header:has(.expanded) .hsdc-mobile-group-item:nth-child(1) {
+      header#header .hsdc-mobile-nav.expanded
+      .hsdc-mobile-group-item:nth-child(1),
+      header#header .hsdc-mobile-nav[data-expanded="true"]
+      .hsdc-mobile-group-item:nth-child(1) {
         transition-delay: 0.04s;
       }
 
-      header#header:has(.expanded) .hsdc-mobile-group-item:nth-child(2) {
+      header#header .hsdc-mobile-nav.expanded
+      .hsdc-mobile-group-item:nth-child(2),
+      header#header .hsdc-mobile-nav[data-expanded="true"]
+      .hsdc-mobile-group-item:nth-child(2) {
         transition-delay: 0.08s;
       }
 
-      header#header:has(.expanded) .hsdc-mobile-group-item:nth-child(3) {
+      header#header .hsdc-mobile-nav.expanded
+      .hsdc-mobile-group-item:nth-child(3),
+      header#header .hsdc-mobile-nav[data-expanded="true"]
+      .hsdc-mobile-group-item:nth-child(3) {
         transition-delay: 0.12s;
       }
 
@@ -766,827 +817,518 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         display: none !important;
       }
     }
-  </style>
+  </style></style>
 
+<header id="header" class="hsdc-header">
+  <div class="absolute inset-0" style="background: transparent !important;"></div>
 
-  <!-- =======================================================
-       Header 背景
-  ======================================================== -->
-
-  <div
-    class="absolute inset-0"
-    style="background: transparent !important;"
-  ></div>
-
-
-  <!-- =======================================================
-       手机端
-  ======================================================== -->
-
+  <!-- 移动端 -->
   <div class="hsdc-mobile-header relative text-default py-1.5 px-3 w-full">
-
     <div class="flex items-center justify-between w-full">
-
-      <a
-        class="hsdc-brand"
-        href={getHomePermalink()}
-        aria-label="返回首页"
-      >
+      <a class="hsdc-brand" href={getHomePermalink()} aria-label="返回首页">
         <Logo />
       </a>
 
       <div class="flex items-center translate-x-1">
         <ToggleMenu />
       </div>
-
     </div>
 
+    <nav class="hsdc-mobile-nav" aria-label="移动端主导航">
+      <a
+        class="hsdc-mobile-home"
+        href={getHomePermalink()}
+      >
+        首页
+      </a>
 
-    <!-- =====================================================
-         手机展开菜单
-    ====================================================== -->
+      {
+        groups?.map((group) => (
+          <div class="hsdc-mobile-group">
+            <button
+              type="button"
+              class="hsdc-mobile-group-button"
+              aria-expanded="false"
+            >
+              <span>{group.text}</span>
+              <span
+                class="hsdc-mobile-group-chevron"
+                aria-hidden="true"
+              >
+                ›
+              </span>
+            </button>
 
-    <nav
-      class="hsdc-mobile-nav"
-      aria-label="移动端主导航"
-    >
-      <ul class="hsdc-mobile-groups">
-
-        {
-          groups.map((group) => (
-            <li class="hsdc-mobile-group-item">
-
-              <details class="hsdc-mobile-group">
-
-                <summary class="hsdc-mobile-group-trigger">
-                  <span>{group.text}</span>
-
-                  <Icon
-                    name="tabler:chevron-down"
-                    class="hsdc-mobile-group-chevron"
-                  />
-                </summary>
-
-                <div class="hsdc-mobile-submenu">
-                  <div class="hsdc-mobile-submenu-inner">
-
-                    <ul>
-                      {
-                        group.links.map((link) => (
-                          <li>
-                            <a
-                              class:list={[
-                                {
-                                  'aw-link-active':
-                                    link.href === currentPath,
-                                },
-                              ]}
-                              href={link.href}
-                            >
-                              {link.text}
-                            </a>
-                          </li>
-                        ))
-                      }
-                    </ul>
-
-                  </div>
-                </div>
-
-              </details>
-
-            </li>
-          ))
-        }
-
-
-        <!-- 手机主题 -->
-
-        <li class="menu-theme-item">
-
-          <ToggleTheme iconClass="w-5 h-5" />
-
-          <span class="text-sm">
-            切换主题
-          </span>
-
-        </li>
-
-      </ul>
+            <div class="hsdc-mobile-submenu">
+              {group.links?.map((item) => (
+                <a
+                  href={item.href}
+                  target={item.target}
+                  rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                >
+                  {item.text}
+                </a>
+              ))}
+            </div>
+          </div>
+        ))
+      }
     </nav>
-
   </div>
 
-
-  <!-- =======================================================
-       电脑 / 平板端
-  ======================================================== -->
-
+  <!-- 桌面端 / 平板端 -->
   <div
     class:list={[
-      'hsdc-desktop-header relative text-default py-1.5 px-6 mx-auto w-full items-center',
-      {
-        'max-w-7xl': !isFullWidth,
-      },
+      'hsdc-desktop-header',
+      'relative',
+      'mx-auto',
+      'w-full',
+      'px-4',
+      'sm:px-6',
+      'lg:px-8',
+      'py-3',
     ]}
   >
+    <div class="flex items-center w-full min-h-[64px]">
+      <!-- Logo -->
+      <a
+        class="hsdc-brand flex items-center shrink-0"
+        href={getHomePermalink()}
+        aria-label="返回首页"
+      >
+        <Logo />
+      </a>
 
-    <!-- Logo -->
-
-    <a
-      class="hsdc-brand"
-      href={getHomePermalink()}
-      aria-label="返回首页"
-    >
-      <Logo />
-    </a>
-
-
-    <!-- 搜索区域预留 -->
-
-    <div class="hsdc-desktop-search-space"></div>
-
-
-    <!-- =====================================================
-         电脑 / 平板一级菜单
-    ====================================================== -->
-
-    <nav
-      class="hsdc-desktop-nav"
-      aria-label="主导航"
-    >
-
-      <ul class="hsdc-desktop-groups">
+      <!-- 桌面导航 -->
+      <nav
+        class="hsdc-desktop-nav flex items-center ml-auto"
+        aria-label="主导航"
+      >
+        <a
+          class="hsdc-home-link"
+          href={getHomePermalink()}
+        >
+          首页
+        </a>
 
         {
-          groups.map((group, index) => (
-            <li
+          groups?.map((group, index) => (
+            <div
               class="hsdc-desktop-group"
               data-group-index={index}
             >
-
               <button
                 type="button"
-                class="hsdc-desktop-group-trigger"
+                class="hsdc-desktop-group-button"
                 aria-expanded="false"
+                aria-haspopup="true"
               >
                 <span>{group.text}</span>
 
-                <Icon
-                  name="tabler:chevron-down"
-                  class="hsdc-desktop-chevron"
-                />
+                <svg
+                  class="hsdc-chevron"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m6 9 6 6 6-6"></path>
+                </svg>
               </button>
-
-
-              <!-- Windows 式二级菜单 -->
 
               <div
                 class="hsdc-desktop-dropdown"
                 role="menu"
               >
                 {
-                  group.links.map((link) => (
+                  group.links?.map((item) => (
                     <a
-                      href={link.href}
+                      href={item.href}
+                      target={item.target}
+                      rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
                       role="menuitem"
-                      class:list={[
-                        {
-                          'aw-link-active':
-                            link.href === currentPath,
-                        },
-                      ]}
                     >
-                      {link.text}
+                      {item.text}
                     </a>
                   ))
                 }
               </div>
-
-            </li>
+            </div>
           ))
         }
+      </nav>
 
-      </ul>
-
-    </nav>
-
-
-    <!-- =====================================================
-         右侧功能
-    ====================================================== -->
-
-    <div class="hsdc-desktop-actions">
-
-      <div class="flex items-center">
+      <!-- 右侧预留区域 -->
+      <div class="hsdc-header-right flex items-center ml-4 shrink-0">
+        {showToggleTheme && <ToggleTheme />}
 
         {
-          showToggleTheme && (
-            <ToggleTheme
-              iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block"
-            />
-          )
-        }
-
-        {
-          showRssFeed && (
+          actions?.map((action) => (
             <a
-              class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
-              aria-label="RSS Feed"
-              href={getAsset('/rss.xml')}
+              href={action.href}
+              target={action.target}
+              rel={action.target === '_blank' ? 'noopener noreferrer' : undefined}
+              class="hsdc-action"
             >
-              <Icon
-                name="tabler:rss"
-                class="w-5 h-5"
-              />
+              {action.text}
             </a>
-          )
+          ))
         }
-
-        {
-          actions?.length ? (
-            <span class="ml-4 rtl:ml-0 rtl:mr-4">
-              {
-                actions.map((btnProps) => (
-                  <Button
-                    {...btnProps}
-                    class="ml-2 py-2.5 px-5.5 md:px-6 font-semibold shadow-none text-sm w-auto"
-                  />
-                ))
-              }
-            </span>
-          ) : (
-            ''
-          )
-        }
-
       </div>
-
     </div>
-
   </div>
 
-
-  <!-- =======================================================
-       菜单控制
-  ======================================================== -->
-
   <script>
-    /**
-     * Header 导航控制
-     *
-     * 重点：
-     *
-     * 1. 不再使用 data-hsdcNavigationInitialized。
-     *    Astro Client Router 页面切换后，旧 Header 的 DOM
-     *    会被替换，新 Header 必须重新绑定事件。
-     *
-     * 2. 使用 AbortController。
-     *    每次重新初始化之前，先取消上一轮 listener，
-     *    避免出现一次点击触发多个 listener。
-     *
-     * 3. 手机 details 不使用浏览器默认 toggle。
-     *    手动控制 open 状态，让关闭动画完成之后
-     *    再真正移除 open，避免二级菜单突然跳出来。
-     */
+    (() => {
+      let controller: AbortController | null = null;
 
-    const hsdcWindow = /** @type {Window & {
-      __hsdcHeaderController?: AbortController;
-      __hsdcHeaderLifecycleBound?: boolean;
-    }} */ (window);
+      const initHeader = () => {
+        controller?.abort();
+        controller = new AbortController();
 
+        const { signal } = controller;
+        const header = document.querySelector('#header');
 
-    const initHeaderNavigation = () => {
+        if (!header) return;
 
-      const header = document.querySelector('#header');
-
-      if (!header) return;
-
-
-      /* =====================================================
-         清理上一轮事件
-      ====================================================== */
-
-      hsdcWindow.__hsdcHeaderController?.abort();
-
-      const controller = new AbortController();
-
-      hsdcWindow.__hsdcHeaderController = controller;
-
-      const { signal } = controller;
-
-
-      /* =====================================================
-         桌面菜单
-      ====================================================== */
-
-      const desktopGroups = Array.from(
-        header.querySelectorAll('.hsdc-desktop-group')
-      );
-
-
-      const closeAllDesktopGroups = () => {
-
-        desktopGroups.forEach((group) => {
-
-          group.classList.remove('is-open');
-
-          const button =
-            group.querySelector(
-              '.hsdc-desktop-group-trigger'
-            );
-
-          button?.setAttribute(
-            'aria-expanded',
-            'false'
-          );
-        });
-      };
-
-
-      desktopGroups.forEach((group) => {
-
-        const button =
-          group.querySelector(
-            '.hsdc-desktop-group-trigger'
-          );
-
-        if (!button) return;
-
-
-        button.addEventListener(
-          'click',
-          (event) => {
-
-            event.preventDefault();
-            event.stopPropagation();
-
-
-            const wasOpen =
-              group.classList.contains('is-open');
-
-
-            if (wasOpen) {
-
-              closeAllDesktopGroups();
-
-              return;
-            }
-
-
-            closeAllDesktopGroups();
-
-
-            group.classList.add('is-open');
-
-            button.setAttribute(
-              'aria-expanded',
-              'true'
-            );
-          },
-          {
-            signal,
-          }
-        );
-      });
-
-
-      /* =====================================================
-         点击桌面菜单以外区域
-      ====================================================== */
-
-      document.addEventListener(
-        'click',
-        (event) => {
-
-          const target = event.target;
-
-          if (
-            target instanceof Node &&
-            header.contains(target)
-          ) {
-            return;
-          }
-
-          closeAllDesktopGroups();
-        },
-        {
-          signal,
-        }
-      );
-
-
-      /* =====================================================
-         ESC
-      ====================================================== */
-
-      document.addEventListener(
-        'keydown',
-        (event) => {
-
-          if (event.key === 'Escape') {
-
-            closeAllDesktopGroups();
-          }
-        },
-        {
-          signal,
-        }
-      );
-
-
-      /* =====================================================
-         手机菜单
-      ====================================================== */
-
-      const mobileGroups = Array.from(
-        header.querySelectorAll('.hsdc-mobile-group')
-      ).filter(
-        (element) =>
-          element instanceof HTMLDetailsElement
-      );
-
-
-      const mobileCloseTimers =
-        new WeakMap();
-
-
-      const clearMobileCloseTimer = (group) => {
-
-        const timer =
-          mobileCloseTimers.get(group);
-
-        if (timer) {
-
-          window.clearTimeout(timer);
-
-          mobileCloseTimers.delete(group);
-        }
-      };
-
-
-      const resetMobileGroup = (group) => {
-
-        clearMobileCloseTimer(group);
-
-        group.classList.remove(
-          'is-open',
-          'is-closing'
+        const desktopGroups = Array.from(
+          header.querySelectorAll<HTMLElement>('.hsdc-desktop-group')
         );
 
-        group.open = false;
-      };
-
-
-      const closeMobileGroup = (
-        group,
-        immediate = false
-      ) => {
-
-        clearMobileCloseTimer(group);
-
-
-        if (!group.open) {
-
-          group.classList.remove(
-            'is-open',
-            'is-closing'
-          );
-
-          return;
-        }
-
-
-        /* =================================================
-           汉堡菜单整体关闭时：
-           立即关闭 details，绝不让二级菜单
-           在主菜单收起过程中重新占位。
-        ================================================== */
-
-        if (immediate) {
-
-          resetMobileGroup(group);
-
-          return;
-        }
-
-
-        group.classList.remove('is-open');
-
-        group.classList.add('is-closing');
-
-
-        const timer =
-          window.setTimeout(
-            () => {
-
-              group.open = false;
-
-              group.classList.remove(
-                'is-closing'
-              );
-
-              mobileCloseTimers.delete(
-                group
-              );
-
-            },
-            340
-          );
-
-
-        mobileCloseTimers.set(
-          group,
-          timer
-        );
-      };
-
-
-      const closeAllMobileGroups = (
-        immediate = false
-      ) => {
-
-        mobileGroups.forEach(
-          (group) => {
-
-            closeMobileGroup(
-              group,
-              immediate
-            );
-          }
-        );
-      };
-
-
-      const openMobileGroup = (group) => {
-
-        /* 关闭其他二级菜单 */
-
-        mobileGroups.forEach(
-          (otherGroup) => {
-
-            if (otherGroup !== group) {
-
-              closeMobileGroup(
-                otherGroup,
-                true
-              );
-            }
-          }
+        const mobileGroups = Array.from(
+          header.querySelectorAll<HTMLElement>('.hsdc-mobile-group')
         );
 
+        const mobileNav =
+          header.querySelector<HTMLElement>('.hsdc-mobile-nav');
 
-        clearMobileCloseTimer(group);
-
-
-        group.open = true;
-
-        group.classList.remove(
-          'is-closing'
-        );
-
+        const toggleMenu =
+          header.querySelector<HTMLElement>('[data-aw-toggle-menu]');
 
         /*
-         * 下一帧再加入 is-open。
-         *
-         * 这样浏览器能明确识别：
-         *
-         * 0 → 1fr
-         *
-         * 从而触发展开动画，而不是直接出现。
+         * ================================
+         * 桌面端一级菜单
+         * ================================
          */
 
-        requestAnimationFrame(() => {
+        const closeDesktopGroups = () => {
+          desktopGroups.forEach((group) => {
+            group.classList.remove('is-open');
 
-          if (!group.open) return;
+            const button =
+              group.querySelector<HTMLButtonElement>(
+                '.hsdc-desktop-group-button'
+              );
 
-          group.classList.add(
-            'is-open'
-          );
-        });
-      };
+            if (button) {
+              button.setAttribute('aria-expanded', 'false');
+            }
+          });
+        };
 
+        const openDesktopGroup = (group: HTMLElement) => {
+          desktopGroups.forEach((item) => {
+            if (item !== group) {
+              item.classList.remove('is-open');
 
-      mobileGroups.forEach(
-        (group) => {
+              const button =
+                item.querySelector<HTMLButtonElement>(
+                  '.hsdc-desktop-group-button'
+                );
 
-          const summary =
-            group.querySelector('summary');
+              if (button) {
+                button.setAttribute('aria-expanded', 'false');
+              }
+            }
+          });
 
-          if (!summary) return;
+          const button =
+            group.querySelector<HTMLButtonElement>(
+              '.hsdc-desktop-group-button'
+            );
 
+          const isOpen = group.classList.contains('is-open');
 
-          /*
-           * 阻止 details 原生瞬间打开/关闭。
-           */
+          if (isOpen) {
+            group.classList.remove('is-open');
+            button?.setAttribute('aria-expanded', 'false');
+          } else {
+            group.classList.add('is-open');
+            button?.setAttribute('aria-expanded', 'true');
+          }
+        };
 
-          summary.addEventListener(
-            'click',(event) => {
+        desktopGroups.forEach((group) => {
+          const button =
+            group.querySelector<HTMLButtonElement>(
+              '.hsdc-desktop-group-button'
+            );
 
+          if (!button) return;
+
+          button.addEventListener(
+            'click',
+            (event) => {
               event.preventDefault();
               event.stopPropagation();
 
-
-              if (
-                group.open &&
-                !group.classList.contains(
-                  'is-closing'
-                )
-              ) {
-
-                closeMobileGroup(
-                  group,
-                  false
-                );
-
-                return;
-              }
-
-
-              openMobileGroup(group);
+              openDesktopGroup(group);
             },
-            {
-              signal,
-            }
-          );
-        }
-      );
-
-
-      /* =====================================================
-         汉堡按钮
-      ====================================================== */
-
-      const toggleMenu =
-        header.querySelector(
-          '[data-aw-toggle-menu]'
-        );
-
-      if (toggleMenu) {
-
-        /*
-         * capture=true
-         *
-         * 必须在 BasicScripts 的 toggle handler
-         * 之前执行。
-         *
-         * 这样关闭主菜单时，二级菜单先被清掉，
-         * 不会出现：
-         *
-         * 二级菜单跳出来
-         * ↓
-         * 主菜单才收回
-         */
-
-        toggleMenu.addEventListener(
-          'click',
-          () => {
-
-            const isCurrentlyOpen =
-              toggleMenu.classList.contains(
-                'expanded'
-              ) ||
-              header.classList.contains(
-                'expanded'
-              ) ||
-              header.querySelector(
-                '.hsdc-mobile-nav.expanded'
-              );
-
-
-            if (isCurrentlyOpen) {
-
-              closeAllMobileGroups(
-                true
-              );
-            }
-          },
-          {
-            signal,
-            capture: true,
-          }
-        );
-      }
-
-
-      /* =====================================================
-         点击手机二级菜单链接
-      ====================================================== */
-
-      header
-        .querySelectorAll(
-          '.hsdc-mobile-submenu a'
-        )
-        .forEach((link) => {
-
-          link.addEventListener(
-            'click',
-            () => {
-
-              /*
-               * 页面即将进行 Astro Client Router
-               * 切换，不需要在这里强制关闭动画。
-               *
-               * 新页面初始化时会自动 reset。
-               */
-            },
-            {
-              signal,
-            }
+            { signal }
           );
         });
 
+        document.addEventListener(
+          'click',
+          (event) => {
+            const target = event.target as Node | null;
 
-      /* =====================================================
-         页面切换 / 初始化
-      ====================================================== */
+            if (!target) return;
 
-      closeAllDesktopGroups();
+            if (!header.contains(target)) {
+              closeDesktopGroups();
+              return;
+            }
 
-      closeAllMobileGroups(true);
-
-
-      /* =====================================================
-         屏幕尺寸变化
-      ====================================================== */
-
-      const mediaQuery =
-        window.matchMedia(
-          '(min-width: 768px)'
+            if (
+              !(target instanceof Element) ||
+              !target.closest('.hsdc-desktop-group')
+            ) {
+              closeDesktopGroups();
+            }
+          },
+          { signal }
         );
 
+        document.addEventListener(
+          'keydown',
+          (event) => {
+            if (event.key === 'Escape') {
+              closeDesktopGroups();
+            }
+          },
+          { signal }
+        );
 
-      mediaQuery.addEventListener(
-        'change',
-        () => {
+        /*
+         * ================================
+         * 移动端二级菜单
+         * ================================
+         */
 
-          if (mediaQuery.matches) {
+        const closeMobileGroups = (immediate = false) => {
+          mobileGroups.forEach((group) => {
+            const button =
+              group.querySelector<HTMLButtonElement>(
+                '.hsdc-mobile-group-button'
+              );
 
-            closeAllMobileGroups(true);
+            const submenu =
+              group.querySelector<HTMLElement>(
+                '.hsdc-mobile-submenu'
+              );
 
-          } else {
+            group.classList.remove('is-open');
 
-            closeAllDesktopGroups();
+            button?.setAttribute('aria-expanded', 'false');
+
+            if (!submenu) return;
+
+            submenu.style.transition = immediate
+              ? 'none'
+              : '';
+
+            submenu.style.maxHeight = '0px';
+            submenu.style.opacity = '0';
+            submenu.style.transform = 'translateY(-4px)';
+          });
+        };
+
+        const openMobileGroup = (group: HTMLElement) => {
+          const button =
+            group.querySelector<HTMLButtonElement>(
+              '.hsdc-mobile-group-button'
+            );
+
+          const submenu =
+            group.querySelector<HTMLElement>(
+              '.hsdc-mobile-submenu'
+            );
+
+          if (!button || !submenu) return;
+
+          const isOpen = group.classList.contains('is-open');
+
+          /*
+           * 先关闭其它二级菜单。
+           * 这样移动端始终只展开一个菜单，
+           * 同时避免多个 submenu 同时参与布局。
+           */
+          mobileGroups.forEach((item) => {
+            if (item === group) return;
+
+            const itemButton =
+              item.querySelector<HTMLButtonElement>(
+                '.hsdc-mobile-group-button'
+              );
+
+            const itemSubmenu =
+              item.querySelector<HTMLElement>(
+                '.hsdc-mobile-submenu'
+              );
+
+            item.classList.remove('is-open');
+            itemButton?.setAttribute('aria-expanded', 'false');
+
+            if (itemSubmenu) {
+              itemSubmenu.style.maxHeight = '0px';
+              itemSubmenu.style.opacity = '0';
+              itemSubmenu.style.transform = 'translateY(-4px)';
+            }
+          });
+
+          if (isOpen) {
+            group.classList.remove('is-open');
+            button.setAttribute('aria-expanded', 'false');
+
+            submenu.style.maxHeight = '0px';
+            submenu.style.opacity = '0';
+            submenu.style.transform = 'translateY(-4px)';
+
+            return;
           }
-        },
-        {
+
+          group.classList.add('is-open');
+          button.setAttribute('aria-expanded', 'true');
+
+          /*
+           * 读取真实高度，再展开。
+           * 不直接写死高度，避免不同设备出现截断。
+           */
+          submenu.style.maxHeight = `${submenu.scrollHeight}px`;
+          submenu.style.opacity = '1';
+          submenu.style.transform = 'translateY(0)';
+        };
+
+        mobileGroups.forEach((group) => {
+          const button =
+            group.querySelector<HTMLButtonElement>(
+              '.hsdc-mobile-group-button'
+            );
+
+          if (!button) return;
+
+          button.addEventListener(
+            'click',
+            (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+
+              openMobileGroup(group);
+            },
+            { signal }
+          );
+        });
+
+        /*
+         * ================================
+         * 汉堡菜单
+         * ================================
+         */
+
+        if (toggleMenu) {
+          toggleMenu.addEventListener(
+            'click',
+            (event) => {
+              /*
+               * 不在这里主动切换 expanded。
+               * ToggleMenu / BasicScripts 负责主菜单状态，
+               * Header 这里只负责清理二级菜单状态。
+               */
+              event.stopPropagation();
+
+              const isExpanded =
+                toggleMenu.classList.contains('expanded');
+
+              if (isExpanded) {
+                closeMobileGroups(true);
+              }
+            },
+            {
+              signal,
+              capture: true,
+            }
+          );
+        }
+
+        /*
+         * 点击移动端二级菜单后，
+         * 立即清理所有展开状态。
+         */
+        header
+          .querySelectorAll<HTMLAnchorElement>(
+            '.hsdc-mobile-submenu a'
+          )
+          .forEach((link) => {
+            link.addEventListener(
+              'click',
+              () => {
+                closeMobileGroups(true);
+              },
+              { signal }
+            );
+          });
+
+        /*
+         * ================================
+         * 初始状态
+         * ================================
+         */
+
+        closeDesktopGroups();
+        closeMobileGroups(true);
+
+        /*
+         * ================================
+         * 屏幕尺寸变化
+         * ================================
+         */
+
+        const mediaQuery = window.matchMedia('(min-width: 1024px)');
+
+        const handleMediaChange = () => {
+          if (mediaQuery.matches) {
+            closeMobileGroups(true);
+
+            if (mobileNav) {
+              mobileNav.classList.remove('expanded');
+              mobileNav.removeAttribute('data-expanded');
+            }
+
+            toggleMenu?.classList.remove('expanded');
+          } else {
+            closeDesktopGroups();
+          }
+        };
+
+        mediaQuery.addEventListener('change', handleMediaChange, {
           signal,
-        }
-      );
-    };
+        });
+      };
 
-
-    /* =======================================================
-       初次加载
-    ======================================================== */
-
-    if (
-      document.readyState ===
-      'loading'
-    ) {
-
-      document.addEventListener(
-        'DOMContentLoaded',
-        initHeaderNavigation,
-        {
-          once: true,
-        }
-      );
-
-    } else {
-
-      initHeaderNavigation();
-    }
-
-
-    /* =======================================================
-       Astro Client Router
-    ======================================================== */
-
-    if (
-      !hsdcWindow.__hsdcHeaderLifecycleBound
-    ) {
-
-      hsdcWindow.__hsdcHeaderLifecycleBound =
-        true;
-
+      initHeader();
 
       document.addEventListener(
         'astro:after-swap',
         () => {
-
-          /*
-           * 等新 Header DOM 完成替换后
-           * 再重新绑定。
-           */
-
-          requestAnimationFrame(() => {
-
-            initHeaderNavigation();
-
-          });
+          initHeader();
         }
       );
-    }
+    })();
   </script>
 </header>
