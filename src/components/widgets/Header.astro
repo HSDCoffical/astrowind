@@ -16,13 +16,14 @@ interface Link {
   icon?: string;
 }
 
-interface MenuLink extends Link {
-  links?: Array<MenuLink>;
+interface MenuGroup {
+  text: string;
+  links: Array<Link>;
 }
 
 export interface Props {
   id?: string;
-  links?: Array<MenuLink>;
+  groups?: Array<MenuGroup>;
   actions?: Array<CallToAction>;
   isSticky?: boolean;
   isDark?: boolean;
@@ -34,7 +35,7 @@ export interface Props {
 
 const {
   id = 'header',
-  links = [],
+  groups = [],
   actions = [],
   isSticky = false,
   isDark = false,
@@ -55,7 +56,7 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 >
   <style>
     /* =========================================================
-       Header 基础
+       基础
     ========================================================= */
 
     header#header {
@@ -65,11 +66,9 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         box-shadow 280ms ease;
     }
 
-
     header#header * {
       background: transparent !important;
     }
-
 
     header#header .bg-white,
     header#header .dark\:bg-gray-900,
@@ -81,87 +80,73 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 
     /* =========================================================
-       桌面端 Hover
-    ========================================================= */
-
-    @media (hover: hover) and (pointer: fine) {
-      header#header button:hover,
-      header#header a:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-      }
-
-      .dark header#header button:hover,
-      .dark header#header a:hover {
-        background: rgba(255, 255, 255, 0.05) !important;
-      }
-
-      header#header nav > ul > li > a,
-      header#header nav > ul > li > button {
-        transition:
-          color 180ms ease,
-          transform 180ms ease,
-          background-color 180ms ease;
-      }
-
-      header#header nav > ul > li > a:hover,
-      header#header nav > ul > li > button:hover {
-        transform: translateY(-1px);
-      }
-    }
-
-
-    /* =========================================================
        Logo
     ========================================================= */
 
-    header#header a[href="/"] {
+    .hsdc-brand {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      text-decoration: none;
       transition:
         transform 220ms ease,
         opacity 220ms ease;
     }
 
+    .hsdc-brand:hover {
+      transform: translateY(-1px);
+      opacity: 0.94;
+    }
 
-    @media (hover: hover) and (pointer: fine) {
-      header#header a[href="/"]:hover {
-        transform: translateY(-1px);
-        opacity: 0.92;
-      }
+    .hsdc-brand-name {
+      margin-left: 0.65rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
     }
 
 
     /* =========================================================
-       手机端禁用毛玻璃
+       手机端整体
     ========================================================= */
 
-    @media (max-width: 768px) {
-      header#header {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-      }
+    .hsdc-mobile-header {
+      display: flex;
+    }
+
+    .hsdc-desktop-header {
+      display: none;
     }
 
 
     /* =========================================================
-       手机端菜单动画
+       手机菜单
     ========================================================= */
 
     @media (max-width: 767px) {
 
-      header#header nav {
+      header#header {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      .hsdc-mobile-header {
+        display: flex;
+      }
+
+      .hsdc-desktop-header {
+        display: none !important;
+      }
+
+      .hsdc-mobile-nav {
         display: block !important;
-
         width: 100%;
-
         max-height: 0;
-
         opacity: 0;
-
         overflow: hidden;
-
         transform: translateY(-8px);
-
         visibility: hidden;
-
         pointer-events: none;
 
         transition:
@@ -171,20 +156,14 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           visibility 0s linear 0.38s;
       }
 
-
-      header#header nav.expanded,
-      header#header nav[data-expanded="true"],
-      header#header:has(.expanded) nav {
+      header#header .hsdc-mobile-nav.expanded,
+      header#header .hsdc-mobile-nav[data-expanded="true"],
+      header#header:has(.expanded) .hsdc-mobile-nav {
         max-height: calc(100vh - 72px);
-
         opacity: 1;
-
         transform: translateY(0);
-
         visibility: visible;
-
         pointer-events: auto;
-
         overflow-y: auto;
 
         transition:
@@ -196,22 +175,16 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 
       /* =====================================================
-         菜单列表
+         一级板块
       ====================================================== */
 
-      header#header nav > ul {
+      .hsdc-mobile-groups {
         padding-top: 8px;
         padding-bottom: 12px;
       }
 
-
-      /* =====================================================
-         菜单项目初始状态
-      ====================================================== */
-
-      header#header nav > ul > li {
+      .hsdc-mobile-group-item {
         opacity: 0;
-
         transform: translateY(-8px);
 
         transition:
@@ -219,107 +192,175 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
           transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
-
-      /* =====================================================
-         菜单打开
-      ====================================================== */
-
-      header#header:has(nav.expanded) nav > ul > li,
-      header#header:has(.expanded) nav > ul > li {
+      header#header:has(.expanded) .hsdc-mobile-group-item {
         opacity: 1;
         transform: translateY(0);
       }
 
-
-      /* =====================================================
-         菜单依次进入
-      ====================================================== */
-
-      header#header:has(.expanded) nav > ul > li:nth-child(1) {
+      header#header:has(.expanded) .hsdc-mobile-group-item:nth-child(1) {
         transition-delay: 0.04s;
       }
 
-      header#header:has(.expanded) nav > ul > li:nth-child(2) {
+      header#header:has(.expanded) .hsdc-mobile-group-item:nth-child(2) {
         transition-delay: 0.08s;
       }
 
-      header#header:has(.expanded) nav > ul > li:nth-child(3) {
+      header#header:has(.expanded) .hsdc-mobile-group-item:nth-child(3) {
         transition-delay: 0.12s;
       }
 
-      header#header:has(.expanded) nav > ul > li:nth-child(4) {
-        transition-delay: 0.16s;
-      }
-
-      header#header:has(.expanded) nav > ul > li:nth-child(5) {
-        transition-delay: 0.20s;
-      }
-
-      header#header:has(.expanded) nav > ul > li:nth-child(6) {
-        transition-delay: 0.24s;
-      }
-
-      header#header:has(.expanded) nav > ul > li:nth-child(7) {
-        transition-delay: 0.28s;
-      }
-
-      header#header:has(.expanded) nav > ul > li:nth-child(8) {
-        transition-delay: 0.32s;
-      }
-
 
       /* =====================================================
-         关闭菜单
+         details / summary
       ====================================================== */
 
-      header#header nav:not(.expanded) > ul > li {
-        transition-delay: 0s;
-      }
-
-
-      /* =====================================================
-         手机菜单文字
-      ====================================================== */
-
-      header#header nav > ul > li > a,
-      header#header nav > ul > li > button {
+      .hsdc-mobile-group {
         width: 100%;
+      }
 
+      .hsdc-mobile-group summary {
+        list-style: none;
+        cursor: pointer;
+      }
+
+      .hsdc-mobile-group summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .hsdc-mobile-group-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
         box-sizing: border-box;
 
-        padding-top: 13px;
-        padding-bottom: 13px;
+        padding: 13px 16px;
+
+        font-size: 1.05rem;
+        font-weight: 500;
 
         transition:
           transform 160ms ease,
-          opacity 160ms ease;
+          opacity 160ms ease,
+          background-color 180ms ease;
       }
 
-
-      /*
-       * 手指按下反馈
-       */
-
-      header#header nav > ul > li > a:active,
-      header#header nav > ul > li > button:active {
+      .hsdc-mobile-group-trigger:active {
         transform: scale(0.975);
         opacity: 0.72;
       }
 
+      .hsdc-mobile-group-chevron {
+        width: 18px;
+        height: 18px;
+
+        transition:
+          transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 180ms ease;
+      }
+
+      .hsdc-mobile-group[open]
+      .hsdc-mobile-group-chevron {
+        transform: rotate(180deg);
+      }
+
 
       /* =====================================================
-         手机菜单滚动条
+         二级菜单动画
       ====================================================== */
 
-      header#header nav::-webkit-scrollbar {
+      .hsdc-mobile-submenu {
+        display: grid;
+        grid-template-rows: 0fr;
+
+        opacity: 0;
+        transform: translateY(-4px);
+
+        transition:
+          grid-template-rows 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.22s ease,
+          transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .hsdc-mobile-group[open] .hsdc-mobile-submenu {
+        grid-template-rows: 1fr;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .hsdc-mobile-submenu-inner {
+        overflow: hidden;
+      }
+
+      .hsdc-mobile-submenu ul {
+        padding: 0 0 6px 14px;
+      }
+
+      .hsdc-mobile-submenu a {
+        display: flex;
+        align-items: center;
+
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 10px 16px;
+
+        font-size: 0.96rem;
+        color: inherit;
+
+        border-radius: 10px;
+
+        transition:
+          transform 180ms ease,
+          opacity 180ms ease,
+          background-color 180ms ease;
+      }
+
+      .hsdc-mobile-submenu a:active {
+        transform: scale(0.975);
+        opacity: 0.72;
+      }
+
+      .hsdc-mobile-submenu .aw-link-active {
+        font-weight: 600;
+      }
+
+
+      /* =====================================================
+         手机主题
+      ====================================================== */
+
+      .menu-theme-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        padding: 0.75rem 1rem;
+        margin-top: 0.5rem;
+
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        color: #666;
+      }
+
+      .dark .menu-theme-item {
+        border-top-color: rgba(255, 255, 255, 0.06);
+        color: #aaa;
+      }
+
+
+      /* =====================================================
+         手机滚动条
+      ====================================================== */
+
+      .hsdc-mobile-nav::-webkit-scrollbar {
         width: 4px;
       }
 
-      header#header nav::-webkit-scrollbar-track {
+      .hsdc-mobile-nav::-webkit-scrollbar-track {
         background: transparent !important;
       }
 
-      header#header nav::-webkit-scrollbar-thumb {
+      .hsdc-mobile-nav::-webkit-scrollbar-thumb {
         background: rgba(100, 116, 139, 0.25);
         border-radius: 999px;
       }
@@ -327,51 +368,291 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 
     /* =========================================================
-       手机主题按钮
+       电脑 / 平板
     ========================================================= */
 
-    .menu-theme-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1rem;
-      margin-top: 0.5rem;
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
-      color: #666;
-    }
-
-    .dark .menu-theme-item {
-      border-top-color: rgba(255, 255, 255, 0.06);
-      color: #aaa;
-    }
-
-
     @media (min-width: 768px) {
-      .menu-theme-item {
+
+      .hsdc-mobile-header {
         display: none !important;
+      }
+
+      .hsdc-desktop-header {
+        display: flex;
+      }
+
+
+      /* =====================================================
+         中间导航
+      ====================================================== */
+
+      .hsdc-desktop-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex: 0 0 auto;
+
+        margin: 0 1rem;
+      }
+
+      .hsdc-desktop-groups {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+
+      .hsdc-desktop-group {
+        position: relative;
+      }
+
+
+      /* =====================================================
+         一级菜单按钮
+      ====================================================== */
+
+      .hsdc-desktop-group-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.28rem;
+
+        min-height: 42px;
+        padding: 0.55rem 0.85rem;
+
+        border: 0;
+        border-radius: 10px;
+
+        color: inherit;
+        font-size: 0.9375rem;
+        font-weight: 500;
+
+        cursor: pointer;
+        white-space: nowrap;
+
+        transition:
+          background-color 180ms ease,
+          color 180ms ease,
+          transform 180ms ease;
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        .hsdc-desktop-group-trigger:hover {
+          background: rgba(255, 255, 255, 0.1) !important;
+          transform: translateY(-1px);
+        }
+
+        .dark .hsdc-desktop-group-trigger:hover {
+          background: rgba(255, 255, 255, 0.06) !important;
+        }
+      }
+
+      .hsdc-desktop-group-trigger:active {
+        transform: scale(0.97);
+      }
+
+      .hsdc-desktop-group.is-open
+      .hsdc-desktop-group-trigger {
+        background: rgba(255, 255, 255, 0.1) !important;
+      }
+
+      .dark .hsdc-desktop-group.is-open
+      .hsdc-desktop-group-trigger {
+        background: rgba(255, 255, 255, 0.06) !important;
+      }
+
+
+      /* =====================================================
+         V 箭头
+      ====================================================== */
+
+      .hsdc-desktop-chevron {
+        width: 15px;
+        height: 15px;
+
+        transition:
+          transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .hsdc-desktop-group.is-open
+      .hsdc-desktop-chevron {
+        transform: rotate(180deg);
+      }
+
+
+      /* =====================================================
+         Windows 式二级菜单
+      ====================================================== */
+
+      .hsdc-desktop-dropdown {
+        position: absolute;
+
+        top: calc(100% + 7px);
+        left: 50%;
+
+        min-width: 178px;
+
+        padding: 6px;
+
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 12px;
+
+        background: rgba(255, 255, 255, 0.94) !important;
+
+        box-shadow:
+          0 16px 40px rgba(15, 23, 42, 0.12),
+          0 4px 12px rgba(15, 23, 42, 0.06);
+
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+
+        transform:
+          translate(-50%, -7px)
+          scale(0.97);
+
+        transform-origin: top center;
+
+        transition:
+          opacity 180ms ease,
+          transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s linear 220ms;
+      }
+
+      .dark .hsdc-desktop-dropdown {
+        background: rgba(25, 25, 28, 0.94) !important;
+
+        border-color: rgba(255, 255, 255, 0.1);
+
+        box-shadow:
+          0 18px 45px rgba(0, 0, 0, 0.35),
+          0 4px 14px rgba(0, 0, 0, 0.2);
+      }
+
+      .hsdc-desktop-group.is-open
+      .hsdc-desktop-dropdown {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+
+        transform:
+          translate(-50%, 0)
+          scale(1);
+
+        transition:
+          opacity 180ms ease,
+          transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s linear 0s;
+      }
+
+
+      /* =====================================================
+         二级菜单项目
+      ====================================================== */
+
+      .hsdc-desktop-dropdown a {
+        display: flex;
+        align-items: center;
+
+        min-height: 38px;
+        padding: 0.45rem 0.8rem;
+
+        border-radius: 8px;
+
+        font-size: 0.9rem;
+        font-weight: 450;
+
+        white-space: nowrap;
+
+        transition:
+          background-color 160ms ease,
+          transform 160ms ease,
+          opacity 160ms ease;
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        .hsdc-desktop-dropdown a:hover {
+          background: rgba(100, 116, 139, 0.09) !important;
+          transform: translateX(2px);
+        }
+
+        .dark .hsdc-desktop-dropdown a:hover {
+          background: rgba(255, 255, 255, 0.08) !important;
+        }
+      }
+
+      .hsdc-desktop-dropdown a:active {
+        transform: scale(0.975);
+        opacity: 0.72;
+      }
+
+      .hsdc-desktop-dropdown .aw-link-active {
+        font-weight: 600;
+      }
+
+
+      /* =====================================================
+         搜索预留区域
+      ====================================================== */
+
+      .hsdc-desktop-search-space {
+        flex: 1 1 auto;
+        min-width: 80px;
+      }
+
+
+      /* =====================================================
+         右侧功能
+      ====================================================== */
+
+      .hsdc-desktop-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        flex: 0 0 auto;
+      }
+
+
+      /* =====================================================
+         减少动态效果
+      ====================================================== */
+
+      @media (prefers-reduced-motion: reduce) {
+        .hsdc-desktop-group-trigger,
+        .hsdc-desktop-chevron,
+        .hsdc-desktop-dropdown,
+        .hsdc-desktop-dropdown a,
+        .hsdc-mobile-nav,
+        .hsdc-mobile-group-item,
+        .hsdc-mobile-group-trigger,
+        .hsdc-mobile-group-chevron,
+        .hsdc-mobile-submenu,
+        .hsdc-mobile-submenu a {
+          transition: none !important;
+        }
       }
     }
 
 
     /* =========================================================
-       减少动态效果
+       768px 以下隐藏桌面菜单
     ========================================================= */
 
-    @media (prefers-reduced-motion: reduce) {
-      header#header,
-      header#header nav,
-      header#header nav > ul > li,
-      header#header nav > ul > li > a,
-      header#header nav > ul > li > button {
-        transition: none !important;
+    @media (max-width: 767px) {
+      .hsdc-desktop-header {
+        display: none !important;
       }
     }
   </style>
 
 
-  <!-- =====================================================
+  <!-- =======================================================
        Header 背景
-  ====================================================== -->
+  ======================================================== -->
 
   <div
     class="absolute inset-0"
@@ -379,43 +660,28 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
   ></div>
 
 
-  <div
-    class:list={[
-      'relative text-default py-1.5 px-3 md:px-6 mx-auto w-full',
-      {
-        'md:flex md:justify-between': position !== 'center',
-      },
-      {
-        'md:grid md:grid-cols-3 md:items-center': position === 'center',
-      },
-      {
-        'max-w-7xl': !isFullWidth,
-      },
-    ]}
-  >
+  <!-- =======================================================
+       手机端
+  ======================================================== -->
 
-    <!-- =====================================================
-         Logo + 菜单按钮
-    ====================================================== -->
+  <div class="hsdc-mobile-header relative text-default py-1.5 px-3 w-full">
 
-    <div
-      class:list={[
-        {
-          'mr-auto rtl:mr-0 rtl:ml-auto': position === 'right',
-        },
-        'flex justify-between',
-      ]}
-    >
+    <div class="flex items-center justify-between w-full">
 
       <a
-        class="flex items-center"
+        class="hsdc-brand"
         href={getHomePermalink()}
+        aria-label="返回首页"
       >
         <Logo />
+
+        <span class="hsdc-brand-name">
+          凉宫数据开放平台
+        </span>
       </a>
 
 
-      <div class="flex items-center md:hidden">
+      <div class="flex items-center">
         <ToggleMenu />
       </div>
 
@@ -423,90 +689,65 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
 
 
     <!-- =====================================================
-         导航菜单
+         手机展开菜单
     ====================================================== -->
 
     <nav
-      class="items-center w-full md:w-auto hidden md:flex md:mx-5 text-default overflow-y-auto overflow-x-hidden md:overflow-visible md:justify-self-center"
-      aria-label="Main navigation"
+      class="hsdc-mobile-nav"
+      aria-label="移动端主导航"
     >
-
-      <ul
-        class="flex flex-col md:flex-row md:self-center w-full md:w-auto text-xl md:text-[0.9375rem] tracking-[0.01rem] font-medium md:justify-center"
-      >
+      <ul class="hsdc-mobile-groups">
 
         {
-          links.map(({ text, href, links }) => (
-            <li class={links?.length ? 'dropdown' : ''}>
+          groups.map((group) => (
+            <li class="hsdc-mobile-group-item">
 
-              {
-                links?.length ? (
-                  <>
-                    <button
-                      type="button"
-                      class="hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap"
-                    >
-                      {text}
+              <details class="hsdc-mobile-group">
 
-                      <Icon
-                        name="tabler:chevron-down"
-                        class="w-3.5 h-3.5 ml-0.5 rtl:ml-0 rtl:mr-0.5 hidden md:inline"
-                      />
-                    </button>
+                <summary class="hsdc-mobile-group-trigger">
+                  <span>{group.text}</span>
+
+                  <Icon
+                    name="tabler:chevron-down"
+                    class="hsdc-mobile-group-chevron"
+                  />
+                </summary>
 
 
-                    <ul
-                      class="dropdown-menu md:backdrop-blur-md dark:md:bg-dark rounded md:absolute pl-4 md:pl-0 md:hidden font-medium md:bg-white/90 md:min-w-[200px] drop-shadow-xl"
-                    >
+                <div class="hsdc-mobile-submenu">
+                  <div class="hsdc-mobile-submenu-inner">
+
+                    <ul>
                       {
-                        links.map(
-                          ({
-                            text: text2,
-                            href: href2,
-                          }) => (
-                            <li>
-                              <a
-                                class:list={[
-                                  'first:rounded-t last:rounded-b md:hover:bg-gray-100 hover:text-link dark:hover:text-white dark:hover:bg-gray-700 py-2 px-5 block whitespace-no-wrap',
-                                  {
-                                    'aw-link-active':
-                                      href2 === currentPath,
-                                  },
-                                ]}
-                                href={href2}
-                              >
-                                {text2}
-                              </a>
-                            </li>
-                          )
-                        )
+                        group.links.map((link) => (
+                          <li>
+                            <a
+                              class:list={[
+                                {
+                                  'aw-link-active':
+                                    link.href === currentPath,
+                                },
+                              ]}
+                              href={link.href}
+                            >
+                              {link.text}
+                            </a>
+                          </li>
+                        ))
                       }
                     </ul>
-                  </>
-                ) : (
-                  <a
-                    class:list={[
-                      'hover:text-link dark:hover:text-white px-4 py-3 flex items-center whitespace-nowrap',
-                      {
-                        'aw-link-active':
-                          href === currentPath,
-                      },
-                    ]}
-                    href={href}
-                  >
-                    {text}
-                  </a>
-                )
-              }
+
+                  </div>
+                </div>
+
+              </details>
 
             </li>
           ))
         }
 
 
-        <!-- ===================================================
-             手机主题切换
-        ==================================================== -->
+        <!-- 手机主题 -->
 
         <li class="menu-theme-item">
           <ToggleTheme iconClass="w-5 h-5" />
@@ -517,55 +758,138 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
         </li>
 
       </ul>
+    </nav>
 
+  </div>
+
+
+  <!-- =======================================================
+       电脑 / 平板端
+  ======================================================== -->
+
+  <div
+    class:list={[
+      'hsdc-desktop-header relative text-default py-1.5 px-6 mx-auto w-full items-center',
+      {
+        'max-w-7xl': !isFullWidth,
+      },
+    ]}
+  >
+
+    <!-- Logo -->
+
+    <a
+      class="hsdc-brand"
+      href={getHomePermalink()}
+      aria-label="返回首页"
+    >
+      <Logo />
+
+      <span class="hsdc-brand-name">
+        凉宫数据开放平台
+      </span>
+    </a>
+
+
+    <!-- 搜索区域预留 -->
+
+    <div class="hsdc-desktop-search-space"></div>
+
+
+    <!-- =====================================================
+         电脑 / 平板一级菜单
+    ====================================================== -->
+
+    <nav
+      class="hsdc-desktop-nav"
+      aria-label="主导航"
+    >
+      <ul class="hsdc-desktop-groups">
+
+        {
+          groups.map((group, index) => (
+            <li
+              class="hsdc-desktop-group"
+              data-group-index={index}
+            >
+
+              <button
+                type="button"
+                class="hsdc-desktop-group-trigger"
+                aria-expanded="false"
+              >
+                <span>{group.text}</span>
+
+                <Icon
+                  name="tabler:chevron-down"
+                  class="hsdc-desktop-chevron"
+                />
+              </button>
+
+
+              <!-- Windows 式小菜单 -->
+
+              <div
+                class="hsdc-desktop-dropdown"
+                role="menu"
+              >
+                {
+                  group.links.map((link) => (
+                    <a
+                      href={link.href}
+                      role="menuitem"
+                      class:list={[
+                        {
+                          'aw-link-active':
+                            link.href === currentPath,
+                        },
+                      ]}
+                    >
+                      {link.text}
+                    </a>
+                  ))
+                }
+              </div>
+
+            </li>
+          ))
+        }
+
+      </ul>
     </nav>
 
 
     <!-- =====================================================
-         桌面端右侧功能
+         右侧功能
     ====================================================== -->
 
-    <div
-      class:list={[
+    <div class="hsdc-desktop-actions">
+
+      <div class="flex items-center">
+
         {
-          'ml-auto rtl:ml-0 rtl:mr-auto':
-            position === 'left',
-        },
-        'hidden md:self-center md:flex items-center md:mb-0 fixed w-full md:w-auto md:static justify-end left-0 rtl:left-auto rtl:right-0 bottom-0 p-3 md:p-0 md:justify-self-end',
-      ]}
-    >
+          showToggleTheme && (
+            <ToggleTheme
+              iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block"
+            />
+          )
+        }
 
-      <div
-        class="items-center flex justify-between w-full md:w-auto"
-      >
 
-        <div class="flex">
-
-          {
-            showToggleTheme && (
-              <ToggleTheme
-                iconClass="w-6 h-6 md:w-5 md:h-5 md:inline-block"
+        {
+          showRssFeed && (
+            <a
+              class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
+              aria-label="RSS Feed"
+              href={getAsset('/rss.xml')}
+            >
+              <Icon
+                name="tabler:rss"
+                class="w-5 h-5"
               />
-            )
-          }
-
-
-          {
-            showRssFeed && (
-              <a
-                class="text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 inline-flex items-center"
-                aria-label="RSS Feed"
-                href={getAsset('/rss.xml')}
-              >
-                <Icon
-                  name="tabler:rss"
-                  class="w-5 h-5"
-                />
-              </a>
-            )
-          }
-
-        </div>
+            </a>
+          )
+        }
 
 
         {
@@ -590,5 +914,113 @@ const currentPath = `/${trimSlash(new URL(Astro.url).pathname)}`;
     </div>
 
   </div>
+
+
+  <!-- =======================================================
+       电脑端菜单控制
+  ======================================================== -->
+
+  <script>
+    const initDesktopNavigation = () => {
+      const header = document.querySelector('#header');
+
+      if (!header) return;
+
+      const groups = Array.from(
+        header.querySelectorAll('.hsdc-desktop-group')
+      );
+
+      const closeAllGroups = () => {
+        groups.forEach((group) => {
+          group.classList.remove('is-open');
+
+          const button =
+            group.querySelector('.hsdc-desktop-group-trigger');
+
+          button?.setAttribute('aria-expanded', 'false');
+        });
+      };
+
+      groups.forEach((group) => {
+        const button =
+          group.querySelector('.hsdc-desktop-group-trigger');
+
+        if (!button) return;
+
+        button.addEventListener('click', (event) => {
+          event.stopPropagation();
+
+          const wasOpen =
+            group.classList.contains('is-open');
+
+          closeAllGroups();
+
+          if (!wasOpen) {
+            group.classList.add('is-open');
+            button.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+
+
+      /*
+       * 点击页面其他位置关闭
+       */
+
+      document.addEventListener('click', (event) => {
+        const target = event.target;
+
+        if (
+          target instanceof Node &&
+          header.contains(target)
+        ) {
+          return;
+        }
+
+        closeAllGroups();
+      });
+
+
+      /*
+       * ESC 关闭
+       */
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          closeAllGroups();
+        }
+      });
+
+
+      /*
+       * 从桌面端切换到手机端时清理状态
+       */
+
+      const mediaQuery =
+        window.matchMedia('(min-width: 768px)');
+
+      const handleViewportChange = () => {
+        if (!mediaQuery.matches) {
+          closeAllGroups();
+        }
+      };
+
+      mediaQuery.addEventListener(
+        'change',
+        handleViewportChange
+      );
+    };
+
+
+    if (document.readyState === 'loading') {
+      document.addEventListener(
+        'DOMContentLoaded',
+        initDesktopNavigation,
+        { once: true }
+      );
+    } else {
+      initDesktopNavigation();
+    }
+  </script>
 
 </header>
