@@ -1,38 +1,49 @@
-import { getPermalink, getBlogPermalink, getAsset } from './utils/permalinks';
+import { getPermalink, getBlogPermalink } from './utils/permalinks';
 
 export const headerData = {
-  links: [
+  groups: [
     {
-      text: '首页',
-      href: getPermalink('/'),
+      text: '信息板块',
+      links: [
+        {
+          text: '信息中心',
+          href: getBlogPermalink(),
+        },
+        {
+          text: '社区中心',
+          href: 'https://hono-bbs-9qj.pages.dev',
+        },
+      ],
     },
     {
-      text: '信息中心',
-      href: getBlogPermalink(),
+      text: '数据板块',
+      links: [
+        {
+          text: '工具中心',
+          href: 'https://it-toolbox-19l.pages.dev/',
+        },
+        {
+          text: '下载中心',
+          href: getPermalink('/download'),
+        },
+      ],
     },
     {
-      text: '社区中心',
-      href: 'https://hono-bbs-9qj.pages.dev',
-    },
-    {
-      text: '工具中心',
-      href: 'https://it-toolbox-19l.pages.dev/',
-    },
-    {
-      text: '下载中心',
-      href: getPermalink('/download'),
-    },
-    {
-      text: '人员介绍',
-      href: getPermalink('/team'),
-    },
-    {
-      text: '个人中心',
-      href: 'https://users-manage-react.pages.dev/account?sessionId=',
-    },
-    {
-      text: '关于我们',
-      href: getPermalink('/about'),
+      text: '凉宫数据',
+      links: [
+        {
+          text: '人员介绍',
+          href: getPermalink('/team'),
+        },
+        {
+          text: '个人中心',
+          href: 'https://users-manage-react.pages.dev/account?sessionId=',
+        },
+        {
+          text: '关于我们',
+          href: getPermalink('/about'),
+        },
+      ],
     },
   ],
 };
