@@ -1,0 +1,98 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+---
+<Layout title="世界时间 - 通信中心">
+  <section class="mx-auto max-w-6xl px-4 py-12">
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">世界时间</h1>
+      <p class="text-gray-500">多时区实时时钟与本地时差对比</p>
+    </div>
+    
+    <!-- 时钟卡片容器 -->
+    <div id="time-container" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <!-- 通过 JS 动态渲染 -->
+    </div>
+  </section>
+
+  <script>
+    // 定义需要展示的国家/城市及其时区
+    const zones = [
+      { name: '北京', tz: 'Asia/Shanghai', utc: 'UTC+8' },
+      { name: '东京', tz: 'Asia/Tokyo', utc: 'UTC+9' },
+      { name: '纽约', tz: 'America/New_York', utc: 'UTC-5/-4' },
+      { name: '墨西哥城', tz: 'America/Mexico_City', utc: 'UTC-6' },
+      { name: '伦敦', tz: 'Europe/London', utc: 'UTC+0/+1' },
+      { name: '悉尼', tz: 'Australia/Sydney', utc: 'UTC+10/+11' },
+    ];
+
+    const container = document.getElementById('time-container');
+    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    // 初始化卡片 UI
+    zones.forEach(zone => {
+      container.innerHTML += `
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <h2 class="text-xl font-bold text-gray-800">${zone.name}</h2>
+              <p class="text-xs text-gray-400 mt-1">${zone.tz}</p>
+            </div>
+            <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">${zone.utc}</span>
+          </div>
+          <p id="time-${zone.tz}" class="text-4xl font-mono font-bold text-gray-800 tracking-widest mb-3">--:--:--</p>
+          <div class="border-t border-gray-100 pt-3">
+            <p id="diff-${zone.tz}" class="text-sm text-gray-500 font-medium">计算时差中...</p>
+          </div>
+        </div>
+      `;
+    });
+
+    function updateTimes() {
+      const now = new Date();
+      
+      zones.forEach(zone => {
+        // 1. 格式化时间到秒
+        const timeFormatter = new Intl.DateTimeFormat('zh-CN', {
+          timeZone: zone.tz,
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+        document.getElementById(`time-${zone.tz}`).innerText = timeFormatter.format(now);
+
+        // 2. 计算动态时差
+        const localOffset = now.getTimezoneOffset() * -1; // 本地时区偏移（分钟）
+        
+        // 获取目标时区的偏移字符串，例如 "GMT+08:00" 或 "GMT-05:00"
+        const targetParts = new Intl.DateTimeFormat('en-US', { 
+          timeZone: zone.tz, 
+          timeZoneName: 'longOffset' 
+        }).formatToParts(now);
+        
+        const offsetStr = targetParts.find(p => p.type === 'timeZoneName').value;
+        const match = offsetStr.match(/GMT([+-])(\d{2}):(\d{2})/);
+        
+        let diffText = '';
+        if (match) {
+          const sign = match[1] === '+' ? 1 : -1;
+          const targetOffset = sign * (parseInt(match[2]) * 60 + parseInt(match[3]));
+          const diffMins = targetOffset - localOffset;
+          
+          if (diffMins === 0) {
+            diffText = '与本地时间一致';
+          } else {
+            const hours = Math.floor(Math.abs(diffMins) / 60);
+            const mins = Math.abs(diffMins) % 60;
+            diffText = `距离本地时间 ${diffMins > 0 ? '快' : '慢'} ${hours} 小时${mins > 0 ? ` ${mins} 分钟` : ''}`;
+          }
+        }
+        document.getElementById(`diff-${zone.tz}`).innerText = diffText;
+      });
+    }
+
+    // 立即执行一次，然后每秒刷新
+    updateTimes();
+    setInterval(updateTimes, 1000);
+  </script>
+</Layout>
