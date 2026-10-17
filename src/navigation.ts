@@ -60,6 +60,21 @@ export const headerData = {
         },
       ],
     },
+    // ====== 新增的通信中心板块开始 ======
+    {
+      text: '通信中心',
+      links: [
+        {
+          text: '以太物联',
+          href: getPermalink('/iot'),
+        },
+        {
+          text: '世界时间',
+          href: getPermalink('/world-time'),
+        },
+      ],
+    },
+    // ====== 新增的通信中心板块结束 ======
   ],
 
   /**
@@ -109,6 +124,16 @@ export const headerData = {
       text: '关于我们',
       href: getPermalink('/about'),
     },
+    // ====== 新增的兼容链接开始 ======
+    {
+      text: '以太物联',
+      href: getPermalink('/iot'),
+    },
+    {
+      text: '世界时间',
+      href: getPermalink('/world-time'),
+    },
+    // ====== 新增的兼容链接结束 ======
   ],
 };
 
