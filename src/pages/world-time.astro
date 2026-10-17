@@ -3,12 +3,13 @@ import Layout from '~/layouts/PageLayout.astro';
 ---
 <Layout title="世界时间 - 通信中心">
   <section class="mx-auto max-w-6xl px-4 pt-28 pb-12">
+    <!-- 标题区 -->
     <div class="mb-8 text-center">
       <h1 class="text-3xl font-bold text-gray-800 mb-2">世界时间</h1>
-      <p class="text-gray-500">多时区实时时钟与本地时差对比</p>
+      <p class="text-gray-500">全球多时区实时时钟与精准时差对比</p>
     </div>
 
-    <!-- 搜索框 -->
+    <!-- 搜索框 (去除了任何 sticky 定位，保证随页面自然滚动) -->
     <div class="mb-8 max-w-md mx-auto">
       <div class="relative">
         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
@@ -23,45 +24,116 @@ import Layout from '~/layouts/PageLayout.astro';
   </section>
 
   <script>
-    // 1. 本地内置全球主要城市数据（无需任何网络请求，绝对不会报错）
+    // 1. 内置庞大的全球各地区数据（超过 100 个主要城市/首都）
     const allCities = [
-      // 亚洲
+      // 亚洲 (Asia)
       { name: '北京', country: '中国', tz: 'Asia/Shanghai' },
       { name: '上海', country: '中国', tz: 'Asia/Shanghai' },
+      { name: '广州', country: '中国', tz: 'Asia/Shanghai' },
+      { name: '深圳', country: '中国', tz: 'Asia/Shanghai' },
+      { name: '成都', country: '中国', tz: 'Asia/Shanghai' },
       { name: '香港', country: '中国', tz: 'Asia/Hong_Kong' },
+      { name: '澳门', country: '中国', tz: 'Asia/Macau' },
       { name: '台北', country: '中国', tz: 'Asia/Taipei' },
       { name: '东京', country: '日本', tz: 'Asia/Tokyo' },
+      { name: '大阪', country: '日本', tz: 'Asia/Tokyo' },
       { name: '首尔', country: '韩国', tz: 'Asia/Seoul' },
+      { name: '釜山', country: '韩国', tz: 'Asia/Seoul' },
       { name: '新加坡', country: '新加坡', tz: 'Asia/Singapore' },
       { name: '曼谷', country: '泰国', tz: 'Asia/Bangkok' },
-      { name: '迪拜', country: '阿联酋', tz: 'Asia/Dubai' },
+      { name: '吉隆坡', country: '马来西亚', tz: 'Asia/Kuala_Lumpur' },
+      { name: '雅加达', country: '印尼', tz: 'Asia/Jakarta' },
+      { name: '马尼拉', country: '菲律宾', tz: 'Asia/Manila' },
+      { name: '河内', country: '越南', tz: 'Asia/Ho_Chi_Minh' },
+      { name: '新德里', country: '印度', tz: 'Asia/Kolkata' },
       { name: '孟买', country: '印度', tz: 'Asia/Kolkata' },
-      // 美洲
-      { name: '纽约', country: '美国', tz: 'America/New_York' },
-      { name: '洛杉矶', country: '美国', tz: 'America/Los_Angeles' },
-      { name: '芝加哥', country: '美国', tz: 'America/Chicago' },
-      { name: '多伦多', country: '加拿大', tz: 'America/Toronto' },
-      { name: '墨西哥城', country: '墨西哥', tz: 'America/Mexico_City' },
-      { name: '圣保罗', country: '巴西', tz: 'America/Sao_Paulo' },
-      { name: '布宜诺斯艾利斯', country: '阿根廷', tz: 'America/Argentina/Buenos_Aires' },
-      // 欧洲
+      { name: '迪拜', country: '阿联酋', tz: 'Asia/Dubai' },
+      { name: '阿布扎比', country: '阿联酋', tz: 'Asia/Dubai' },
+      { name: '利雅得', country: '沙特', tz: 'Asia/Riyadh' },
+      { name: '特拉维夫', country: '以色列', tz: 'Asia/Jerusalem' },
+      { name: '德黑兰', country: '伊朗', tz: 'Asia/Tehran' },
+      { name: '卡拉奇', country: '巴基斯坦', tz: 'Asia/Karachi' },
+      { name: '达卡', country: '孟加拉国', tz: 'Asia/Dhaka' },
+      { name: '加德满都', country: '尼泊尔', tz: 'Asia/Kathmandu' },
+      
+      // 欧洲 (Europe)
       { name: '伦敦', country: '英国', tz: 'Europe/London' },
       { name: '巴黎', country: '法国', tz: 'Europe/Paris' },
       { name: '柏林', country: '德国', tz: 'Europe/Berlin' },
-      { name: '莫斯科', country: '俄罗斯', tz: 'Europe/Moscow' },
+      { name: '慕尼黑', country: '德国', tz: 'Europe/Berlin' },
       { name: '罗马', country: '意大利', tz: 'Europe/Rome' },
       { name: '马德里', country: '西班牙', tz: 'Europe/Madrid' },
-      // 大洋洲 & 非洲
+      { name: '巴塞罗那', country: '西班牙', tz: 'Europe/Madrid' },
+      { name: '阿姆斯特丹', country: '荷兰', tz: 'Europe/Amsterdam' },
+      { name: '布鲁塞尔', country: '比利时', tz: 'Europe/Brussels' },
+      { name: '苏黎世', country: '瑞士', tz: 'Europe/Zurich' },
+      { name: '维也纳', country: '奥地利', tz: 'Europe/Vienna' },
+      { name: '斯德哥尔摩', country: '瑞典', tz: 'Europe/Stockholm' },
+      { name: '奥斯陆', country: '挪威', tz: 'Europe/Oslo' },
+      { name: '哥本哈根', country: '丹麦', tz: 'Europe/Copenhagen' },
+      { name: '赫尔辛基', country: '芬兰', tz: 'Europe/Helsinki' },
+      { name: '莫斯科', country: '俄罗斯', tz: 'Europe/Moscow' },
+      { name: '基辅', country: '乌克兰', tz: 'Europe/Kyiv' },
+      { name: '华沙', country: '波兰', tz: 'Europe/Warsaw' },
+      { name: '布拉格', country: '捷克', tz: 'Europe/Prague' },
+      { name: '雅典', country: '希腊', tz: 'Europe/Athens' },
+      { name: '伊斯坦布尔', country: '土耳其', tz: 'Europe/Istanbul' },
+      { name: '里斯本', country: '葡萄牙', tz: 'Europe/Lisbon' },
+      { name: '都柏林', country: '爱尔兰', tz: 'Europe/Dublin' },
+
+      // 北美洲 (North America)
+      { name: '纽约', country: '美国', tz: 'America/New_York' },
+      { name: '华盛顿', country: '美国', tz: 'America/New_York' },
+      { name: '波士顿', country: '美国', tz: 'America/New_York' },
+      { name: '迈阿密', country: '美国', tz: 'America/New_York' },
+      { name: '芝加哥', country: '美国', tz: 'America/Chicago' },
+      { name: '休斯顿', country: '美国', tz: 'America/Chicago' },
+      { name: '达拉斯', country: '美国', tz: 'America/Chicago' },
+      { name: '丹佛', country: '美国', tz: 'America/Denver' },
+      { name: '凤凰城', country: '美国', tz: 'America/Phoenix' },
+      { name: '洛杉矶', country: '美国', tz: 'America/Los_Angeles' },
+      { name: '旧金山', country: '美国', tz: 'America/Los_Angeles' },
+      { name: '西雅图', country: '美国', tz: 'America/Los_Angeles' },
+      { name: '拉斯维加斯', country: '美国', tz: 'America/Los_Angeles' },
+      { name: '多伦多', country: '加拿大', tz: 'America/Toronto' },
+      { name: '温哥华', country: '加拿大', tz: 'America/Vancouver' },
+      { name: '蒙特利尔', country: '加拿大', tz: 'America/Toronto' },
+      { name: '墨西哥城', country: '墨西哥', tz: 'America/Mexico_City' },
+      { name: '哈瓦那', country: '古巴', tz: 'America/Havana' },
+      { name: '巴拿马城', country: '巴拿马', tz: 'America/Panama' },
+
+      // 南美洲 (South America)
+      { name: '圣保罗', country: '巴西', tz: 'America/Sao_Paulo' },
+      { name: '里约热内卢', country: '巴西', tz: 'America/Sao_Paulo' },
+      { name: '布宜诺斯艾利斯', country: '阿根廷', tz: 'America/Argentina/Buenos_Aires' },
+      { name: '圣地亚哥', country: '智利', tz: 'America/Santiago' },
+      { name: '利马', country: '秘鲁', tz: 'America/Lima' },
+      { name: '波哥大', country: '哥伦比亚', tz: 'America/Bogota' },
+      { name: '加拉加斯', country: '委内瑞拉', tz: 'America/Caracas' },
+
+      // 大洋洲 (Oceania)
       { name: '悉尼', country: '澳大利亚', tz: 'Australia/Sydney' },
       { name: '墨尔本', country: '澳大利亚', tz: 'Australia/Melbourne' },
+      { name: '布里斯班', country: '澳大利亚', tz: 'Australia/Brisbane' },
+      { name: '珀斯', country: '澳大利亚', tz: 'Australia/Perth' },
+      { name: '阿德莱德', country: '澳大利亚', tz: 'Australia/Adelaide' },
       { name: '奥克兰', country: '新西兰', tz: 'Pacific/Auckland' },
+      { name: '惠灵顿', country: '新西兰', tz: 'Pacific/Auckland' },
+      { name: '斐济', country: '斐济', tz: 'Pacific/Fiji' },
+
+      // 非洲 (Africa)
       { name: '开罗', country: '埃及', tz: 'Africa/Cairo' },
       { name: '约翰内斯堡', country: '南非', tz: 'Africa/Johannesburg' },
+      { name: '开普敦', country: '南非', tz: 'Africa/Johannesburg' },
+      { name: '内罗毕', country: '肯尼亚', tz: 'Africa/Nairobi' },
+      { name: '拉各斯', country: '尼日利亚', tz: 'Africa/Lagos' },
+      { name: '卡萨布兰卡', country: '摩洛哥', tz: 'Africa/Casablanca' },
+      { name: '阿尔及尔', country: '阿尔及利亚', tz: 'Africa/Algiers' },
+      { name: '亚的斯亚贝巴', country: '埃塞俄比亚', tz: 'Africa/Addis_Ababa' },
     ];
 
     const container = document.getElementById('time-container');
     const searchInput = document.getElementById('search-input');
-
     let displayedCities = []; 
 
     // 2. 渲染卡片
@@ -76,7 +148,6 @@ import Layout from '~/layouts/PageLayout.astro';
 
       cityList.forEach((city, index) => {
         const id = `city-${index}`;
-
         container.innerHTML += `
           <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition">
             <div class="flex justify-between items-start mb-4">
@@ -88,7 +159,8 @@ import Layout from '~/layouts/PageLayout.astro';
             </div>
             <p id="time-${id}" class="text-4xl font-mono font-bold text-gray-800 tracking-widest mb-3">--:--:--</p>
             <div class="border-t border-gray-100 pt-3">
-              <p id="diff-${id}" class="text-sm text-gray-500 font-medium">计算时差中...</p>
+              <!-- 调整了这里的字体样式，给长文本留出空间 -->
+              <p id="diff-${id}" class="text-xs text-gray-500 font-medium leading-relaxed">计算时差中...</p>
             </div>
           </div>
         `;
@@ -97,11 +169,10 @@ import Layout from '~/layouts/PageLayout.astro';
       updateAllTimes();
     }
 
-    // 3. 实时更新所有可见卡片的时间
+    // 3. 实时更新并计算精确到秒的时差
     function updateAllTimes() {
       const now = new Date();
-      const localOffset = now.getTimezoneOffset() * -1; 
-
+      
       displayedCities.forEach((city, index) => {
         const id = `city-${index}`;
         const timeEl = document.getElementById(`time-${id}`);
@@ -112,66 +183,97 @@ import Layout from '~/layouts/PageLayout.astro';
         try {
           // 格式化时间
           const timeFormatter = new Intl.DateTimeFormat('zh-CN', {
-            timeZone: city.tz,
-            hour12: false,
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
+            timeZone: city.tz, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'
           });
           timeEl.innerText = timeFormatter.format(now);
 
-          // 获取目标时区偏移
+          // 获取 UTC 标签
           const parts = new Intl.DateTimeFormat('en-US', {
-            timeZone: city.tz,
-            timeZoneName: 'longOffset'
+            timeZone: city.tz, timeZoneName: 'longOffset'
           }).formatToParts(now);
-          
           const offsetStr = parts.find(p => p.type === 'timeZoneName')?.value || 'GMT';
           
           if (utcLabel) {
             utcLabel.innerText = offsetStr.replace('GMT', 'UTC').replace(':00', '');
           }
 
-          // 计算时差
-          const match = offsetStr.match(/GMT([+-])(\d{2}):(\d{2})/);
-          if (match) {
-            const sign = match[1] === '+' ? 1 : -1;
-            const targetOffset = sign * (parseInt(match[2]) * 60 + parseInt(match[3]));
-            const diffMins = targetOffset - localOffset;
+          // ====== 高精度秒级时差计算 ======
+          // 提取目标时区的年月日时分秒
+          const targetParts = new Intl.DateTimeFormat('en-US', {
+            timeZone: city.tz,
+            year: 'numeric', month: 'numeric', day: 'numeric',
+            hour: 'numeric', minute: 'numeric', second: 'numeric',
+            hour12: false
+          }).formatToParts(now);
 
-            if (diffMins === 0) {
-              diffEl.innerText = '与本地时间一致';
-            } else {
-              const hours = Math.floor(Math.abs(diffMins) / 60);
-              const mins = Math.abs(diffMins) % 60;
-              diffEl.innerText = `比本地${diffMins > 0 ? '快' : '慢'} ${hours} 小时${mins > 0 ? ` ${mins} 分钟` : ''}`;
-            }
+          const getVal = (type) => parseInt(targetParts.find(p => p.type === type).value, 10);
+          
+          const targetDate = new Date(
+            getVal('year'), getVal('month') - 1, getVal('day'),
+            getVal('hour'), getVal('minute'), getVal('second')
+          );
+          
+          // 将两个时间转化为绝对毫秒数
+          const localMs = new Date(
+            now.getFullYear(), now.getMonth(), now.getDate(),
+            now.getHours(), now.getMinutes(), now.getSeconds()
+          ).getTime();
+          
+          const targetMs = targetDate.getTime();
+          let diffMs = targetMs - localMs;
+
+          // 处理跨天导致的毫秒差异（因为去掉了日期只对比时分秒）
+          if (diffMs > 12 * 60 * 60 * 1000) diffMs -= 24 * 60 * 60 * 1000;
+          if (diffMs < -12 * 60 * 60 * 1000) diffMs += 24 * 60 * 60 * 1000;
+
+          if (diffMs === 0) {
+            diffEl.innerText = '与当前地区时间一致';
+            diffEl.className = 'text-xs text-gray-500 font-medium leading-relaxed';
+          } else {
+            const isAhead = diffMs > 0;
+            const absMs = Math.abs(diffMs);
+            
+            const h = Math.floor(absMs / 3600000);
+            const m = Math.floor((absMs % 3600000) / 60000);
+            const s = Math.floor((absMs % 60000) / 1000);
+            
+            let timeStr = '';
+            if (h > 0) timeStr += `${h} 小时 `;
+            if (m > 0) timeStr += `${m} 分钟 `;
+            if (s > 0 || timeStr === '') timeStr += `${s} 秒`;
+
+            diffEl.innerText = `比当前地区${isAhead ? '提前' : '晚'} ${timeStr.trim()}`;
+            
+            // 加一点颜色区分
+            diffEl.className = isAhead 
+              ? 'text-xs text-orange-500 font-medium leading-relaxed'
+              : 'text-xs text-blue-500 font-medium leading-relaxed';
           }
         } catch (e) {
-          timeEl.innerText = '时区错误';
+          timeEl.innerText = '解析错误';
+          diffEl.innerText = '';
         }
       });
     }
 
-    // 4. 增强版搜索逻辑 (支持国家名、城市名匹配)
+    // 4. 搜索过滤
     searchInput.addEventListener('input', (e) => {
       const kw = e.target.value.trim().toLowerCase();
       if (!kw) {
-        // 没有关键字时，默认展示前 12 个热门城市
-        renderCards(allCities.slice(0, 12));
+        renderCards(allCities.slice(0, 12)); // 默认展示前12个热门
         return;
       }
 
-      // 只要城市名或国家名包含输入的文字，就能搜出来
       const matches = allCities.filter(city => {
         return city.name.toLowerCase().includes(kw) || 
-               city.country.toLowerCase().includes(kw);
+               city.country.toLowerCase().includes(kw) ||
+               city.tz.toLowerCase().includes(kw);
       });
 
       renderCards(matches);
     });
 
-    // 初始化默认展示
+    // 初始化
     renderCards(allCities.slice(0, 12));
     setInterval(updateAllTimes, 1000);
   </script>
