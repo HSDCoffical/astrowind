@@ -2,7 +2,8 @@
 import Layout from '~/layouts/PageLayout.astro';
 ---
 <Layout title="以太物联 - 通信中心">
-  <section class="mx-auto max-w-5xl px-4 py-12">
+  <!-- pt-28 确保顶部不被导航栏遮挡 -->
+  <section class="mx-auto max-w-5xl px-4 pt-28 pb-12">
     <div class="mb-10 text-center">
       <h1 class="text-3xl font-bold text-gray-800 mb-2">以太物联</h1>
       <p class="text-gray-500">平台服务实时运行状态监控</p>
@@ -13,8 +14,9 @@ import Layout from '~/layouts/PageLayout.astro';
       <!-- GitHub -->
       <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm transition hover:shadow-md">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-            <span class="text-xl">🐙</span>
+          <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white">
+            <!-- GitHub SVG 图标 -->
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
           </div>
           <h2 class="text-lg font-bold text-gray-700">GitHub 部署</h2>
         </div>
@@ -25,8 +27,9 @@ import Layout from '~/layouts/PageLayout.astro';
       <!-- Cloudflare -->
       <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm transition hover:shadow-md">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center">
-            <span class="text-xl">☁️</span>
+          <div class="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white">
+            <!-- Cloudflare SVG 图标 -->
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M16.9 12.3l-1.4-1.4c-.4-.4-1-.4-1.4 0l-1.4 1.4c-.4.4-.4 1 0 1.4l1.4 1.4c.4.4 1 .4 1.4 0l1.4-1.4c.4-.4.4-1 0-1.4zM12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/><path d="M12 6c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6zm0 10c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/></svg>
           </div>
           <h2 class="text-lg font-bold text-gray-700">Cloudflare 服务</h2>
         </div>
@@ -50,28 +53,76 @@ import Layout from '~/layouts/PageLayout.astro';
     <!-- 错误记录区 -->
     <div class="mt-10 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
       <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-red-500"></span> 异常记录
+        <span class="w-2 h-2 rounded-full bg-red-500"></span> 异常记录 (24h内精确到秒)
       </h3>
       <ul id="error-log" class="text-sm text-gray-500 space-y-2 max-h-60 overflow-y-auto">
-        <li class="text-gray-400">暂无异常记录</li>
+        <!-- 历史记录会在这里渲染 -->
       </ul>
     </div>
   </section>
 
   <script>
-    const errorLog = [];
-    const logEl = document.getElementById('error-log');
-    let hasError = false;
-
-    function addError(msg) {
-      hasError = true;
-      const time = new Date().toLocaleTimeString();
-      errorLog.unshift(`[${time}] ${msg}`);
-      logEl.innerHTML = errorLog.map(e => `<li class="border-b border-gray-100 pb-1">${e}</li>`).join('');
+    // === 1. 时间格式化工具 (处理24h/月天逻辑) ===
+    function formatLogTime(timestamp) {
+      const now = new Date().getTime();
+      const diffMs = now - timestamp;
+      const diffHours = diffMs / (1000 * 60 * 60);
+      
+      const date = new Date(timestamp);
+      const pad = (n) => n.toString().padStart(2, '0');
+      
+      // 24 小时内：HH:mm:ss
+      if (diffHours < 24) {
+        return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+      }
+      
+      // 24小时到30天（约720小时）：MM/DD HH:mm
+      if (diffHours < 720) {
+        return `${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+      }
+      
+      // 超过 30 天：X天前
+      const diffDays = Math.floor(diffHours / 24);
+      return `${diffDays}天前`;
     }
 
+    // === 2. 异常记录存储逻辑 (LocalStorage) ===
+    const STORAGE_KEY = 'iot_error_logs';
+    let errorLog = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const logEl = document.getElementById('error-log');
+
+    function saveAndRenderLogs() {
+      // 限制最多存 50 条，防止撑爆本地存储
+      if (errorLog.length > 50) errorLog = errorLog.slice(0, 50);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(errorLog));
+      
+      if (errorLog.length === 0) {
+        logEl.innerHTML = '<li class="text-gray-400">暂无异常记录</li>';
+        return;
+      }
+
+      logEl.innerHTML = errorLog.map(item => `
+        <li class="border-b border-gray-100 pb-1">
+          <span class="text-gray-400 font-mono mr-2">[${formatLogTime(item.time)}]</span>
+          <span class="text-gray-600">${item.msg}</span>
+        </li>
+      `).join('');
+    }
+
+    function addError(msg) {
+      // 避免短时间内反复记录相同错误
+      if (errorLog.length > 0 && errorLog[0].msg === msg) return;
+      
+      errorLog.unshift({ time: Date.now(), msg });
+      saveAndRenderLogs();
+    }
+
+    // 初始化渲染历史记录
+    saveAndRenderLogs();
+
+    // === 3. 状态检测逻辑 ===
     function updateTime(id) {
-      document.getElementById(id).innerText = `最近检测: ${new Date().toLocaleTimeString()}`;
+      document.getElementById(id).innerText = `最近检测: ${new Date().toLocaleTimeString('zh-CN', { hour12: false })}`;
     }
 
     async function checkGitHub() {
@@ -101,7 +152,6 @@ import Layout from '~/layouts/PageLayout.astro';
         const res = await fetch('https://www.cloudflarestatus.com/api/v2/summary.json');
         const data = await res.json();
         const el = document.getElementById('cf-status');
-        // Cloudflare API 返回的 indicator 有 none, minor, major, critical
         if (data.status.indicator === 'none') {
           el.innerText = '运行正常';
           el.className = 'text-green-600 font-bold text-lg';
@@ -136,14 +186,9 @@ import Layout from '~/layouts/PageLayout.astro';
     checkCloudflare();
     updateBrowserStatus();
 
-    // 监听网络状态变化
-    window.addEventListener('online', () => {
-      updateBrowserStatus();
-      addError('浏览器网络已恢复');
-    });
+    window.addEventListener('online', updateBrowserStatus);
     window.addEventListener('offline', updateBrowserStatus);
 
-    // 每 60 秒轮询一次外部 API
     setInterval(() => {
       checkGitHub();
       checkCloudflare();
