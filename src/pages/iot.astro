@@ -1,0 +1,152 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+---
+<Layout title="以太物联 - 通信中心">
+  <section class="mx-auto max-w-5xl px-4 py-12">
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">以太物联</h1>
+      <p class="text-gray-500">平台服务实时运行状态监控</p>
+    </div>
+    
+    <!-- 平台状态卡片 -->
+    <div class="grid gap-6 md:grid-cols-3">
+      <!-- GitHub -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm transition hover:shadow-md">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+            <span class="text-xl">🐙</span>
+          </div>
+          <h2 class="text-lg font-bold text-gray-700">GitHub 部署</h2>
+        </div>
+        <p id="github-status" class="text-gray-400 font-bold text-lg">检测中...</p>
+        <p id="github-time" class="text-xs text-gray-400 mt-2">--:--:--</p>
+      </div>
+
+      <!-- Cloudflare -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm transition hover:shadow-md">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center">
+            <span class="text-xl">☁️</span>
+          </div>
+          <h2 class="text-lg font-bold text-gray-700">Cloudflare 服务</h2>
+        </div>
+        <p id="cf-status" class="text-gray-400 font-bold text-lg">检测中...</p>
+        <p id="cf-time" class="text-xs text-gray-400 mt-2">--:--:--</p>
+      </div>
+
+      <!-- 浏览器 -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm transition hover:shadow-md">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+            <span class="text-xl">🌐</span>
+          </div>
+          <h2 class="text-lg font-bold text-gray-700">浏览器连接</h2>
+        </div>
+        <p id="browser-status" class="text-gray-400 font-bold text-lg">检测中...</p>
+        <p class="text-xs text-gray-400 mt-2">本地网络状态</p>
+      </div>
+    </div>
+
+    <!-- 错误记录区 -->
+    <div class="mt-10 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-red-500"></span> 异常记录
+      </h3>
+      <ul id="error-log" class="text-sm text-gray-500 space-y-2 max-h-60 overflow-y-auto">
+        <li class="text-gray-400">暂无异常记录</li>
+      </ul>
+    </div>
+  </section>
+
+  <script>
+    const errorLog = [];
+    const logEl = document.getElementById('error-log');
+    let hasError = false;
+
+    function addError(msg) {
+      hasError = true;
+      const time = new Date().toLocaleTimeString();
+      errorLog.unshift(`[${time}] ${msg}`);
+      logEl.innerHTML = errorLog.map(e => `<li class="border-b border-gray-100 pb-1">${e}</li>`).join('');
+    }
+
+    function updateTime(id) {
+      document.getElementById(id).innerText = `最近检测: ${new Date().toLocaleTimeString()}`;
+    }
+
+    async function checkGitHub() {
+      try {
+        const res = await fetch('https://www.githubstatus.com/api/v2/status.json');
+        const data = await res.json();
+        const el = document.getElementById('github-status');
+        if (data.status.indicator === 'none') {
+          el.innerText = '运行正常';
+          el.className = 'text-green-600 font-bold text-lg';
+        } else {
+          el.innerText = `服务异常 (${data.status.description})`;
+          el.className = 'text-red-600 font-bold text-lg';
+          addError(`GitHub 服务异常: ${data.status.description}`);
+        }
+        updateTime('github-time');
+      } catch (e) {
+        const el = document.getElementById('github-status');
+        el.innerText = '检测失败 (网络或跨域)';
+        el.className = 'text-red-500 font-bold text-lg';
+        addError('GitHub 状态检测请求失败');
+      }
+    }
+
+    async function checkCloudflare() {
+      try {
+        const res = await fetch('https://www.cloudflarestatus.com/api/v2/summary.json');
+        const data = await res.json();
+        const el = document.getElementById('cf-status');
+        // Cloudflare API 返回的 indicator 有 none, minor, major, critical
+        if (data.status.indicator === 'none') {
+          el.innerText = '运行正常';
+          el.className = 'text-green-600 font-bold text-lg';
+        } else {
+          el.innerText = `服务异常 (${data.status.description})`;
+          el.className = 'text-red-600 font-bold text-lg';
+          addError(`Cloudflare 服务异常: ${data.status.description}`);
+        }
+        updateTime('cf-time');
+      } catch (e) {
+        const el = document.getElementById('cf-status');
+        el.innerText = '检测失败 (网络或跨域)';
+        el.className = 'text-red-500 font-bold text-lg';
+        addError('Cloudflare 状态检测请求失败');
+      }
+    }
+
+    function updateBrowserStatus() {
+      const el = document.getElementById('browser-status');
+      if (navigator.onLine) {
+        el.innerText = '在线';
+        el.className = 'text-green-600 font-bold text-lg';
+      } else {
+        el.innerText = '离线';
+        el.className = 'text-red-600 font-bold text-lg';
+        addError('浏览器网络已断开');
+      }
+    }
+
+    // 初始化执行
+    checkGitHub();
+    checkCloudflare();
+    updateBrowserStatus();
+
+    // 监听网络状态变化
+    window.addEventListener('online', () => {
+      updateBrowserStatus();
+      addError('浏览器网络已恢复');
+    });
+    window.addEventListener('offline', updateBrowserStatus);
+
+    // 每 60 秒轮询一次外部 API
+    setInterval(() => {
+      checkGitHub();
+      checkCloudflare();
+    }, 60000);
+  </script>
+</Layout>
