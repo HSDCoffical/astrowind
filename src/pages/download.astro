@@ -2,6 +2,7 @@
 import PageLayout from '~/layouts/PageLayout.astro';
 
 const software = {
+  id: 'hsdc-studio', // 新增：用于本地存储的唯一 ID
   name: 'HSDC Studio',
   version: '1.0.0',
   platform: 'Android',
@@ -133,7 +134,9 @@ const software = {
                 LATEST
               </div>
 
-              <h3>
+              <!-- 修改部分：将原本独立的大图标改到文字左侧，如果指的是另外加一个，这里也满足 -->
+              <h3 style="display: flex; align-items: center; gap: 10px;">
+                <img src={software.icon} alt="logo" width="28" height="28" style="border-radius: 6px;" />
                 {software.name}
               </h3>
 
@@ -165,8 +168,7 @@ const software = {
 
 
           <!-- 版本信息 -->
-
-          <div class="release-info">
+          <div class="release-info" style="grid-template-columns: repeat(3, minmax(0, 150px));">
 
             <div>
               <span>
@@ -186,6 +188,17 @@ const software = {
 
               <strong>
                 {software.platform}
+              </strong>
+            </div>
+
+            <!-- 新增：下载量统计显示 -->
+            <div>
+              <span>
+                本机下载量
+              </span>
+
+              <strong id="download-count" style="color: rgb(14, 165, 233);">
+                0 次
               </strong>
             </div>
 
@@ -230,7 +243,9 @@ const software = {
 
           <div class="actions">
 
+            <!-- 修改部分：给下载按钮加上 id 和点击事件 -->
             <a
+              id="download-btn"
               class="download-button"
               href={software.download}
               target="_blank"
@@ -275,8 +290,33 @@ const software = {
     </section>
 
   </main>
-</PageLayout>
 
+  <!-- 新增：处理下载计数的 JS 逻辑 -->
+  <script define:vars={{ softwareId: software.id }}>
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('download-btn');
+      const countEl = document.getElementById('download-count');
+      const storageKey = `download_count_${softwareId}`;
+
+      // 1. 初始化读取本地记录
+      let count = parseInt(localStorage.getItem(storageKey) || '0', 10);
+      countEl.innerText = `${count} 次`;
+
+      // 2. 点击下载时 +1 并保存
+      if (btn) {
+        btn.addEventListener('click', () => {
+          count += 1;
+          localStorage.setItem(storageKey, count.toString());
+          countEl.innerText = `${count} 次`;
+          
+          // 给数字加个简单的闪动反馈
+          countEl.style.transform = 'scale(1.1)';
+          setTimeout(() => countEl.style.transform = 'scale(1)', 200);
+        });
+      }
+    });
+  </script>
+</PageLayout>
 
 <style>
 
@@ -286,6 +326,8 @@ const software = {
 
 .download-page {
   width: 100%;
+  /* 增加 padding-top 防止被顶部导航栏遮挡 */
+  padding-top: 100px; 
 }
 
 
@@ -621,8 +663,9 @@ h1 {
 .release-info {
   display: grid;
 
+  /* 改为3列以容纳下载量 */
   grid-template-columns:
-    repeat(2, minmax(0, 180px));
+    repeat(3, minmax(0, 1fr));
 
   gap: 12px;
 
@@ -656,6 +699,8 @@ h1 {
 
 .release-info strong {
   font-size: 0.9rem;
+  display: inline-block;
+  transition: transform 0.2s ease;
 }
 
 
@@ -861,6 +906,11 @@ h1 {
   .release-info {
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
+  }
+  
+  /* 手机端3列可能太挤，下载量单独占一行 */
+  .release-info div:nth-child(3) {
+    grid-column: span 2;
   }
 
 
