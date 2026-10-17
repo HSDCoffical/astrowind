@@ -2,10 +2,21 @@
 import Layout from '~/layouts/PageLayout.astro';
 ---
 <Layout title="世界时间 - 通信中心">
-  <section class="mx-auto max-w-6xl px-4 py-12">
-    <div class="mb-10 text-center">
+  <!-- pt-28 确保顶部不被导航栏遮挡 -->
+  <section class="mx-auto max-w-6xl px-4 pt-28 pb-12">
+    <div class="mb-8 text-center">
       <h1 class="text-3xl font-bold text-gray-800 mb-2">世界时间</h1>
       <p class="text-gray-500">多时区实时时钟与本地时差对比</p>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="mb-8 max-w-md mx-auto">
+      <div class="relative">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </span>
+        <input type="text" id="search-input" placeholder="搜索国家或城市..." class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm text-gray-700">
+      </div>
     </div>
     
     <!-- 时钟卡片容器 -->
@@ -15,7 +26,6 @@ import Layout from '~/layouts/PageLayout.astro';
   </section>
 
   <script>
-    // 定义需要展示的国家/城市及其时区
     const zones = [
       { name: '北京', tz: 'Asia/Shanghai', utc: 'UTC+8' },
       { name: '东京', tz: 'Asia/Tokyo', utc: 'UTC+9' },
@@ -23,53 +33,60 @@ import Layout from '~/layouts/PageLayout.astro';
       { name: '墨西哥城', tz: 'America/Mexico_City', utc: 'UTC-6' },
       { name: '伦敦', tz: 'Europe/London', utc: 'UTC+0/+1' },
       { name: '悉尼', tz: 'Australia/Sydney', utc: 'UTC+10/+11' },
+      { name: '巴黎', tz: 'Europe/Paris', utc: 'UTC+1/+2' },
+      { name: '洛杉矶', tz: 'America/Los_Angeles', utc: 'UTC-8/-7' },
+      { name: '莫斯科', tz: 'Europe/Moscow', utc: 'UTC+3' },
+      { name: '迪拜', tz: 'Asia/Dubai', utc: 'UTC+4' },
     ];
 
     const container = document.getElementById('time-container');
+    const searchInput = document.getElementById('search-input');
     const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // 初始化卡片 UI
-    zones.forEach(zone => {
-      container.innerHTML += `
-        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition">
-          <div class="flex justify-between items-start mb-4">
-            <div>
-              <h2 class="text-xl font-bold text-gray-800">${zone.name}</h2>
-              <p class="text-xs text-gray-400 mt-1">${zone.tz}</p>
+    function renderCards(filterText = '') {
+      container.innerHTML = '';
+      const filtered = zones.filter(z => z.name.includes(filterText) || z.tz.toLowerCase().includes(filterText.toLowerCase()));
+      
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">未找到相关地区</div>`;
+        return;
+      }
+
+      filtered.forEach(zone => {
+        container.innerHTML += `
+          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h2 class="text-xl font-bold text-gray-800">${zone.name}</h2>
+                <p class="text-xs text-gray-400 mt-1">${zone.tz}</p>
+              </div>
+              <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">${zone.utc}</span>
             </div>
-            <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded">${zone.utc}</span>
+            <p id="time-${zone.tz}" class="text-4xl font-mono font-bold text-gray-800 tracking-widest mb-3">--:--:--</p>
+            <div class="border-t border-gray-100 pt-3">
+              <p id="diff-${zone.tz}" class="text-sm text-gray-500 font-medium">计算时差中...</p>
+            </div>
           </div>
-          <p id="time-${zone.tz}" class="text-4xl font-mono font-bold text-gray-800 tracking-widest mb-3">--:--:--</p>
-          <div class="border-t border-gray-100 pt-3">
-            <p id="diff-${zone.tz}" class="text-sm text-gray-500 font-medium">计算时差中...</p>
-          </div>
-        </div>
-      `;
-    });
+        `;
+      });
+      updateTimes(); // 渲染完立即更新时间
+    }
 
     function updateTimes() {
       const now = new Date();
+      const localOffset = now.getTimezoneOffset() * -1;
       
       zones.forEach(zone => {
-        // 1. 格式化时间到秒
-        const timeFormatter = new Intl.DateTimeFormat('zh-CN', {
-          timeZone: zone.tz,
-          hour12: false,
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        });
-        document.getElementById(`time-${zone.tz}`).innerText = timeFormatter.format(now);
+        const timeEl = document.getElementById(`time-${zone.tz}`);
+        const diffEl = document.getElementById(`diff-${zone.tz}`);
+        if (!timeEl || !diffEl) return; // 被过滤掉的不更新
 
-        // 2. 计算动态时差
-        const localOffset = now.getTimezoneOffset() * -1; // 本地时区偏移（分钟）
-        
-        // 获取目标时区的偏移字符串，例如 "GMT+08:00" 或 "GMT-05:00"
-        const targetParts = new Intl.DateTimeFormat('en-US', { 
-          timeZone: zone.tz, 
-          timeZoneName: 'longOffset' 
-        }).formatToParts(now);
-        
+        const timeFormatter = new Intl.DateTimeFormat('zh-CN', {
+          timeZone: zone.tz, hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+        timeEl.innerText = timeFormatter.format(now);
+
+        const targetParts = new Intl.DateTimeFormat('en-US', { timeZone: zone.tz, timeZoneName: 'longOffset' }).formatToParts(now);
         const offsetStr = targetParts.find(p => p.type === 'timeZoneName').value;
         const match = offsetStr.match(/GMT([+-])(\d{2}):(\d{2})/);
         
@@ -87,12 +104,13 @@ import Layout from '~/layouts/PageLayout.astro';
             diffText = `距离本地时间 ${diffMins > 0 ? '快' : '慢'} ${hours} 小时${mins > 0 ? ` ${mins} 分钟` : ''}`;
           }
         }
-        document.getElementById(`diff-${zone.tz}`).innerText = diffText;
+        diffEl.innerText = diffText;
       });
     }
 
-    // 立即执行一次，然后每秒刷新
-    updateTimes();
+    searchInput.addEventListener('input', (e) => renderCards(e.target.value.trim()));
+
+    renderCards();
     setInterval(updateTimes, 1000);
   </script>
 </Layout>
