@@ -18,57 +18,89 @@ import Layout from '~/layouts/PageLayout.astro';
       </div>
     </div>
 
-    <!-- 加载/错误提示 -->
-    <div id="status-msg" class="text-center text-gray-400 py-10">正在加载全球时区数据...</div>
+    <!-- 加载提示 (隐藏显示) -->
+    <div id="status-msg" class="text-center text-gray-400 py-4 text-sm hidden">正在加载全球时区数据...</div>
 
     <!-- 时钟卡片容器 -->
     <div id="time-container" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
   </section>
 
   <script>
-    // 1. 使用 jsDelivr 的 geo-data-api 静态接口（无需 Key）
-    const BASE_URL = 'https://cdn.jsdelivr.net/npm/geo-data-api@latest/dist/api/v1';
-
     const container = document.getElementById('time-container');
     const statusMsg = document.getElementById('status-msg');
     const searchInput = document.getElementById('search-input');
     const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    let allCities = [];       // 全量城市数据
-    let displayedCities = []; // 当前显示的城市
-    const MAX_RESULTS = 30;   // 限制显示数量，避免 DOM 卡顿
+    let allCities = [];       
+    let displayedCities = []; 
+    const MAX_RESULTS = 30;   
 
-    // 2. 获取城市数据（利用 jsDelivr 的 search/cities.json 索引）
+    // 1. 本地兜底数据（如果所有云端接口都挂了，显示这些保证页面不空）
+    const fallbackData = [
+      { name: '北京', country_name: '中国', timezone: 'Asia/Shanghai' },
+      { name: '东京', country_name: '日本', timezone: 'Asia/Tokyo' },
+      { name: '纽约', country_name: '美国', timezone: 'America/New_York' },
+      { name: '洛杉矶', country_name: '美国', timezone: 'America/Los_Angeles' },
+      { name: '伦敦', country_name: '英国', timezone: 'Europe/London' },
+      { name: '巴黎', country_name: '法国', timezone: 'Europe/Paris' },
+      { name: '悉尼', country_name: '澳大利亚', timezone: 'Australia/Sydney' },
+      { name: '迪拜', country_name: '阿联酋', timezone: 'Asia/Dubai' },
+      { name: '莫斯科', country_name: '俄罗斯', timezone: 'Europe/Moscow' },
+      { name: '墨西哥城', country_name: '墨西哥', timezone: 'America/Mexico_City' },
+    ];
+
+    // 2. 定义多个备用 CDN 节点 (降级策略)
+    const CDN_NODES = [
+      'https://jsd.cdn.zzko.cn/npm/geo-data-api@1.0.3/dist/api/v1',
+      'https://cdn.jsdmirror.com/npm/geo-data-api@1.0.3/dist/api/v1',
+      'https://cdn.jsdelivr.net/npm/geo-data-api@1.0.3/dist/api/v1'
+    ];
+
+    // 3. 数据加载函数 (带自动重试和降级)
     async function loadCityData() {
-      try {
-        // 该文件是预构建的搜索索引，包含城市名和时区等精简字段
-        const res = await fetch(`${BASE_URL}/search/cities.json`);
-        if (!res.ok) throw new Error('网络响应异常');
-        const json = await res.json();
-        
-        // 数据格式通常为 { data: [ { name, timezone, country_name, ... } ] }
-        allCities = json.data || [];
-        
-        statusMsg.style.display = 'none';
-        
-        // 默认展示几个主要城市（如果数据里有的话）
-        const defaults = ['Beijing', 'Tokyo', 'New York', 'London'];
-        let defaultList = allCities.filter(c => defaults.includes(c.name));
-        
-        // 如果匹配不到，就取前 8 个有 timezone 的城市
-        if (defaultList.length === 0) {
-          defaultList = allCities.filter(c => c.timezone).slice(0, 8);
+      statusMsg.classList.remove('hidden');
+      
+      for (let i = 0; i < CDN_NODES.length; i++) {
+        try {
+          const url = `${CDN_NODES[i]}/search/cities.json`;
+          const res = await fetch(url, { signal: AbortSignal.timeout(5000) }); // 5秒超时
+          if (!res.ok) throw new Error('Network response was not ok');
+          
+          const json = await res.json();
+          allCities = json.data || [];
+          
+          if (allCities.length > 0) {
+            statusMsg.classList.add('hidden');
+            initRender();
+            return; // 成功获取则退出循环
+          }
+        } catch (err) {
+          console.warn(`CDN 节点 ${i + 1} 加载失败，尝试下一个...`);
         }
-        
-        renderCards(defaultList);
-      } catch (err) {
-        statusMsg.innerText = '数据加载失败，请检查网络或稍后重试。';
-        statusMsg.className = 'text-center text-red-400 py-10';
-        console.error(err);
       }
+
+      // 如果所有 CDN 都失败，使用本地兜底数据
+      console.warn('所有云端节点加载失败，切换至本地兜底数据');
+      allCities = fallbackData;
+      statusMsg.classList.add('hidden');
+      initRender();
     }
 
-    // 3. 渲染卡片
+    // 4. 初始化渲染
+    function initRender() {
+      // 如果数据里没有中文，我们做一些简单的英文到中文的映射增强搜索
+      const defaults = ['北京', '东京', '纽约', '伦敦', 'Beijing', 'Tokyo', 'New York', 'London'];
+      let defaultList = allCities.filter(c => defaults.includes(c.name));
+      
+      // 如果匹配不到，就取前 8 个
+      if (defaultList.length === 0) {
+        defaultList = allCities.slice(0, 8);
+      }
+      
+      renderCards(defaultList);
+    }
+
+    // 5. 渲染卡片
     function renderCards(cityList) {
       displayedCities = cityList;
       container.innerHTML = '';
@@ -79,20 +111,22 @@ import Layout from '~/layouts/PageLayout.astro';
       }
 
       cityList.forEach((city, index) => {
-        // 如果没有时区数据则跳过
         if (!city.timezone) return;
 
-        // 给每个卡片一个唯一 ID，方便更新
         const id = `city-${index}`;
-        const displayName = city.name;
-        const countryName = city.country_name || '';
+        // 兼容不同数据源的字段名
+        const displayName = city.name || city.city || '未知';
+        const countryName = city.country_name || city.country || '';
+        
+        // 如果名称是纯英文，可以尝试美化一下展示
+        let subtitle = `${countryName ? countryName + ' · ' : ''}${city.timezone}`;
 
         container.innerHTML += `
           <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition">
             <div class="flex justify-between items-start mb-4">
               <div>
                 <h2 class="text-xl font-bold text-gray-800">${displayName}</h2>
-                <p class="text-xs text-gray-400 mt-1">${countryName ? countryName + ' · ' : ''}${city.timezone}</p>
+                <p class="text-xs text-gray-400 mt-1">${subtitle}</p>
               </div>
               <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded" id="utc-label-${id}">--</span>
             </div>
@@ -103,7 +137,6 @@ import Layout from '~/layouts/PageLayout.astro';
           </div>
         `;
 
-        // 渲染后立即更新该卡片的时间，同时把 IANA 时区暂存到 DOM 属性中
         const timeEl = document.getElementById(`time-${id}`);
         if (timeEl) {
           timeEl.dataset.tz = city.timezone;
@@ -113,10 +146,10 @@ import Layout from '~/layouts/PageLayout.astro';
       updateAllTimes();
     }
 
-    // 4. 实时更新所有可见卡片的时间
+    // 6. 实时更新所有可见卡片的时间
     function updateAllTimes() {
       const now = new Date();
-      const localOffset = now.getTimezoneOffset() * -1; // 本地偏移（分钟）
+      const localOffset = now.getTimezoneOffset() * -1; 
 
       displayedCities.forEach((city, index) => {
         if (!city.timezone) return;
@@ -127,18 +160,16 @@ import Layout from '~/layouts/PageLayout.astro';
         const utcLabel = document.getElementById(`utc-label-${id}`);
         if (!timeEl || !diffEl) return;
 
-        // 格式化时间
-        const timeFormatter = new Intl.DateTimeFormat('zh-CN', {
-          timeZone: city.timezone,
-          hour12: false,
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        });
-        timeEl.innerText = timeFormatter.format(now);
-
-        // 获取该时区当前的偏移字符串（例如 GMT+08:00）
         try {
+          const timeFormatter = new Intl.DateTimeFormat('zh-CN', {
+            timeZone: city.timezone,
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          });
+          timeEl.innerText = timeFormatter.format(now);
+
           const parts = new Intl.DateTimeFormat('en-US', {
             timeZone: city.timezone,
             timeZoneName: 'longOffset'
@@ -146,12 +177,10 @@ import Layout from '~/layouts/PageLayout.astro';
           
           const offsetStr = parts.find(p => p.type === 'timeZoneName')?.value || 'GMT';
           
-          // 简化 UTC 标签显示，如 GMT+08:00 -> UTC+8
           if (utcLabel) {
             utcLabel.innerText = offsetStr.replace('GMT', 'UTC').replace(':00', '');
           }
 
-          // 计算时差
           const match = offsetStr.match(/GMT([+-])(\d{2}):(\d{2})/);
           if (match) {
             const sign = match[1] === '+' ? 1 : -1;
@@ -167,33 +196,53 @@ import Layout from '~/layouts/PageLayout.astro';
             }
           }
         } catch (e) {
-          // 某些极少数时区可能解析失败，静默处理
+          timeEl.innerText = '时区错误';
         }
       });
     }
 
-    // 5. 搜索过滤
+    // 7. 增强版搜索逻辑 (支持中英文模糊匹配)
     searchInput.addEventListener('input', (e) => {
       const kw = e.target.value.trim().toLowerCase();
       if (!kw) {
-        // 清空搜索时恢复默认
-        const defaults = ['Beijing', 'Tokyo', 'New York', 'London'];
-        let defaultList = allCities.filter(c => defaults.includes(c.name));
-        if (defaultList.length === 0) defaultList = allCities.filter(c => c.timezone).slice(0, 8);
-        renderCards(defaultList);
+        initRender();
         return;
       }
 
+      // 常见中文到英文的映射（因为有的云端数据库只有英文）
+      const aliasMap = {
+        '美国': ['united states', 'usa', 'america'],
+        '中国': ['china'],
+        '日本': ['japan'],
+        '英国': ['united kingdom', 'uk', 'britain'],
+        '法国': ['france'],
+        '德国': ['germany'],
+        '俄罗斯': ['russia'],
+        '澳大利亚': ['australia'],
+        '加拿大': ['canada']
+      };
+
+      let searchKeywords = [kw];
+      // 如果用户搜的是中文，把对应的英文也加进搜索词里
+      Object.keys(aliasMap).forEach(zhKey => {
+        if (zhKey.includes(kw) || kw.includes(zhKey)) {
+          searchKeywords = searchKeywords.concat(aliasMap[zhKey]);
+        }
+      });
+
       const matches = allCities.filter(city => {
-        const name = (city.name || '').toLowerCase();
-        const country = (city.country_name || '').toLowerCase();
-        return name.includes(kw) || country.includes(kw);
+        const name = (city.name || city.city || '').toLowerCase();
+        const country = (city.country_name || city.country || '').toLowerCase();
+        
+        return searchKeywords.some(keyword => 
+          name.includes(keyword) || country.includes(keyword)
+        );
       }).slice(0, MAX_RESULTS);
 
       renderCards(matches);
     });
 
-    // 6. 初始化
+    // 启动
     loadCityData();
     setInterval(updateAllTimes, 1000);
   </script>
